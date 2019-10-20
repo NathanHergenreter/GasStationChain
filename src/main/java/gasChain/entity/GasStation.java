@@ -31,6 +31,7 @@ public class GasStation {
 	
 	
 	// Stupid-ass getters and setters fuck Java
+	// If you visually hate them or just hate the boilerplate in general look into projectlombok 
 	public String getLocation() { return location; }
 	public List<Sale> getSales() { return sales; }
 	public void addSale(Sale sale) { sales.add(sale); }
