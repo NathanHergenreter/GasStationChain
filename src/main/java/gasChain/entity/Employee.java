@@ -11,13 +11,13 @@ import javax.persistence.ManyToOne;
 public class Employee {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 	
 	private String name;
 	private float wagesHourly;
 	private int hoursWeekly;
-//	private something type ???
+//	private sometype type/class ???
 
     @ManyToOne
     @JoinColumn(name = "workplace_id")
@@ -25,10 +25,13 @@ public class Employee {
     
     // Constructors
     protected Employee() {}
+    public Employee(String name, float wagesHourly, int hoursWeekly) 
+    { 
+    	this.name = name; this.wagesHourly = wagesHourly; this.hoursWeekly = hoursWeekly; 
+    }
     public Employee(String name, float wagesHourly, int hoursWeekly, GasStation workplace)
     {
-    	this.name = name; this.wagesHourly = wagesHourly; this.hoursWeekly = hoursWeekly; this.workplace = workplace;
-    	workplace.addEmployee(this);
+    	this(name, wagesHourly, hoursWeekly); this.workplace = workplace; workplace.addEmployee(this);
     }
     
     public String getName() { return name; }

@@ -13,7 +13,7 @@ import javax.persistence.ManyToOne;
 public class Sale {
 	
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 	
 	private String type;
@@ -27,15 +27,27 @@ public class Sale {
 	
     // Constructors
     protected Sale() {}
-    public Sale(String type, float cost, Date sellDate, GasStation sellLocation)
+    public Sale(String type, float price, Date sellDate)
     {
-    	this.type = type; this.price = cost; this.sellDate = sellDate; this.sellLocation = sellLocation;
-    	sellLocation.addSale(this);
+    	this.type = type; this.price = price; this.sellDate = sellDate;
+    }
+    public Sale(String type, float price, Date sellDate, GasStation sellLocation)
+    {
+    	this(type, price, sellDate); this.sellLocation = sellLocation; sellLocation.addSale(this);
+    }
+    public Sale(Sale sale)
+    {
+    	this(sale.getType(), sale.getPrice(), sale.getSellDate()); 
+    }
+    public Sale(Sale sale, GasStation sellLocation)
+    {
+    	this(sale); 
     }
     
     public String getType() { return type; }
     public float getPrice() { return price; }
     public Date getSellDate() { return sellDate; }
     public GasStation getSellLocation() { return sellLocation; }
+    public Sale addSellLocation(GasStation sellLocation) { this.sellLocation = sellLocation; sellLocation.addSale(this); return this; }
     
 }

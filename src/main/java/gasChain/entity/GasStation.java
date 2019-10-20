@@ -9,19 +9,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 @Entity
 public class GasStation {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 	
 	private String location;
 //	private String region; ???
 
+    @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
 	private List<Sale> sales = new ArrayList<Sale>();
 
+    @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "workplace")
 	private List<Employee> employees = new ArrayList<Employee>();
 	
