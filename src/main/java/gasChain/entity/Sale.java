@@ -41,7 +41,7 @@ public class Sale {
     }
     public Sale(Sale sale, GasStation sellLocation)
     {
-    	this(sale); 
+    	this(sale); this.sellLocation = sellLocation;
     }
     
     public String getType() { return type; }

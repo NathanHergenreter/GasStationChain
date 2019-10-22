@@ -53,16 +53,14 @@ public class DBGenCLR implements CommandLineRunner {
 		for(GasStation gasStation : gasStations)
 		{
 //			gasStationService.add(gasStation);
-			int numSales = rng.nextInt() % maxSales;
 			
 			// Generate sales
-			while(numSales > 0) 
+			for(int numSales = rng.nextInt(maxSales); numSales > 0; numSales--) 
 			{ 
 				gasStation.addSale( 
 						new Sale(
 						saleTemplates.get(rng.nextInt(saleTemplates.size())),
 						gasStation));
-				numSales--;
 			}
 			
 			int numEmployees = rng.nextInt(maxEmployees - minEmployees) + minEmployees;
