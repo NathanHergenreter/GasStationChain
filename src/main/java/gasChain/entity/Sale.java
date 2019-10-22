@@ -33,7 +33,7 @@ public class Sale {
     }
     public Sale(String type, float price, Date sellDate, GasStation sellLocation)
     {
-    	this(type, price, sellDate); this.sellLocation = sellLocation; sellLocation.addSale(this);
+    	this(type, price, sellDate); this.sellLocation = sellLocation;
     }
     public Sale(Sale sale)
     {

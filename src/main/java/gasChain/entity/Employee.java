@@ -31,7 +31,7 @@ public class Employee {
     }
     public Employee(String name, float wagesHourly, int hoursWeekly, GasStation workplace)
     {
-    	this(name, wagesHourly, hoursWeekly); this.workplace = workplace; workplace.addEmployee(this);
+    	this(name, wagesHourly, hoursWeekly); this.workplace = workplace;
     }
     
     public String getName() { return name; }

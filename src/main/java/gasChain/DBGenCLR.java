@@ -52,6 +52,7 @@ public class DBGenCLR implements CommandLineRunner {
 		
 		for(GasStation gasStation : gasStations)
 		{
+//			gasStationService.add(gasStation);
 			int numSales = rng.nextInt() % maxSales;
 			
 			// Generate sales
@@ -64,18 +65,23 @@ public class DBGenCLR implements CommandLineRunner {
 				numSales--;
 			}
 			
-			int numEmployees = rng.nextInt() % (maxEmployees - minEmployees) + minEmployees;
-
+			int numEmployees = rng.nextInt(maxEmployees - minEmployees) + minEmployees;
+			float minWage = 8.5f; float maxWage = 15.0f;
+			int minHours = 20; int maxHours = 50;
+			
 			// Generate employees
 			while(numEmployees > 0)
 			{
+				float wage = rng.nextFloat() * (maxWage - minWage) + minWage;
+				wage = ((float) (new Float(wage * 100.0f)).intValue()) / 100.0f;
+				int hours = rng.nextInt(maxHours - minHours) + minHours;
 				String name = firstNames.get(rng.nextInt(firstNames.size()))
 								+ " " + lastNames.get(rng.nextInt(lastNames.size()));
-				gasStation.addEmployee(new Employee(name, 10.0f, 30));
+				gasStation.addEmployee(new Employee(name, wage, hours, gasStation));
 				numEmployees--;
 			}
 
-			gasStationService.add(gasStation);
+			gasStationService.update(gasStation);
 		}
 	}
 	

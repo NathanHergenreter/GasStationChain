@@ -16,6 +16,8 @@ public class GasStationService {
     
     public GasStationService add(GasStation gasStation) { repo.save(gasStation); return this; }
     
+    public GasStationService update(GasStation gasStation) { repo.save(gasStation); return this; }
+    
     public boolean isEmpty() { return repo.count() <= 0; }
     
     public List<GasStation> findAll() { return repo.findAll(); }
