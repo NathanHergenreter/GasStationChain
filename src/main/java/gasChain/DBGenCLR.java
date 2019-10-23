@@ -10,8 +10,11 @@ import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import gasChain.entity.Employee;
@@ -22,6 +25,7 @@ import gasChain.service.GasStationService;
 import gasChain.service.SaleService;
 
 @Component
+@Order(1)
 public class DBGenCLR implements CommandLineRunner {
 	
 //	@Autowired
@@ -31,12 +35,17 @@ public class DBGenCLR implements CommandLineRunner {
 //	@Autowired
 //	SaleService saleService;
 	
+    private static Logger LOG = LoggerFactory
+    	      .getLogger(GasStationChainApplication.class);
+	
 	@Override
 	public void run(String... args) throws Exception 
 	{
+        LOG.info("Starting database generation...");
 		Path curRelPath = Paths.get("");
 		String corePath = curRelPath.toAbsolutePath().toString() + "\\src\\main\\resources\\dbGeneratorData";
 		generateGasStations(corePath);
+        LOG.info("...finished database generation");
 	}
 	
 	private void generateGasStations(String corePath) throws FileNotFoundException
