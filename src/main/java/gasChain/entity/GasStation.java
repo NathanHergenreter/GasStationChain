@@ -20,7 +20,8 @@ public class GasStation {
     private Long id;
 	
 	private String location;
-//	private String region; ???
+	private String state;
+	private String region;
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
@@ -33,11 +34,14 @@ public class GasStation {
 	//Default Constructor
 	protected GasStation() {}
 	public GasStation(String location) { this.location = location; }
+	public GasStation(String location, String state, String region) { this.location = location; this.state = state; this.region = region; }
 	
 	
 	// Stupid-ass getters and setters fuck Java
 	// If you visually hate them or just hate the boilerplate in general look into projectlombok 
 	public String getLocation() { return location; }
+	public String getState() { return state; }
+	public String getRegion() { return region; }
 	public List<Sale> getSales() { return sales; }
 	public void addSale(Sale sale) { sales.add(sale); }
 	public List<Employee> getEmployees() { return employees; }

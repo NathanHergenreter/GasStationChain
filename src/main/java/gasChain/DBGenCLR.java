@@ -41,11 +41,14 @@ public class DBGenCLR implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception 
 	{
+		long startTime = System.currentTimeMillis();
         LOG.info("Starting database generation...");
 		Path curRelPath = Paths.get("");
 		String corePath = curRelPath.toAbsolutePath().toString() + "\\src\\main\\resources\\dbGeneratorData";
 		generateGasStations(corePath);
-        LOG.info("...finished database generation");
+        long endTime = System.currentTimeMillis();
+        LOG.info("...finished database generation in " + ((endTime - startTime) / 1000) + " seconds");
+        
 	}
 	
 	private void generateGasStations(String corePath) throws FileNotFoundException
@@ -105,6 +108,9 @@ public class DBGenCLR implements CommandLineRunner {
 			{
 			case 0:
 				locations.add(new GasStation(next[0]));
+				break;
+			case 1:
+				locations.add(new GasStation(next[0], next[1], next[2]));
 				break;
 			default:
 				locations.add(new GasStation("Error"));

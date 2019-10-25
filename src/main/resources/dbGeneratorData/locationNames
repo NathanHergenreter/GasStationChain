@@ -1,85 +1,85 @@
-0
-Montgomery;
-Birmingham;
-Juneau;
-Anchorage;
-Phoenix;
-Little Rock;
-Sacramento;
-Los Angeles;
-Denver;
-Hartford;
-Bridgeport;
-Dover;
-Wilmington;
-Tallahassee;
-Jacksonville;
-Atlanta;
-Honolulu;
-Boise;
-Springfield;
-Chicago;
-Indianapolis;
-Des Moines;
-Topeka;
-Wichita;
-Frankfort;
-Louisville;
-Baton Rouge;
-New Orleans;
-Augusta;
-Portland;
-Annapolis;
-Baltimore;
-Boston;
-Lansing;
-Detroit;
-St. Paul;
-Minneapolis;
-Jackson;
-Jefferson City;
-Kansas City;
-Helena;
-Billings;
-Lincoln;
-Omaha;
-Carson City;
-Las Vegas;
-Concord;
-Manchester;
-Trenton;
-Newark;
-Santa Fe;
-Albuquerque;
-Albany;
-New York;
-Raleigh;
-Charlotte;
-Bismarck;
-Fargo;
-Columbus;
-Oklahoma City;
-Salem;
-Portland;
-Harrisburg;
-Philadelphia;
-Providence;
-Columbia;
-Charleston;
-Pierre;
-Sioux Falls;
-Nashville;
-Austin;
-Houston;
-Salt Lake City;
-Montpelier;
-Burlington;
-Richmond;
-Virginia Beach;
-Olympia;
-Seattle;
-Charleston;
-Madison;
-Milwaukee;
-Cheyenne;
-Washington D.C.;
+1
+Montgomery;Alabama;South
+Birmingham;Alabama;South
+Juneau;Alaska;Pacific
+Anchorage;Alaska;Pacific
+Phoenix;Arizona;West
+Little Rock;Arkansas;South
+Sacramento;California;West
+Los Angeles;California;West
+Denver;Colorado;West
+Hartford;Connecticut;Northeast
+Bridgeport;Connecticut;Northeast
+Dover;Delware;South
+Wilmington;Delaware;South
+Tallahassee;Florida;South
+Jacksonville;Florida;South
+Atlanta;Georgia;South
+Honolulu;Hawaii;Pacific
+Boise;Idaho;West
+Springfield;Illinois;Midwest
+Chicago;Illinois;Midwest
+Indianapolis;Indiana;Midwest
+Des Moines;Iowa;Midwest
+Topeka;Kansas;Midwest
+Wichita;Kansas;Midwest
+Frankfort;Kentucky;South
+Louisville;Kentucky;South
+Baton Rouge;Louisiana;South
+New Orleans;Louisiana;South
+Augusta;Maine;Northeast
+Portland;Maine;Northeast
+Annapolis;Maryland;South
+Baltimore;Maryland;South
+Boston;Massachusetts;Northeast
+Lansing;Michigan;Midwest
+Detroit;Michigan;Midwest
+St. Paul;Minnesota;Midwest
+Minneapolis;Minnesota;Midwest
+Jackson;Mississippi;South
+Jefferson City;Missouri;Midwest
+Kansas City;Missouri;Midwest
+Helena;Montana;West
+Billings;Montana;West
+Lincoln;Nebraska;Midwest
+Omaha;Nebraska;Midwest
+Carson City;Nevada;West
+Las Vegas;Nevada;West
+Concord;New Hampshire;Northeast
+Manchester;New Hampshire;Northeast
+Trenton;New Jersey;Northeast
+Newark;New Jersey;Northeast
+Santa Fe;New Mexico;West
+Albuquerque;New Mexico;West
+Albany;New York;Northeast
+New York;New York;Northeast
+Raleigh;North Carolina;South
+Charlotte;North Carolina;South
+Bismarck;North Dakota;Midwest
+Fargo;North Dakota;Midwest
+Columbus;Ohio;Midwest
+Oklahoma City;Oklahoma;South
+Salem;Oregon;West
+Portland;Oregon;West
+Harrisburg;Pennsylvania;Northeast
+Philadelphia;Pennsylvania;Northeast
+Providence;Rhode Island;Northeast
+Columbia;South Carolina;South
+Charleston;South Carolina;South
+Pierre;South Dakota;Midwest
+Sioux Falls;South Dakota;Midwest
+Nashville;Tennessee;South
+Austin;Texas;South
+Houston;Texas;South
+Salt Lake City;Utah;West
+Montpelier;Vermont;Northeast
+Burlington;Vermont;Northeast
+Richmond;Virginia;South
+Virginia Beach;Virginia;South
+Olympia;Washington;West
+Seattle;Washington;West
+Charleston;West Virginia;South
+Madison;Wisconsin;Midwest
+Milwaukee;Wisconsin;Midwest
+Cheyenne;Wyoming;West
+Washington D.C.;Washington D.C.;South
