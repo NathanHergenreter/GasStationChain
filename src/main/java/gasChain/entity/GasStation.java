@@ -29,7 +29,7 @@ public class GasStation {
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "workplace")
-	private List<Employee> employees = new ArrayList<Employee>();
+	private List<Cashier> cashiers = new ArrayList<Cashier>();
 	
 	//Default Constructor
 	protected GasStation() {}
@@ -43,7 +43,7 @@ public class GasStation {
 	public String getState() { return state; }
 	public String getRegion() { return region; }
 	public List<Sale> getSales() { return sales; }
-	public void addSale(Sale sale) { sales.add(sale); }
-	public List<Employee> getEmployees() { return employees; }
-	public void addEmployee(Employee employee) { employees.add(employee); }
+	public GasStation addSale(Sale sale) { sales.add(sale); return this; }
+	public List<Cashier> getCashiers() { return cashiers; }
+	public GasStation addCashier(Cashier cashier) { cashiers.add(cashier); return this; }
 }

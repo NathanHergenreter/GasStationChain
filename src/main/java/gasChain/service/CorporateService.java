@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import gasChain.repository.CorporateRepository;
 
 @Service
-public class CorporateService extends UserService {
+public class CorporateService extends EmployeeService {
 
 	@Autowired
 	public CorporateService(CorporateRepository repo) { super(repo); }

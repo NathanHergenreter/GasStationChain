@@ -4,38 +4,24 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.Inheritance;
 
 @Entity
-public class Employee {
-	
+@Inheritance
+public abstract class Employee {
+
 	@Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 	
-	private String name;
-	private float wagesHourly;
-	private int hoursWeekly;
-//	private sometype type/class ???
-
-    @ManyToOne
-    @JoinColumn(name = "workplace_id")
-    private GasStation workplace;
-    
-    // Constructors
-    protected Employee() {}
-    public Employee(String name, float wagesHourly, int hoursWeekly) 
-    { 
-    	this.name = name; this.wagesHourly = wagesHourly; this.hoursWeekly = hoursWeekly; 
-    }
-    public Employee(String name, float wagesHourly, int hoursWeekly, GasStation workplace)
-    {
-    	this(name, wagesHourly, hoursWeekly); this.workplace = workplace;
-    }
-    
-    public String getName() { return name; }
-    public float getWagesHourly() { return wagesHourly; }
-    public int getHoursWeekly() { return hoursWeekly; }
-    public GasStation getWorkplace() { return workplace; }
+	private String username;
+	private String password;
+	
+	protected Employee() {}
+	public Employee(String username, String password) { this.username = username; this.password = password; }
+	
+	public String getUsername() { return username; }
+	public String getPassword() { return password; }
+	
+	public boolean auth() { return false; }
 }

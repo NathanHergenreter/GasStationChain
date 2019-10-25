@@ -17,23 +17,29 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import gasChain.entity.Employee;
+import gasChain.entity.Cashier;
+import gasChain.entity.Corporate;
 import gasChain.entity.GasStation;
+import gasChain.entity.Manager;
 import gasChain.entity.Sale;
+import gasChain.service.CorporateService;
 import gasChain.service.EmployeeService;
 import gasChain.service.GasStationService;
+import gasChain.service.ManagerService;
 import gasChain.service.SaleService;
 
 @Component
 @Order(1)
 public class DBGenCLR implements CommandLineRunner {
 	
-//	@Autowired
-//	EmployeeService employeeService;
 	@Autowired
 	GasStationService gasStationService;
-//	@Autowired
-//	SaleService saleService;
+	
+	// TODO _ remove
+	@Autowired
+	ManagerService managerService;
+	@Autowired
+	CorporateService corporateService;
 	
     private static Logger LOG = LoggerFactory
     	      .getLogger(GasStationChainApplication.class);
@@ -53,6 +59,9 @@ public class DBGenCLR implements CommandLineRunner {
 	
 	private void generateGasStations(String corePath) throws FileNotFoundException
 	{
+		// TODO - flesh out?
+		managerService.add(new Manager("Manager", "password"));
+		corporateService.add(new Corporate("Corporate", "password"));
 		Random rng = new Random();
 		int maxSales = 500;
 		int minEmployees = 3; int maxEmployees = 8;
@@ -64,8 +73,6 @@ public class DBGenCLR implements CommandLineRunner {
 		
 		for(GasStation gasStation : gasStations)
 		{
-//			gasStationService.add(gasStation);
-			
 			// Generate sales
 			for(int numSales = rng.nextInt(maxSales); numSales > 0; numSales--) 
 			{ 
@@ -79,7 +86,7 @@ public class DBGenCLR implements CommandLineRunner {
 			float minWage = 8.5f; float maxWage = 15.0f;
 			int minHours = 20; int maxHours = 50;
 			
-			// Generate employees
+			// Generate cashiers
 			while(numEmployees > 0)
 			{
 				float wage = rng.nextFloat() * (maxWage - minWage) + minWage;
@@ -87,7 +94,7 @@ public class DBGenCLR implements CommandLineRunner {
 				int hours = rng.nextInt(maxHours - minHours) + minHours;
 				String name = firstNames.get(rng.nextInt(firstNames.size()))
 								+ " " + lastNames.get(rng.nextInt(lastNames.size()));
-				gasStation.addEmployee(new Employee(name, wage, hours, gasStation));
+				gasStation.addCashier(new Cashier(name, wage, hours, gasStation));
 				numEmployees--;
 			}
 

@@ -3,7 +3,7 @@ package gasChain.entity;
 import javax.persistence.Entity;
 
 @Entity
-public class Corporate extends User {
+public class Corporate extends Employee {
 
 	public Corporate(String username, String password) {
 		super(username, password);
