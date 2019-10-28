@@ -17,4 +17,7 @@ public class Manager extends Employee {
 	public GasStation getStore() { return store; }
 	public Manager setStore(GasStation store) { this.store = store; return this; }
 
+    @Override
+	public String getAuth() { return "manager"; }
+
 }

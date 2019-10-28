@@ -23,5 +23,8 @@ public abstract class Employee {
 	public String getUsername() { return username; }
 	public String getPassword() { return password; }
 	
+	@Deprecated
 	public boolean auth() { return false; }
+	
+	public String getAuth() { return "generic"; }
 }

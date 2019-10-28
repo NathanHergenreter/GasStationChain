@@ -34,8 +34,6 @@ public class DBGenCLR implements CommandLineRunner {
 	
 	@Autowired
 	GasStationService gasStationService;
-	
-	// TODO _ remove
 	@Autowired
 	ManagerService managerService;
 	@Autowired
@@ -63,7 +61,8 @@ public class DBGenCLR implements CommandLineRunner {
 	private void generateGasStations(String corePath) throws FileNotFoundException
 	{
 		// TODO - flesh out?
-		corporateService.add(new Corporate("Corporate", "password"));
+		corporateService.add(new Corporate("Test Corporate", "password"));
+		
 		int maxSales = 500;
 		int minEmployees = 3; int maxEmployees = 8;
 		
@@ -88,9 +87,10 @@ public class DBGenCLR implements CommandLineRunner {
 	{
 		for(int numSales = rng.nextInt(maxSales); numSales > 0; numSales--) 
 		{ 
-			gasStation.addSale( 
+			gasStation.addSale(
 					new Sale(
 					saleTemplates.get(rng.nextInt(saleTemplates.size())),
+					genDate(),
 					gasStation));
 		}
 	}
@@ -192,10 +192,12 @@ public class DBGenCLR implements CommandLineRunner {
 	{
 		int yearRange = 5;
 		Random rng = new Random();
-		int year = 2019 - (rng.nextInt() % yearRange);
-		int month = rng.nextInt() % 12;
-		int day = rng.nextInt() % 365;
+		String year = Integer.toString(2019 - rng.nextInt(yearRange));
+		String month = Integer.toString((rng.nextInt(12) + 1));
+		String day = Integer.toString((rng.nextInt(28) + 1));
 		
-		return new Date(year, month, day);
+		String sdf = year + "-" + month + "-" + day;
+		
+		return Date.valueOf(sdf);
 	}
 }

@@ -43,6 +43,10 @@ public class Sale {
     {
     	this(sale); this.sellLocation = sellLocation;
     }
+    public Sale(Sale sale, Date sellDate, GasStation sellLocation)
+    {
+    	this(sale); this.sellDate = sellDate; this.sellLocation = sellLocation;
+    }
     
     public String getType() { return type; }
     public float getPrice() { return price; }

@@ -13,7 +13,6 @@ public class Cashier extends Employee {
 	private String name;
 	private float wagesHourly;
 	private int hoursWeekly;
-//	private sometype type/class ???
 
     @ManyToOne
     @JoinColumn(name = "workplace_id")
@@ -21,9 +20,14 @@ public class Cashier extends Employee {
     
     // Constructors
     protected Cashier() { super(); }
+    public Cashier(String username, String password,
+    				String name, float wagesHourly, int hoursWeekly)
+    {
+    	super(username, password);
+    	this.name = name; this.wagesHourly = wagesHourly; this.hoursWeekly = hoursWeekly; 
+    }
     public Cashier(String name, float wagesHourly, int hoursWeekly) 
     { 
-        // TODO - add username/password to constructor?
     	super((name + (new Integer((int)wagesHourly + hoursWeekly + name.length())).toString()), "password");
     	this.name = name; this.wagesHourly = wagesHourly; this.hoursWeekly = hoursWeekly; 
     }
@@ -36,4 +40,7 @@ public class Cashier extends Employee {
     public float getWagesHourly() { return wagesHourly; }
     public int getHoursWeekly() { return hoursWeekly; }
     public GasStation getWorkplace() { return workplace; }
+    
+    @Override
+	public String getAuth() { return "cashier"; }
 }
