@@ -7,7 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -26,6 +28,10 @@ public class GasStation {
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
 	private List<Sale> sales = new ArrayList<Sale>();
+    
+    @OneToOne
+    @JoinColumn(name = "manager_id", referencedColumnName = "id")
+    private Manager manager;
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "workplace")
@@ -44,6 +50,8 @@ public class GasStation {
 	public String getRegion() { return region; }
 	public List<Sale> getSales() { return sales; }
 	public GasStation addSale(Sale sale) { sales.add(sale); return this; }
+	public Manager getManager() { return manager; }
+	public GasStation setManager(Manager manager) { this.manager = manager; return this; }
 	public List<Cashier> getCashiers() { return cashiers; }
 	public GasStation addCashier(Cashier cashier) { cashiers.add(cashier); return this; }
 }

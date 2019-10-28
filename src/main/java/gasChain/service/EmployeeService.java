@@ -14,6 +14,8 @@ public abstract class EmployeeService {
 	
 	public EmployeeService(EmployeeRepository repo) { this.repo = repo; }
 	
+	public EmployeeRepository repo() { return repo; }
+	
 	public EmployeeService add(Employee employee) { repo.save(employee); return this; }
 	
 	public boolean isEmpty() { return repo.count() <= 0; }

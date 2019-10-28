@@ -43,10 +43,13 @@ public class DBGenCLR implements CommandLineRunner {
 	
     private static Logger LOG = LoggerFactory
     	      .getLogger(GasStationChainApplication.class);
+    
+    private static Random rng;
 	
 	@Override
 	public void run(String... args) throws Exception 
 	{
+		rng = new Random();
 		long startTime = System.currentTimeMillis();
         LOG.info("Starting database generation...");
 		Path curRelPath = Paths.get("");
@@ -60,9 +63,7 @@ public class DBGenCLR implements CommandLineRunner {
 	private void generateGasStations(String corePath) throws FileNotFoundException
 	{
 		// TODO - flesh out?
-		managerService.add(new Manager("Manager", "password"));
 		corporateService.add(new Corporate("Corporate", "password"));
-		Random rng = new Random();
 		int maxSales = 500;
 		int minEmployees = 3; int maxEmployees = 8;
 		
@@ -73,33 +74,52 @@ public class DBGenCLR implements CommandLineRunner {
 		
 		for(GasStation gasStation : gasStations)
 		{
-			// Generate sales
-			for(int numSales = rng.nextInt(maxSales); numSales > 0; numSales--) 
-			{ 
-				gasStation.addSale( 
-						new Sale(
-						saleTemplates.get(rng.nextInt(saleTemplates.size())),
-						gasStation));
-			}
+			generateSales(maxSales, gasStation, saleTemplates);
+			generateCashiers(minEmployees, maxEmployees, gasStation, firstNames, lastNames);
+			gasStationService.add(gasStation);
 			
-			int numEmployees = rng.nextInt(maxEmployees - minEmployees) + minEmployees;
-			float minWage = 8.5f; float maxWage = 15.0f;
-			int minHours = 20; int maxHours = 50;
-			
-			// Generate cashiers
-			while(numEmployees > 0)
-			{
-				float wage = rng.nextFloat() * (maxWage - minWage) + minWage;
-				wage = ((float) (new Float(wage * 100.0f)).intValue()) / 100.0f;
-				int hours = rng.nextInt(maxHours - minHours) + minHours;
-				String name = firstNames.get(rng.nextInt(firstNames.size()))
-								+ " " + lastNames.get(rng.nextInt(lastNames.size()));
-				gasStation.addCashier(new Cashier(name, wage, hours, gasStation));
-				numEmployees--;
-			}
+			generateManager(gasStation);
 
 			gasStationService.update(gasStation);
 		}
+	}
+
+	private void generateSales(int maxSales, GasStation gasStation, ArrayList<Sale> saleTemplates)
+	{
+		for(int numSales = rng.nextInt(maxSales); numSales > 0; numSales--) 
+		{ 
+			gasStation.addSale( 
+					new Sale(
+					saleTemplates.get(rng.nextInt(saleTemplates.size())),
+					gasStation));
+		}
+	}
+	
+	private void generateCashiers(int minEmployees, int maxEmployees, GasStation gasStation,
+									ArrayList<String> firstNames, ArrayList<String> lastNames)
+	{
+		int numEmployees = rng.nextInt(maxEmployees - minEmployees) + minEmployees;
+		float minWage = 8.5f; float maxWage = 15.0f;
+		int minHours = 20; int maxHours = 50;
+		
+		while(numEmployees > 0)
+		{
+			float wage = rng.nextFloat() * (maxWage - minWage) + minWage;
+			wage = ((float) (new Float(wage * 100.0f)).intValue()) / 100.0f;
+			int hours = rng.nextInt(maxHours - minHours) + minHours;
+			String name = firstNames.get(rng.nextInt(firstNames.size()))
+							+ " " + lastNames.get(rng.nextInt(lastNames.size()));
+			gasStation.addCashier(new Cashier(name, wage, hours, gasStation));
+			numEmployees--;
+		}
+	}
+	
+	private void generateManager(GasStation gasStation)
+	{
+		Manager manager = new Manager( gasStation.getLocation() + " Manager", "password");
+		manager.setStore(gasStation);
+		gasStation.setManager(manager);
+		managerService.add(manager);
 	}
 	
 	private ArrayList<GasStation> getGasStations(File file) throws FileNotFoundException

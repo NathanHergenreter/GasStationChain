@@ -20,6 +20,7 @@ public class Cashier extends Employee {
     private GasStation workplace;
     
     // Constructors
+    protected Cashier() { super(); }
     public Cashier(String name, float wagesHourly, int hoursWeekly) 
     { 
         // TODO - add username/password to constructor?
