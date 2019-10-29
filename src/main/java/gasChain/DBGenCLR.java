@@ -47,6 +47,11 @@ public class DBGenCLR implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception 
 	{
+		if(gasStationService.isEmpty()) { run2(); }
+	}
+	
+	private void run2() throws Exception
+	{
 		rng = new Random();
 		long startTime = System.currentTimeMillis();
         LOG.info("Starting database generation...");
@@ -55,7 +60,7 @@ public class DBGenCLR implements CommandLineRunner {
 		generateGasStations(corePath);
         long endTime = System.currentTimeMillis();
         LOG.info("...finished database generation in " + ((endTime - startTime) / 1000) + " seconds");
-        
+
 	}
 	
 	private void generateGasStations(String corePath) throws FileNotFoundException
