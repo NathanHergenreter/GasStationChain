@@ -44,6 +44,7 @@ public class DBGenCLR implements CommandLineRunner {
     
     private static Random rng;
 	
+    // If the database is empty, generates gas stations and their sales, cashiers, and manager
 	@Override
 	public void run(String... args) throws Exception 
 	{
@@ -60,21 +61,20 @@ public class DBGenCLR implements CommandLineRunner {
 		generateGasStations(corePath);
         long endTime = System.currentTimeMillis();
         LOG.info("...finished database generation in " + ((endTime - startTime) / 1000) + " seconds");
-
 	}
 	
+	// Pulls data for locations, items, and names from txt files for generation, generates database
 	private void generateGasStations(String corePath) throws FileNotFoundException
 	{
-		// TODO - flesh out?
-		corporateService.add(new Corporate("Test Corporate", "password"));
-		
 		int maxSales = 500;
-		int minEmployees = 3; int maxEmployees = 8;
+		int minEmployees = 3; int maxEmployees = 8; int numCorporate = 30;
 		
 		ArrayList<GasStation> gasStations = getGasStations(new File(corePath + "\\locationNames"));
 		ArrayList<Sale> saleTemplates = getSaleTemplates(new File(corePath + "\\itemTypes"));
 		ArrayList<String> firstNames = getNames(new File(corePath + "\\employeeNamesFirst"));
 		ArrayList<String> lastNames = getNames(new File(corePath + "\\employeeNamesLast"));
+		
+		generateCorporates(numCorporate, firstNames, lastNames);
 		
 		for(GasStation gasStation : gasStations)
 		{
@@ -112,8 +112,7 @@ public class DBGenCLR implements CommandLineRunner {
 			float wage = rng.nextFloat() * (maxWage - minWage) + minWage;
 			wage = ((float) (new Float(wage * 100.0f)).intValue()) / 100.0f;
 			int hours = rng.nextInt(maxHours - minHours) + minHours;
-			String name = firstNames.get(rng.nextInt(firstNames.size()))
-							+ " " + lastNames.get(rng.nextInt(lastNames.size()));
+			String name = genRandomName(firstNames, lastNames);
 			gasStation.addCashier(new Cashier(name, wage, hours, gasStation));
 			numEmployees--;
 		}
@@ -121,12 +120,24 @@ public class DBGenCLR implements CommandLineRunner {
 	
 	private void generateManager(GasStation gasStation)
 	{
-		Manager manager = new Manager( gasStation.getLocation() + " Manager", "password");
+		Manager manager = new Manager( gasStation.getLocation() + "_Manager", "password");
 		manager.setStore(gasStation);
 		gasStation.setManager(manager);
 		managerService.add(manager);
 	}
 	
+	private void generateCorporates(int num, ArrayList<String> firstNames, ArrayList<String> lastNames)
+	{
+		for(int i = 0; i < num; i++)
+		{
+			String username = genRandomName(firstNames, lastNames).replace(' ', '_')
+					+ (new Integer(rng.nextInt(100))).toString();
+			
+			corporateService.add(new Corporate(username, "password"));
+		}
+	}
+	
+	// Produces a list of gas stations using the locations in locationNames
 	private ArrayList<GasStation> getGasStations(File file) throws FileNotFoundException
 	{
 		ArrayList<GasStation> locations = new ArrayList<GasStation>();
@@ -154,6 +165,7 @@ public class DBGenCLR implements CommandLineRunner {
 		return locations;
 	}
 
+	// Produces a list of item templates for sales using the data in itemTypes
 	private ArrayList<Sale> getSaleTemplates(File file) throws FileNotFoundException
 	{
 		ArrayList<Sale> templates = new ArrayList<Sale>();
@@ -177,7 +189,8 @@ public class DBGenCLR implements CommandLineRunner {
 		scan.close();
 		return templates;
 	}
-	
+
+	// Produces a list names using the data in employeeFirstNames or employeeLastNames
 	private ArrayList<String> getNames(File file) throws FileNotFoundException
 	{
 		ArrayList<String> names = new ArrayList<String>();
@@ -193,6 +206,7 @@ public class DBGenCLR implements CommandLineRunner {
 		return names;
 	}
 	
+	// Produces a random date from the past x years
 	private Date genDate()
 	{
 		int yearRange = 5;
@@ -204,5 +218,10 @@ public class DBGenCLR implements CommandLineRunner {
 		String sdf = year + "-" + month + "-" + day;
 		
 		return Date.valueOf(sdf);
+	}
+	
+	private String genRandomName(ArrayList<String> firstNames, ArrayList<String> lastNames)
+	{
+		return firstNames.get(rng.nextInt(firstNames.size())) + " " + lastNames.get(rng.nextInt(lastNames.size()));
 	}
 }

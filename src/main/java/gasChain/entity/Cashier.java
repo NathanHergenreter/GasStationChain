@@ -28,7 +28,7 @@ public class Cashier extends Employee {
     }
     public Cashier(String name, float wagesHourly, int hoursWeekly) 
     { 
-    	super((name + (new Integer((int)wagesHourly + hoursWeekly + name.length())).toString()), "password");
+    	super((name.replace(' ', '_') + (new Integer((int)wagesHourly + hoursWeekly + name.length())).toString()), "password");
     	this.name = name; this.wagesHourly = wagesHourly; this.hoursWeekly = hoursWeekly; 
     }
     public Cashier(String name, float wagesHourly, int hoursWeekly, GasStation workplace)
