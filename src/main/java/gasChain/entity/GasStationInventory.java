@@ -25,14 +25,15 @@ public class GasStationInventory extends Inventory {
     protected GasStationInventory() {
         super();
     }
-    public GasStationInventory(Item item, @NotNull float price, @NotNull int quantity) {
+
+    public GasStationInventory(Item item, @NotNull int price, @NotNull int quantity) {
         super(price, quantity);
         this.maxQuantity = quantity;
         this.item = item;
         this.gasStation = null;
     }
 
-    public GasStationInventory(Item item, @NotNull float price, @NotNull int quantity, int maxQuantity) {
+    public GasStationInventory(Item item, @NotNull int price, @NotNull int quantity, int maxQuantity) {
         super(price, quantity);
         this.maxQuantity = maxQuantity;
         this.item = item;

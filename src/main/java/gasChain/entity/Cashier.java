@@ -8,7 +8,7 @@ import javax.persistence.ManyToOne;
 public class Cashier extends Employee {
 
     private String name;
-    private float wagesHourly;
+    private int wagesHourly;
     private int hoursWeekly;
 
     @ManyToOne
@@ -20,21 +20,21 @@ public class Cashier extends Employee {
     }
 
     public Cashier(String username, String password,
-                   String name, float wagesHourly, int hoursWeekly) {
+                   String name, int wagesHourly, int hoursWeekly) {
         super(username, password);
         this.name = name;
         this.wagesHourly = wagesHourly;
         this.hoursWeekly = hoursWeekly;
     }
 
-    public Cashier(String name, float wagesHourly, int hoursWeekly) {
-        super((name.replace(' ', '_') + (Integer.valueOf((int) wagesHourly + hoursWeekly + name.length())).toString()), "password");
+    public Cashier(String name, int wagesHourly, int hoursWeekly) {
+        super((name.replace(' ', '_') + (Integer.valueOf(wagesHourly + hoursWeekly + name.length())).toString()), "password");
         this.name = name;
         this.wagesHourly = wagesHourly;
         this.hoursWeekly = hoursWeekly;
     }
 
-    public Cashier(String name, float wagesHourly, int hoursWeekly, GasStation workplace) {
+    public Cashier(String name, int wagesHourly, int hoursWeekly, GasStation workplace) {
         this(name, wagesHourly, hoursWeekly);
         this.workplace = workplace;
     }
@@ -43,7 +43,7 @@ public class Cashier extends Employee {
         return name;
     }
 
-    public float getWagesHourly() {
+    public int getWagesHourly() {
         return wagesHourly;
     }
 

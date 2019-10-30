@@ -20,7 +20,7 @@ public class Item {
 
     private String description;
     private String name;
-    private float suggestRetailPrice;
+    private int suggestRetailPrice;
 
     protected Item() {
     }
@@ -29,7 +29,7 @@ public class Item {
         this.description = description;
     }
 
-    public Item(String name, String description, float suggestRetailPrice) {
+    public Item(String name, String description, int suggestRetailPrice) {
         this.name = name;
         this.description = description;
         this.suggestRetailPrice = suggestRetailPrice;
