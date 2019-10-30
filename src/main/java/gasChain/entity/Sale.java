@@ -93,4 +93,5 @@ public class Sale  {
     public int hashCode() {
         return Objects.hash(getId(), getPrice(), getSellDate(), getItem(), getSellLocation(), receipt, isReturned);
     }
+    
 }
