@@ -39,7 +39,7 @@ public class Sale {
     private boolean isReturned;
 
     protected Sale() {}
-    
+
     public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price) {
         this.receipt = receipt;
         this.price = price;
@@ -59,7 +59,7 @@ public class Sale {
         return id;
     }
 
-    public float getPrice() {
+    public int getPrice() {
         return price;
     }
 
@@ -79,19 +79,20 @@ public class Sale {
         return isReturned;
     }
 
-    public void setIsReturned(boolean isreturned) {
-        this.isReturned = isreturned;
+    public void setIsReturned(boolean isReturned) {
+        this.isReturned = isReturned;
     }
+
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sale sale = (Sale) o;
-        return Float.compare(sale.getPrice(), getPrice()) == 0 &&
+        return getPrice() == sale.getPrice() &&
                 isReturned == sale.isReturned &&
                 getId().equals(sale.getId()) &&
-                Objects.equals(getSellDate(), sale.getSellDate()) &&
+                getSellDate().equals(sale.getSellDate()) &&
                 getItem().equals(sale.getItem()) &&
                 getSellLocation().equals(sale.getSellLocation()) &&
                 receipt.equals(sale.receipt);

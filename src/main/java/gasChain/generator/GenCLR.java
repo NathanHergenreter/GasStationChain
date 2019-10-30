@@ -130,7 +130,7 @@ public class GenCLR implements CommandLineRunner {
 			wage = ((float) (new Float(wage * 100.0f)).intValue()) / 100.0f;
 			int hours = GenUtil.rng.nextInt(maxHours - minHours) + minHours;
 			String name = GenUtil.genRandomName(firstNames, lastNames);
-			Cashier cashier = new Cashier(name, wage, hours, gasStation);
+			Cashier cashier = new Cashier(name, (int) (wage * 100), hours, gasStation);
 			gasStation.addCashier(cashier);
 			service.cashier().save(cashier);
 			numEmployees--;

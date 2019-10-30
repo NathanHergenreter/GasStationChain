@@ -36,8 +36,9 @@ public class Item {
     }
 
     public Item(String name, String description, int suggestRetailPrice) {
-        this(name, suggestRetailPrice);
+        this.name = name;
         this.description = description;
+        this.suggestRetailPrice = suggestRetailPrice;
     }
 
     public Long getId() {

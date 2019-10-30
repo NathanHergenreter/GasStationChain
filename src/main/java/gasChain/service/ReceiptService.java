@@ -12,3 +12,4 @@ public class ReceiptService extends GenericService<Receipt, Long, ReceiptReposit
 	@Autowired
 	ReceiptService(ReceiptRepository receiptRepository) { super(receiptRepository); }
 }
+
