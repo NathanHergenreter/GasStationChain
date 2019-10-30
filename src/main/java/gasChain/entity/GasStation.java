@@ -21,7 +21,7 @@ public class GasStation extends Store {
     @OneToMany(mappedBy = "gasStation")
     private Set<GasStationInventory> inventory;
 
-    @Cascade({CascadeType.PERSIST})
+//    @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
     private List<Sale> sales = new ArrayList<>();
 
@@ -36,12 +36,15 @@ public class GasStation extends Store {
     protected GasStation() {
         super();
     }
+    
+    public GasStation(String location, String state, String region) { super(location, state, region); }
 
-    public GasStation(@NotNull double longitude, @NotNull double latitude, String name, GasStationInventory... inventoryItems) {
-        super(longitude, latitude, name);
-        for (GasStationInventory inventory : inventoryItems) inventory.setGasStation(this);
-        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
-    }
+//    public GasStation(@NotNull double longitude, @NotNull double latitude, String name, GasStationInventory... inventoryItems) {
+//        super(longitude, latitude, name);
+//        for (GasStationInventory inventory : inventoryItems) inventory.setGasStation(this);
+//        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
+//    }
+    
 
     public Set<GasStationInventory> getInventory() {
         return inventory;

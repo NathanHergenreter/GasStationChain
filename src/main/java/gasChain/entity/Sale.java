@@ -16,7 +16,7 @@ public class Sale {
     private Long id;
 
     @NotNull
-    private float price;
+    private int price;
 
     @CreatedDate
     private Date sellDate;
@@ -38,15 +38,21 @@ public class Sale {
 
     private boolean isReturned;
 
-    protected Sale() {
-    }
-    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, float price) {
+    protected Sale() {}
+    
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price) {
         this.receipt = receipt;
         this.price = price;
         this.item = item;
         this.sellLocation = sellLocation;
         this.isReturned = false;
         this.sellDate = new Date();
+    }
+
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, 
+    			@NotNull Receipt receipt, int price, Date sellDate) {
+        this(item, sellLocation, receipt, price);
+        this.sellDate = sellDate;
     }
 
     public Long getId() {
