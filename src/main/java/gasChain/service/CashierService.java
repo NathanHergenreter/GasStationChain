@@ -16,7 +16,7 @@ public class CashierService extends EmployeeService {
     public CashierService(CashierRepository repo) { super(repo); }
 
 	@Override
-	public CashierRepository repo() { return (CashierRepository) repo; }
+	protected CashierRepository repo() { return (CashierRepository) repo; }
 	
     public List<Cashier> findAllByWorkplace(GasStation workplace) { return repo().findByWorkplace(workplace); }
 }
