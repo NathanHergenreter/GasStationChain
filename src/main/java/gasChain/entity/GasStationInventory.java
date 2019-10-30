@@ -7,54 +7,25 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "gas_station_inventories")
-public class GasStationInventory implements Serializable {
+public class GasStationInventory extends Inventory {
 
     @Id
     @ManyToOne
     @JoinColumn(name="gas_station")
     private GasStation gasStation;
 
-    @Id
-    @ManyToOne
-    @JoinColumn
-    private Item item;
-
-    @NotNull
-    private float price;
-
-    @NotNull
-    private int quantity;
-
     private int maxQuantity;
 
     public GasStationInventory(Item item, @NotNull float price, @NotNull int quantity) {
-        this.item = item;
-        this.price = price;
-        this.quantity = quantity;
+        super(item, price, quantity); this.maxQuantity = quantity;
     }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public int getQuantity() {
-        return quantity;
+    
+    public GasStationInventory(Item item, @NotNull float price, @NotNull int quantity, int maxQuantity) {
+        super(item, price, quantity); this.maxQuantity = maxQuantity;
     }
 
     public int getMaxQuantity() {
         return maxQuantity;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
     }
 
     public void setMaxQuantity(int maxQuantity) {
