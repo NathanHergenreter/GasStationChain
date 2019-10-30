@@ -21,5 +21,6 @@ public class GasStationService {
     public boolean isEmpty() { return repo.count() <= 0; }
     
     public List<GasStation> findAll() { return repo.findAll(); }
-    
+
+    public GasStation findByManagerUsername(String username) { return repo.findByManagerUsername(username);}
 }

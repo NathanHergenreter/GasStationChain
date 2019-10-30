@@ -1,5 +1,6 @@
 package gasChain.service;
 
+import gasChain.entity.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,4 +19,5 @@ public class ManagerService extends EmployeeService {
 	
 	public Manager findByStore(GasStation store) { return repo().findByStore(store); }
 
+	public void deleteEmployee(Employee e) { repo.delete(e);}
 }

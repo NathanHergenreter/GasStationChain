@@ -40,6 +40,7 @@ public class Cashier extends Employee {
     public float getWagesHourly() { return wagesHourly; }
     public int getHoursWeekly() { return hoursWeekly; }
     public GasStation getWorkplace() { return workplace; }
+
     
     @Override
 	public String getAuth() { return "cashier"; }
