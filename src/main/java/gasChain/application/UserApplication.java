@@ -1,6 +1,9 @@
 package gasChain.application;
 
 import gasChain.userControllers.CashierController;
+import java.util.Scanner;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -11,6 +14,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import gasChain.coreInterfaces.userControllers.IUserController;
+import gasChain.entity.GasStation;
+import gasChain.service.GasStationService;
 
 @Component
 @Order(2)
