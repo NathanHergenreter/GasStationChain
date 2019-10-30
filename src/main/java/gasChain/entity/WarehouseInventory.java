@@ -7,7 +7,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "warehouse_inventories")
-public class WarehouseInventory  implements Serializable {
+public class WarehouseInventory implements Serializable {
 
     @Id
     @ManyToOne
