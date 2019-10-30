@@ -30,6 +30,7 @@ public class WarehouseInventory  implements Serializable {
         this.price = price;
         this.quantity = quantity;
     }
+
     public Item getItem() {
         return item;
     }
