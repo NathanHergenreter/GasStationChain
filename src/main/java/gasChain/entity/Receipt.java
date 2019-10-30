@@ -15,6 +15,7 @@ public class Receipt {
     @OneToMany(mappedBy = "receipt")
     private List<Sale> sales;
 
+
     protected Receipt() {
     }
     public Receipt(List<Sale> sales) {
