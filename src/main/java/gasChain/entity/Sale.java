@@ -26,12 +26,42 @@ public class Sale {
     @JoinColumn(name = "gas_station_id")
     private GasStation sellLocation;
 
+    private boolean isReturned;
 
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull float price) {
+        this.price = price;
+        this.item = item;
+        this.sellLocation = sellLocation;
+        this.isReturned = false;
+    }
 
+    public Long getId() {
+        return id;
+    }
 
+    public float getPrice() {
+        return price;
+    }
 
+    public Date getSellDate() {
+        return sellDate;
+    }
 
+    public Item getItem() {
+        return item;
+    }
 
+    public GasStation getSellLocation() {
+        return sellLocation;
+    }
+
+    public boolean getIsReturned(){
+        return isReturned;
+    }
+
+    public void setIsReturned(boolean isreturned){
+        this.isReturned = isreturned;
+    }
 
 
 

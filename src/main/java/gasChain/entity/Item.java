@@ -21,10 +21,17 @@ public class Item {
 
     private String description;
     private String name;
+    private float suggestRetailPrice;
 
     public Item(String name, String description) {
         this.name = name;
         this.description = description;
+    }
+
+    public Item(String name, String description, float suggestRetailPrice) {
+        this.name = name;
+        this.description = description;
+        this.suggestRetailPrice = suggestRetailPrice;
     }
 
     public Long getId() {
