@@ -18,6 +18,7 @@ public class ManagerController implements IUserController {
     @Override
     public void execute(List<String> cmd) {
         String command = cmd.get(0);
+        //TODO: only pass in cmd e for i>=1
         switch (command){
             case "AddCashier":
                 _managerHelper.addCashier(cmd);
