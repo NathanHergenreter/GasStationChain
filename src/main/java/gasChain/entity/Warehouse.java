@@ -24,7 +24,6 @@ public class Warehouse {
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
     private Set<WarehouseInventory> inventory;
 
-
     public Warehouse(String name, String address, @Pattern(regexp = "(^$|[0-9]{10})") String phoneNumber, WarehouseInventory... inventoryItems) {
         this.name = name;
         this.address = address;
