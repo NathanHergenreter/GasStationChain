@@ -26,4 +26,12 @@ public abstract class EmployeeService {
 	
 	public boolean existsUser(String username) { return repo.findByUsername(username) != null; }
 
+	public boolean hasCorrectAuth(Employee employee, String authority) { 
+		return employee.isAuth(authority);
+	}
+	
+	public boolean hasCorrectAuth(String username, String authority) { 
+		return hasCorrectAuth(findByUsername(username), authority);
+	}
+
 }
