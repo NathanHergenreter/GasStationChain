@@ -1,21 +1,21 @@
 package gasChain.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import gasChain.entity.GasStation;
 import gasChain.entity.Manager;
 import gasChain.repository.ManagerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
-public class ManagerService extends EmployeeService {
+public class ManagerService extends EmployeeService<Manager, ManagerRepository> {
 
-	@Autowired
-	public ManagerService(ManagerRepository repo) { super(repo); }
-	
-	@Override
-	protected ManagerRepository repo() { return (ManagerRepository) repo; }
-	
-	public Manager findByStore(GasStation store) { return repo().findByStore(store); }
+    @Autowired
+    public ManagerService(ManagerRepository managerRepository) {
+        super(managerRepository);
+    }
+
+    public Manager findByStore(GasStation store) {
+        return getRepository().findByStore(store);
+    }
 
 }

@@ -1,17 +1,17 @@
 package gasChain.service;
 
+import gasChain.entity.Corporate;
+import gasChain.repository.CorporateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import gasChain.repository.CorporateRepository;
-
 @Service
-public class CorporateService extends EmployeeService {
+public class CorporateService extends EmployeeService<Corporate, CorporateRepository> {
 
 	@Autowired
-	public CorporateService(CorporateRepository repo) { super(repo); }
+	public CorporateService(CorporateRepository corporateRepository) {
+		super(corporateRepository);
+	}
 
-	@Override
-	protected CorporateRepository repo() { return (CorporateRepository) repo; }
-	
+
 }

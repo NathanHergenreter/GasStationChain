@@ -1,22 +1,16 @@
 package gasChain.entity;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Entity
-@Table(name = "warehouses")
-public class Warehouse {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String name;
-
-    private String address;
+public class Warehouse extends Store {
 
     @Pattern(regexp = "(^$|[0-9]{10})")
     private String phoneNumber;
@@ -24,11 +18,14 @@ public class Warehouse {
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
     private Set<WarehouseInventory> inventory;
 
-    public Warehouse(String name, String address, @Pattern(regexp = "(^$|[0-9]{10})") String phoneNumber, WarehouseInventory... inventoryItems) {
-        this.name = name;
-        this.address = address;
+    protected Warehouse() {
+        super();
+    }
+
+    public Warehouse(@NotNull double longitude, @NotNull double latitude, String name, @Pattern(regexp = "(^$|[0-9]{10})") String phoneNumber, WarehouseInventory... inventoryItems) {
+        super(longitude, latitude, name);
         this.phoneNumber = phoneNumber;
-        for(WarehouseInventory inventory: inventoryItems) inventory.setWarehouse(this);
+        for (WarehouseInventory inventory : inventoryItems) inventory.setWarehouse(this);
         this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
     }
 }

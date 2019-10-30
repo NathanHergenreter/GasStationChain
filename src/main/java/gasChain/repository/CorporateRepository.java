@@ -1,8 +1,7 @@
 package gasChain.repository;
 
-import org.springframework.stereotype.Repository;
-
 import gasChain.entity.Corporate;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CorporateRepository extends EmployeeRepository<Corporate> {

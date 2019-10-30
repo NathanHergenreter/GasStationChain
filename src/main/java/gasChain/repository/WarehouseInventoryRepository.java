@@ -1,11 +1,11 @@
 package gasChain.repository;
 
-import java.util.List;
-
 import gasChain.entity.Warehouse;
 import gasChain.entity.WarehouseInventory;
 
-public interface WarehouseInventoryRepository extends InventoryRepository<WarehouseInventory> {
+import java.util.Set;
 
-	List<WarehouseInventory> findByWarehouse(Warehouse warehouse);
+public interface WarehouseInventoryRepository extends InventoryRepository<WarehouseInventory, Long> {
+
+    Set<WarehouseInventory> findByWarehouse(Warehouse warehouse);
 }

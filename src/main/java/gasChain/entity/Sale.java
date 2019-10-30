@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "sales")
-public class Sale  {
+public class Sale {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -38,6 +38,8 @@ public class Sale  {
 
     private boolean isReturned;
 
+    protected Sale() {
+    }
     public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, float price) {
         this.receipt = receipt;
         this.price = price;
@@ -67,11 +69,11 @@ public class Sale  {
         return sellLocation;
     }
 
-    public boolean getIsReturned(){
+    public boolean getIsReturned() {
         return isReturned;
     }
 
-    public void setIsReturned(boolean isreturned){
+    public void setIsReturned(boolean isreturned) {
         this.isReturned = isreturned;
     }
 
@@ -93,5 +95,5 @@ public class Sale  {
     public int hashCode() {
         return Objects.hash(getId(), getPrice(), getSellDate(), getItem(), getSellLocation(), receipt, isReturned);
     }
-    
+
 }

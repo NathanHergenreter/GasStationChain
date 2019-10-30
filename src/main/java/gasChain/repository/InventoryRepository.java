@@ -1,16 +1,15 @@
 package gasChain.repository;
 
-import java.util.List;
-
+import gasChain.entity.Inventory;
+import gasChain.entity.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import gasChain.entity.GasStationInventory;
-import gasChain.entity.Inventory;
-import gasChain.entity.Item;
+import java.io.Serializable;
 
 @NoRepositoryBean
-public interface InventoryRepository<T extends Inventory> extends JpaRepository<T, Long> {
-	
-	List<GasStationInventory> findByItem(Item item);
+public interface InventoryRepository<T extends Inventory, ID extends Serializable> extends JpaRepository<T, ID> {
+
+	T findByItem(Item item);
+
 }

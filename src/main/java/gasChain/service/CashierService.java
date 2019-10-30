@@ -1,22 +1,22 @@
 package gasChain.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import gasChain.entity.Cashier;
 import gasChain.entity.GasStation;
 import gasChain.repository.CashierRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
-public class CashierService extends EmployeeService {
+public class CashierService extends EmployeeService<Cashier, CashierRepository> {
 
-	@Autowired
-    public CashierService(CashierRepository repo) { super(repo); }
+    @Autowired
+    public CashierService(CashierRepository cashierRepository) {
+        super(cashierRepository);
+    }
 
-	@Override
-	protected CashierRepository repo() { return (CashierRepository) repo; }
-	
-    public List<Cashier> findAllByWorkplace(GasStation workplace) { return repo().findByWorkplace(workplace); }
+    public List<Cashier> findAllByWorkplace(GasStation workplace) {
+        return getRepository().findByWorkplace(workplace);
+    }
 }

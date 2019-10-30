@@ -12,15 +12,17 @@ public class Receipt {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @OneToMany(mappedBy="receipt")
+    @OneToMany(mappedBy = "receipt")
     private List<Sale> sales;
 
+    protected Receipt() {
+    }
     public Receipt(List<Sale> sales) {
         this.sales = sales;
     }
 
     public Receipt(Sale sale) {
-        sales = new ArrayList<Sale>();
+        sales = new ArrayList<>();
         sales.add(sale);
     }
 
@@ -32,11 +34,11 @@ public class Receipt {
         return sales;
     }
 
-    public void addSale(Sale sale){
+    public void addSale(Sale sale) {
         sales.add(sale);
     }
 
-    public void voidSale(Sale sale){
+    public void voidSale(Sale sale) {
         sales.remove(sale);
     }
 
