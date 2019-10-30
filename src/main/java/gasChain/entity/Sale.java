@@ -74,8 +74,8 @@ public class Sale {
         return isReturned;
     }
 
-    public void setIsReturned(boolean isreturned) {
-        this.isReturned = isreturned;
+    public void setIsReturned(boolean isReturned) {
+        this.isReturned = isReturned;
     }
 
 
