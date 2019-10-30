@@ -14,7 +14,7 @@ public class ManagerService extends EmployeeService {
 	public ManagerService(ManagerRepository repo) { super(repo); }
 	
 	@Override
-	public ManagerRepository repo() { return (ManagerRepository) repo; }
+	protected ManagerRepository repo() { return (ManagerRepository) repo; }
 	
 	public Manager findByStore(GasStation store) { return repo().findByStore(store); }
 

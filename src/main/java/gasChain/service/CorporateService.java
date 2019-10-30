@@ -12,6 +12,6 @@ public class CorporateService extends EmployeeService {
 	public CorporateService(CorporateRepository repo) { super(repo); }
 
 	@Override
-	public CorporateRepository repo() { return (CorporateRepository) repo; }
+	protected CorporateRepository repo() { return (CorporateRepository) repo; }
 	
 }
