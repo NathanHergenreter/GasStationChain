@@ -21,11 +21,15 @@ public class Warehouse extends Store {
     protected Warehouse() {
         super();
     }
+    
+    public Warehouse(String location, String state, String region) { super(location, state, region); }
 
-    public Warehouse(@NotNull double longitude, @NotNull double latitude, String name, @Pattern(regexp = "(^$|[0-9]{10})") String phoneNumber, WarehouseInventory... inventoryItems) {
-        super(longitude, latitude, name);
-        this.phoneNumber = phoneNumber;
-        for (WarehouseInventory inventory : inventoryItems) inventory.setWarehouse(this);
-        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
-    }
+//    public Warehouse(@NotNull double longitude, @NotNull double latitude, String name, @Pattern(regexp = "(^$|[0-9]{10})") String phoneNumber, WarehouseInventory... inventoryItems) {
+//        super(longitude, latitude, name);
+//        this.phoneNumber = phoneNumber;
+//        for (WarehouseInventory inventory : inventoryItems) inventory.setWarehouse(this);
+//        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
+//    }
+    
+    public Warehouse addInventory(WarehouseInventory item) { inventory.add(item); return this; }
 }

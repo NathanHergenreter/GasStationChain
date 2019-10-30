@@ -14,20 +14,54 @@ import java.util.Arrays;
 import java.util.List;
 
 import gasChain.coreInterfaces.userControllers.IUserController;
+import gasChain.entity.Employee;
 import gasChain.entity.GasStation;
+import gasChain.service.CashierService;
+import gasChain.service.CorporateService;
 import gasChain.service.GasStationService;
+import gasChain.service.ManagerService;
 
 @Component
 @Order(2)
 public class UserApplication implements CommandLineRunner {
+	
+	@Autowired
+	CashierService cashierService;
+	@Autowired
+	ManagerService managerService;
+	@Autowired
+	CorporateService corporateService;
+	
+	static Scanner in;
+	
 	@Override
 	public void run(String... args) throws Exception {
+		in = new Scanner(System.in);
+		
 		System.out.println("Enter username: ");
-		//TODO: validate user here...
-		//if user instanceOf cashier, promptCashier()
-		//elif user instanceOf cashier, promptStoreManager()
-		//elif user instanceOf cashier, promptCorporateEmployee()
-		//else prompt "invalid username"...
+		String username = in.next();
+		
+		Employee employee = cashierService.findByUsername(username);
+		employee = employee == null ? managerService.findByUsername(username) : employee;
+		employee = employee == null ? corporateService.findByUsername(username) : employee;
+		
+		switch(employee.getAuth())
+		{
+			case "cashier":
+				promptCashier();
+				break;
+			case "manager":
+				promptStoreManager();
+				break;
+			case "corporate":
+				promptCorporateEmployee();
+				break;
+			default:
+				System.out.println("Invalid username - User does not exist");
+				break;
+		}
+		
+		in.close();
 	}
 
 	IUserController _controller;

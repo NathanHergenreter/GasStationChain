@@ -8,7 +8,7 @@ import java.io.Serializable;
 public abstract class Inventory implements Serializable {
 
     @NotNull
-    private float price;
+    private int price;
 
     @NotNull
     private int quantity;
@@ -16,16 +16,16 @@ public abstract class Inventory implements Serializable {
     Inventory() {
     }
 
-    public Inventory(float price, int quantity) {
+    public Inventory(int price, int quantity) {
         this.price = price;
         this.quantity = quantity;
     }
 
-    public float getPrice() {
+    public int getPrice() {
         return price;
     }
 
-    public void setPrice(float price) {
+    public void setPrice(int price) {
         this.price = price;
     }
 
