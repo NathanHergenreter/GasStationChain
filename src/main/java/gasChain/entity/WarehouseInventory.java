@@ -24,7 +24,7 @@ public class WarehouseInventory extends Inventory {
         super();
     }
 
-    public WarehouseInventory(Item item, float price, int quantity) {
+    public WarehouseInventory(Item item, int price, int quantity) {
         super(price, quantity);
         this.item = item;
         this.warehouse = null;
