@@ -1,6 +1,10 @@
 package gasChain.entity;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,17 +16,18 @@ public class Receipt {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "receipt")
-    private List<Sale> sales;
+    private List<Sale> sales = new ArrayList<>();
 
-    protected Receipt() {
+    public Receipt() {
     }
+    
     public Receipt(List<Sale> sales) {
         this.sales = sales;
     }
 
     public Receipt(Sale sale) {
-        sales = new ArrayList<>();
         sales.add(sale);
     }
 

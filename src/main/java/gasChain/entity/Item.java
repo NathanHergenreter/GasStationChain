@@ -24,9 +24,15 @@ public class Item {
 
     protected Item() {
     }
-    public Item(String name, String description) {
+    
+    
+    public Item(String name, int suggestRetailPrice) {
         this.name = name;
-        this.description = description;
+        this.suggestRetailPrice = suggestRetailPrice;
+    }
+
+    public Item(String name, float suggestRetailPrice) {
+        this(name, (int) (suggestRetailPrice * 100));
     }
 
     public Item(String name, String description, int suggestRetailPrice) {
@@ -66,5 +72,7 @@ public class Item {
     public Set<GasStationInventory> getInGasStations() {
         return inGasStations;
     }
+    
+    public int getSuggestRetailPrice() { return suggestRetailPrice; }
 
 }
