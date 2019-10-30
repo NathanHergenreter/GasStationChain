@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 public class ServiceMaster {
 
 	@Autowired
+	private AvailabilityService availabilityService;
+	
+	@Autowired
 	private CashierService cashierService;
 	
 	@Autowired
@@ -36,6 +39,10 @@ public class ServiceMaster {
 	@Autowired
 	private WarehouseService warehouseService;
 	
+	@Autowired
+	private WorkPeriodService workPeriodService;
+	
+	public AvailabilityService availability() { return availabilityService; }
 	public CashierService cashier() { return cashierService; }
 	public CorporateService corporate() { return corporateService; }
 	public ItemService item() { return itemService; }
@@ -46,4 +53,5 @@ public class ServiceMaster {
 	public SaleService sale() { return saleService; }
 	public WarehouseInventoryService warehouseInventory() { return warehouseInventoryService; }
 	public WarehouseService warehouse() { return warehouseService; }
+	public WorkPeriodService workPeriod() { return workPeriodService; }
 }
