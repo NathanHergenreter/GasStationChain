@@ -11,7 +11,7 @@ public class ManagerController implements IUserController {
         _managerHelper = helper;
     }
 
-    IManagerHelper _managerHelper;
+    private IManagerHelper _managerHelper;
 
     @Override
     public void execute(List<String> cmd) throws Exception {
@@ -22,6 +22,8 @@ public class ManagerController implements IUserController {
                 break;
             case "UpdateCashier":
                 _managerHelper.updateCashier(cmd.subList(1,cmd.size()));
+            case "UpdateCashierAvailability":
+                _managerHelper.updateCashierAvailability(cmd.subList(1,cmd.size()));
             case "RemoveCashier":
                 _managerHelper.removeCashier(cmd.subList(1,cmd.size()));
                 break;

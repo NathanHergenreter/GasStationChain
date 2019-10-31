@@ -1,6 +1,11 @@
 package gasChain.application;
 
+import gasChain.coreInterfaces.managers.ICashierHelper;
 import gasChain.coreInterfaces.managers.IManagerHelper;
+import gasChain.coreInterfaces.managers.IUserHelper;
+import gasChain.entity.Cashier;
+import gasChain.entity.Manager;
+import gasChain.managers.CashierHelper;
 import gasChain.managers.ManagerHelper;
 import gasChain.userControllers.CashierController;
 import java.util.Scanner;
@@ -47,16 +52,18 @@ public class UserApplication implements CommandLineRunner {
 		Employee employee = cashierService.findByUsername(username);
 		employee = employee == null ? managerService.findByUsername(username) : employee;
 		employee = employee == null ? corporateService.findByUsername(username) : employee;
-		
+		IUserHelper helper;
+
 		switch(employee.getAuth())
 		{
 			case "cashier":
-                _controller = new CashierController();
+				helper = new CashierHelper((Cashier)employee);
+                _controller = new CashierController((CashierHelper)helper);
                 promptUser(in);
 				break;
 			case "manager":
-			    IManagerHelper helper = new ManagerHelper(employee);
-			    _controller = new ManagerController(helper);
+			    helper = new ManagerHelper((Manager) employee);
+			    _controller = new ManagerController((ManagerHelper)helper);
                 promptUser(in);
 				break;
 			case "corporate":
