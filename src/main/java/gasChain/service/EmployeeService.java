@@ -11,7 +11,6 @@ public abstract class EmployeeService<T extends Employee, R extends EmployeeRepo
         super(r);
     }
 
-
     public Employee findByUsername(String username) {
         return getRepository().findByUsername(username);
     }

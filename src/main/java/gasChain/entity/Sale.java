@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "sales")
 public class Sale {
 
     @Id
@@ -26,7 +25,7 @@ public class Sale {
     @JoinColumn(name = "item_id")
     private Item item;
 
-    @OneToOne
+    @ManyToOne
     @NotNull
     @JoinColumn(name = "gas_station_id")
     private GasStation sellLocation;
@@ -54,14 +53,17 @@ public class Sale {
         this.sellDate = new Date();
     }
 
-    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, 
-    			@NotNull Receipt receipt, int price, Date sellDate) {
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price, Date sellDate) {
         this(item, sellLocation, receipt, price);
         this.sellDate = sellDate;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public Receipt getReceipt() {
+        return receipt;
     }
 
     public int getPrice() {

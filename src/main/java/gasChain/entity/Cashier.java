@@ -1,12 +1,11 @@
 package gasChain.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.persistence.*;
-
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Cashier extends Employee {
@@ -30,6 +29,7 @@ public class Cashier extends Employee {
     protected Cashier() {
         super();
     }
+
 
     public Cashier(String username, String password,
                    String name, int wagesHourly, int hoursWeekly) {

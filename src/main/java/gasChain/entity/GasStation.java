@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,12 +20,12 @@ public class GasStation extends Store {
     @OneToMany(mappedBy = "gasStation")
     private Set<GasStationInventory> inventory;
 
-//    @Cascade({CascadeType.PERSIST})
+    @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
     private List<Sale> sales = new ArrayList<>();
 
     @OneToOne
-    @JoinColumn(name = "manager_id", referencedColumnName = "id")
+    @JoinColumn(name = "manager_id")
     private Manager manager;
 
     @Cascade({CascadeType.PERSIST})
@@ -36,14 +35,13 @@ public class GasStation extends Store {
     protected GasStation() {
         super();
     }
-    
-    public GasStation(String location, String state, String region) { super(location, state, region); }
 
-//    public GasStation(@NotNull double longitude, @NotNull double latitude, String name, GasStationInventory... inventoryItems) {
-//        super(longitude, latitude, name);
-//        for (GasStationInventory inventory : inventoryItems) inventory.setGasStation(this);
-//        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
-//    }
+    public GasStation(String location, String state, String region, GasStationInventory... inventoryItems) {
+        super(location, state, region);
+        for (GasStationInventory inventory : inventoryItems) inventory.setGasStation(this);
+        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
+    }
+
     
 
     public Set<GasStationInventory> getInventory() {
@@ -53,12 +51,6 @@ public class GasStation extends Store {
     public List<Sale> getSales() {
         return sales;
     }
-
-    public GasStation addSale(Sale sale) {
-        sales.add(sale);
-        return this;
-    }
-
     public Manager getManager() {
         return manager;
     }

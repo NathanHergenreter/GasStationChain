@@ -1,12 +1,12 @@
 package gasChain.generator;
 
+import gasChain.entity.GasStation;
+import gasChain.entity.Item;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import gasChain.entity.GasStation;
-import gasChain.entity.Item;
 
 public class GenDataRepository {
 
@@ -14,7 +14,7 @@ public class GenDataRepository {
 	private ArrayList<Item> items;
 	private ArrayList<String> firstNames;
 	private ArrayList<String> lastNames;
-	
+
 	public GenDataRepository(String corePath) throws FileNotFoundException
 	{
 		locations = getLocations(new File(corePath + "\\locationNames"));
@@ -22,18 +22,17 @@ public class GenDataRepository {
 		firstNames = getNames(new File(corePath + "\\employeeNamesFirst"));
 		lastNames = getNames(new File(corePath + "\\employeeNamesLast"));
 	}
-	
+
 	public ArrayList<LocationStruct> locations() { return locations; }
 	public ArrayList<Item> items() { return items; }
 	public ArrayList<String> firstNames() { return firstNames; }
 	public ArrayList<String> lastNames() { return lastNames; }
-	
+
 	public ArrayList<GasStation> produceGasStations()
 	{
 		ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
-		for(LocationStruct location : locations) 
-		{ 
-			gasStations.add(new GasStation(location.location, location.state, location.region)); 
+		for (LocationStruct location : locations) {
+			gasStations.add(new GasStation(location.location, location.state, location.region));
 		}
 		return gasStations;
 	}
@@ -104,13 +103,13 @@ public class GenDataRepository {
 		scan.close();
 		return templates;
 	}
-	
+
 	protected class LocationStruct {
-		
+
 		String location;
 		String state;
 		String region;
-		
+
 		protected LocationStruct(String location, String state, String region)
 		{
 			this.location = location; this.state = state; this.region = region;
