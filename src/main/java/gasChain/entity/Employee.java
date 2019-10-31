@@ -6,38 +6,26 @@ import javax.persistence.*;
 @Inheritance
 public abstract class Employee {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
 
-    private String username;
-    private String password;
+	private String username;
+	private String password;
 
-    Employee() {
-    }
+	Employee() {
+	}
 
+    public Long getId() { return id; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+    
     public Employee(String username, String password) {
         this.username = username;
-        this.password = password;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
         this.password = password;
     }
 
@@ -45,7 +33,7 @@ public abstract class Employee {
         return "generic";
     }
 
-    public boolean isAuth(String authority) {
-        return getAuth().equals(authority);
-    }
+	public boolean isAuth(String authority) {
+		return getAuth().equals(authority);
+	}
 }

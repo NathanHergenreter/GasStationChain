@@ -2,8 +2,6 @@ package gasChain.userControllers;
 
 import gasChain.coreInterfaces.managers.IManagerHelper;
 import gasChain.coreInterfaces.userControllers.IUserController;
-import gasChain.entity.Employee;
-
 import java.util.List;
 
 public class ManagerController implements IUserController {
@@ -36,6 +34,8 @@ public class ManagerController implements IUserController {
             case "ScheduleEmployees":
                 _managerHelper.getEmployeeSchedule(cmd.subList(1,cmd.size()));
                 break;
+            case "RestockInventory":
+            	_managerHelper.restockGasStationInventory(cmd);
             default:
                 break;
         }

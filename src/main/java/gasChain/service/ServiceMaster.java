@@ -8,10 +8,10 @@ public class ServiceMaster {
 
 	@Autowired
 	private AvailabilityService availabilityService;
-	
+
 	@Autowired
 	private CashierService cashierService;
-	
+
 	@Autowired
 	private CorporateService corporateService;
 
@@ -23,13 +23,13 @@ public class ServiceMaster {
 
 	@Autowired
 	private ItemService itemService;
-	
+
 	@Autowired
 	private ManagerService managerService;
 
 	@Autowired
 	private ReceiptService receiptService;
-	
+
 	@Autowired
 	private SaleService saleService;
 
@@ -38,7 +38,7 @@ public class ServiceMaster {
 
 	@Autowired
 	private WarehouseService warehouseService;
-	
+
 	@Autowired
 	private WorkPeriodService workPeriodService;
 

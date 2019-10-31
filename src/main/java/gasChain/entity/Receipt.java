@@ -11,13 +11,13 @@ import java.util.List;
 @Entity
 public class Receipt {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
 
-    @Cascade({CascadeType.PERSIST})
-    @OneToMany(mappedBy = "receipt")
-    private List<Sale> sales = new ArrayList<>();
+	@Cascade({ CascadeType.PERSIST })
+	@OneToMany(mappedBy = "receipt")
+	private List<Sale> sales = new ArrayList<>();
 
     @OneToOne
     @NotNull
@@ -27,34 +27,32 @@ public class Receipt {
     public Receipt() {
     }
 
+	public Receipt(List<Sale> sales) {
+		this.sales = sales;
+	}
 
-    public Receipt(List<Sale> sales) {
-        this.sales = sales;
-    }
-
-    public Receipt(Sale sale) {
-        sales.add(sale);
-    }
+	public Receipt(Sale sale) {
+		sales.add(sale);
+	}
 
     public void setPayment(Payment payment) {
         this.payment = payment;
     }
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public List<Sale> getSales() {
-        return sales;
-    }
+	public List<Sale> getSales() {
+		return sales;
+	}
 
-    public void addSale(Sale sale) {
-        sales.add(sale);
-    }
+	public void addSale(Sale sale) {
+		sales.add(sale);
+	}
 
-    public void voidSale(Sale sale) {
-        sales.remove(sale);
-    }
-
+	public void voidSale(Sale sale) {
+		sales.remove(sale);
+	}
 
 }

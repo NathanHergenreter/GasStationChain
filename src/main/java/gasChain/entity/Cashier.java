@@ -54,26 +54,17 @@ public class Cashier extends Employee {
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+    public void setName(String name) { this.name = name;}
 
     public int getWagesHourly() {
         return wagesHourly;
     }
-
-    public void setWagesHourly(int hourlyWage) {
-        wagesHourly = hourlyWage;
-    }
+    public void setWagesHourly(int hourlyWage) { wagesHourly = hourlyWage; }
 
     public int getHoursWeekly() {
         return hoursWeekly;
     }
-
-    public void setHoursWeekly(int weeklyHours) {
-        hoursWeekly = weeklyHours;
-    }
+    public void setHoursWeekly(int weeklyHours) { hoursWeekly = weeklyHours; }
 
     public GasStation getWorkplace() {
         return workplace;

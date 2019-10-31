@@ -13,5 +13,4 @@ public class CorporateService extends EmployeeService<Corporate, CorporateReposi
 		super(corporateRepository);
 	}
 
-
 }

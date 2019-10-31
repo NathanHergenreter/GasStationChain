@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface GasStationRepository extends JpaRepository<GasStation, Long> {
 
     GasStation findByManager(Manager m);
+
+	GasStation findByLocation(String location);
 }

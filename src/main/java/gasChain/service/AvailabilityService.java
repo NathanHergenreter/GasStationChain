@@ -10,6 +10,8 @@ import gasChain.repository.AvailabilityRepository;
 public class AvailabilityService extends GenericService<Availability, Long, AvailabilityRepository> {
 
 	@Autowired
-	public AvailabilityService(AvailabilityRepository r) { super(r); }
+	public AvailabilityService(AvailabilityRepository r) {
+		super(r);
+	}
 
 }

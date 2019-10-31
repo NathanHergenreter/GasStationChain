@@ -5,16 +5,16 @@ import java.util.Collection;
 
 public interface IGenericService<T, ID extends Serializable> {
 
-    long count();
+	long count();
 
-    boolean isEmpty();
+	boolean isEmpty();
 
-    void deleteById(ID id);
+	void deleteById(ID id);
 
-    Collection<T> findAll();
+	Collection<T> findAll();
 
-    T findById(ID id);
+	T findById(ID id);
 
-    void save(T entity);
+	void save(T entity);
 
 }

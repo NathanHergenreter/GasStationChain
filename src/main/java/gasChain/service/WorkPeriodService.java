@@ -10,6 +10,8 @@ import gasChain.repository.WorkPeriodRepository;
 public class WorkPeriodService extends GenericService<WorkPeriod, Long, WorkPeriodRepository> {
 
 	@Autowired
-	public WorkPeriodService(WorkPeriodRepository r) { super(r); }
+	public WorkPeriodService(WorkPeriodRepository r) {
+		super(r);
+	}
 
 }

@@ -11,7 +11,7 @@ public class WarehouseService extends GenericService<Warehouse, Long, WarehouseR
         super(warehouseRepository);
     }
 
-//    public Warehouse findByName(String name) {
-//        return getRepository().findByName(name);
-//    }
+    public Warehouse findByName(String name) {
+        return getRepository().findByName(name);
+    }
 }

@@ -1,7 +1,5 @@
 package gasChain.coreInterfaces.managers;
 
-import gasChain.entity.Employee;
-
 import java.util.List;
 
 public interface IManagerHelper extends IUserHelper {
@@ -12,4 +10,6 @@ public interface IManagerHelper extends IUserHelper {
     void getCashierPayroll(List<String> args) throws Exception;
     void getEmployeePayrolls(List<String> args) throws Exception;
     void getEmployeeSchedule(List<String> args);
+    boolean restockGasStationInventory(List<String> args);
+    void addItem(List<String> args);
 }

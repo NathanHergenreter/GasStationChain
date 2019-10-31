@@ -12,21 +12,22 @@ import java.util.Iterator;
 import java.util.Set;
 
 @Service
-public class GasStationInventoryService extends InventoryService<GasStationInventory, Long, GasStationInventoryRepository> {
+public class GasStationInventoryService
+		extends InventoryService<GasStationInventory, Long, GasStationInventoryRepository> {
 
-    @Autowired
-    public GasStationInventoryService(GasStationInventoryRepository repo) {
-        super(repo);
-    }
+	@Autowired
+	public GasStationInventoryService(GasStationInventoryRepository repo) {
+		super(repo);
+	}
 
-    @Override
-    public GasStationInventoryRepository getRepository() {
-        return super.getRepository();
-    }
+	@Override
+	public GasStationInventoryRepository getRepository() {
+		return super.getRepository();
+	}
 
-    public Set<GasStationInventory> findByGasStation(GasStation gasStation) {
-        return getRepository().findByGasStation(gasStation);
-    }
+	public Set<GasStationInventory> findByGasStation(GasStation gasStation) {
+		return getRepository().findByGasStation(gasStation);
+	}
 
 	public GasStationInventory findGasStationInventoriesByGasStationAndAndItem(GasStation gasStation, Item item) {
 		return getRepository().findGasStationInventoriesByGasStationAndAndItem(gasStation, item);

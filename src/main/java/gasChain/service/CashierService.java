@@ -11,12 +11,12 @@ import java.util.List;
 @Service
 public class CashierService extends EmployeeService<Cashier, CashierRepository> {
 
-    @Autowired
-    public CashierService(CashierRepository cashierRepository) {
-        super(cashierRepository);
-    }
+	@Autowired
+	public CashierService(CashierRepository cashierRepository) {
+		super(cashierRepository);
+	}
 
-    public List<Cashier> findAllByWorkplace(GasStation workplace) {
-        return getRepository().findByWorkplace(workplace);
-    }
+	public List<Cashier> findAllByWorkplace(GasStation workplace) {
+		return getRepository().findByWorkplace(workplace);
+	}
 }

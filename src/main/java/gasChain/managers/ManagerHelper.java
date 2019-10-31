@@ -1,17 +1,23 @@
 package gasChain.managers;
 
 import gasChain.coreInterfaces.managers.IManagerHelper;
+
 import gasChain.entity.*;
 import gasChain.service.CashierService;
+import gasChain.service.GasStationInventoryService;
 import gasChain.service.GasStationService;
 import gasChain.service.ManagerService;
+import gasChain.service.WarehouseInventoryService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import java.sql.Date;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 public class ManagerHelper implements IManagerHelper {
@@ -25,6 +31,12 @@ public class ManagerHelper implements IManagerHelper {
     GasStationService _gasStationService;
     @Autowired
     CashierService _cashierService;
+    @Autowired
+    ManagerService _managerService;
+    @Autowired
+    WarehouseInventoryService _warehouseInventoryService;
+    @Autowired
+    GasStationInventoryService _gasStationInventoryService;
 
 
     /*
@@ -40,7 +52,7 @@ public class ManagerHelper implements IManagerHelper {
                 args.get(1),
                 args.get(2),
                 Integer.parseInt(args.get(3)),
-                Integer.parseInt(args.get(3))
+                Integer.parseInt(args.get(4))
         );
         _cashierService.save(model);
     }
@@ -338,4 +350,62 @@ public class ManagerHelper implements IManagerHelper {
         }
         return endOfShift;
     }
+    @Override
+	public void addItem(List<String> args) {
+
+	}
+	/*
+	 * This beast of a function takes a list of args but the format is such that you're just supposed to supply a location or manager name
+	 * If the manager name exists then we find gasStation by manager else if location then by location else return false, ie bad input
+	 * From gasStation we check all items to see if quantity is below a tolerance currently set at .5 of maximum amount
+	 * Go through as many warehouseInventories we need until will fill that quantity
+	 * Save to database accordingly
+	 * (Could make this try to search the nearest warehouses first ie. by state / region but this doesn't seem necessary at this point)
+	 * (There's a bunch of ways to go about the logic for that but this seems fine as a proof of concept)
+	 * 
+	 * (non-Javadoc)
+	 * @see gasChain.coreInterfaces.managers.IManagerHelper#restockGasStationInventory(java.util.List)
+	 */
+
+	@Override
+	public boolean restockGasStationInventory(List<String> args) {
+		GasStation gasStation = null;
+		if (_managerService.existsUser(args.get(0))) {
+			gasStation = _gasStationService.findByManager((Manager) _managerService.findByUsername(args.get(0)));
+		} else if (_gasStationService.existsLocation(args.get(0))) {
+			gasStation = _gasStationService.findByLocation(args.get(0));
+		} else {
+			return false;
+		}
+		Set<GasStationInventory> gasStationInventory = _gasStationInventoryService.findByGasStation(gasStation);
+		Iterator<GasStationInventory> iter = gasStationInventory.iterator();
+		while (iter.hasNext()) {
+			GasStationInventory inventory = iter.next();
+			if (((float) inventory.getQuantity() / (float) inventory.getMaxQuantity()) <= .5) {
+				int desiredQuantity = inventory.getMaxQuantity() - inventory.getQuantity();
+				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+				Iterator<WarehouseInventory> warehouseIterator = warehouseInventory.iterator();
+				while (warehouseIterator.hasNext() && desiredQuantity > 0) {
+					WarehouseInventory i = warehouseIterator.next();
+					if (inventory.getItem().getName().equals(warehouseIterator.next().getItem().getName())) {
+						if (i.getQuantity() >= desiredQuantity) {
+							i.setQuantity(i.getQuantity() - desiredQuantity);
+							_warehouseInventoryService.save(i);
+							inventory.setQuantity(inventory.getQuantity() + desiredQuantity);
+							_gasStationInventoryService.save(inventory);
+							desiredQuantity = 0;
+						}
+						else if (i.getQuantity() < desiredQuantity && i.getQuantity() > 0){
+							desiredQuantity -= i.getQuantity();
+							inventory.setQuantity(inventory.getQuantity() + i.getQuantity());
+							_gasStationInventoryService.save(inventory);
+							i.setQuantity(0);
+							_warehouseInventoryService.save(i);
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
 }

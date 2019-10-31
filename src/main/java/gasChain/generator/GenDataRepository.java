@@ -15,6 +15,7 @@ public class GenDataRepository {
 	private ArrayList<String> firstNames;
 	private ArrayList<String> lastNames;
 
+
 	public GenDataRepository(String corePath) throws FileNotFoundException
 	{
 		locations = getLocations(new File(corePath + "\\locationNames"));
@@ -23,10 +24,21 @@ public class GenDataRepository {
 		lastNames = getNames(new File(corePath + "\\employeeNamesLast"));
 	}
 
-	public ArrayList<LocationStruct> locations() { return locations; }
-	public ArrayList<Item> items() { return items; }
-	public ArrayList<String> firstNames() { return firstNames; }
-	public ArrayList<String> lastNames() { return lastNames; }
+	public ArrayList<LocationStruct> locations() {
+		return locations;
+	}
+
+	public ArrayList<Item> items() {
+		return items;
+	}
+
+	public ArrayList<String> firstNames() {
+		return firstNames;
+	}
+
+	public ArrayList<String> lastNames() {
+		return lastNames;
+	}
 
 	public ArrayList<GasStation> produceGasStations()
 	{
@@ -37,15 +49,15 @@ public class GenDataRepository {
 		return gasStations;
 	}
 
-	// Produces a list names using the data in employeeFirstNames or employeeLastNames
-	private ArrayList<String> getNames(File file) throws FileNotFoundException
-	{
+	// Produces a list names using the data in employeeFirstNames or
+	// employeeLastNames
+	private ArrayList<String> getNames(File file) throws FileNotFoundException {
 		ArrayList<String> names = new ArrayList<String>();
 		Scanner scan = new Scanner(file);
-		int version = scan.nextInt(); scan.nextLine();
+		int version = scan.nextInt();
+		scan.nextLine();
 
-		while(scan.hasNext())
-		{
+		while (scan.hasNext()) {
 			names.add(scan.nextLine());
 		}
 
@@ -53,19 +65,16 @@ public class GenDataRepository {
 		return names;
 	}
 
-
 	// Produces a list of gas stations using the locations in locationNames
-	private ArrayList<LocationStruct> getLocations(File file) throws FileNotFoundException
-	{
+	private ArrayList<LocationStruct> getLocations(File file) throws FileNotFoundException {
 		ArrayList<LocationStruct> locations = new ArrayList<LocationStruct>();
 		Scanner scan = new Scanner(file);
-		int version = scan.nextInt(); scan.nextLine();
+		int version = scan.nextInt();
+		scan.nextLine();
 
-		while(scan.hasNext())
-		{
+		while (scan.hasNext()) {
 			String[] next = scan.nextLine().split(";");
-			switch(version)
-			{
+			switch (version) {
 			case 0:
 				locations.add(new LocationStruct(next[0], next[1], next[2]));
 				break;
@@ -80,17 +89,15 @@ public class GenDataRepository {
 	}
 
 	// Produces a list of item templates for sales using the data in itemTypes
-	private ArrayList<Item> getItems(File file) throws FileNotFoundException
-	{
+	private ArrayList<Item> getItems(File file) throws FileNotFoundException {
 		ArrayList<Item> templates = new ArrayList<Item>();
 		Scanner scan = new Scanner(file);
-		int version = scan.nextInt(); scan.nextLine();
+		int version = scan.nextInt();
+		scan.nextLine();
 
-		while(scan.hasNext())
-		{
+		while (scan.hasNext()) {
 			String[] next = scan.nextLine().split(";");
-			switch(version)
-			{
+			switch (version) {
 			case 0:
 				templates.add(new Item(next[0], Float.parseFloat(next[1])));
 				break;
@@ -110,9 +117,10 @@ public class GenDataRepository {
 		String state;
 		String region;
 
-		protected LocationStruct(String location, String state, String region)
-		{
-			this.location = location; this.state = state; this.region = region;
+		protected LocationStruct(String location, String state, String region) {
+			this.location = location;
+			this.state = state;
+			this.region = region;
 		}
 	}
 }
