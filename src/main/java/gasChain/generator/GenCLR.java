@@ -1,17 +1,8 @@
 package gasChain.generator;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-
-import javax.validation.constraints.NotNull;
-
+import gasChain.GasStationChainApplication;
+import gasChain.entity.*;
+import gasChain.service.ServiceMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,20 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import gasChain.GasStationChainApplication;
-import gasChain.entity.Cashier;
-import gasChain.entity.Corporate;
-import gasChain.entity.GasStation;
-import gasChain.entity.Item;
-import gasChain.entity.Manager;
-import gasChain.entity.Receipt;
-import gasChain.entity.Sale;
-import gasChain.service.CorporateService;
-import gasChain.service.EmployeeService;
-import gasChain.service.GasStationService;
-import gasChain.service.ManagerService;
-import gasChain.service.SaleService;
-import gasChain.service.ServiceMaster;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Order(1)
@@ -71,12 +52,14 @@ public class GenCLR implements CommandLineRunner {
 
 		// Generate corporate employees
 		int numCorporate = 30;
+		LOG.info("Starting generation of corporate employees...");
 		generateCorporates(numCorporate, repo.firstNames(), repo.lastNames());
 
 		// Generate gas stations and their employees, sales, and inventory
 		int maxSales = 500;
 		int minEmployees = 3;
 		int maxEmployees = 8;
+		LOG.info("Starting generation of gas stations...");
 		generateGasStations(maxSales, minEmployees, maxEmployees);
 
 		long endTime = System.currentTimeMillis();
@@ -111,7 +94,24 @@ public class GenCLR implements CommandLineRunner {
 				receipt.addSale(sale);
 				numSales--;
 			}
+			Payment p;
+			try {
+				p = new CreditCardAccount("2238467265875675");
+				service.creditCardAccount().save((CreditCardAccount) p);
+			} catch (Exception e) {
+				p = new CashPayment();
+				service.cashPayment().save((CashPayment) p);
+			}
+			receipt.setPayment(p);
+
 			service.receipt().save(receipt);
+
+
+//			List<Sale> sales = receipt.getSales();
+//			for(Sale s: sales){
+//				service.sale().save(s);
+//			}
+
 		}
 	}
 

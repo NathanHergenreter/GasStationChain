@@ -1,15 +1,14 @@
 package gasChain.entity;
 
-import javax.persistence.*;
-
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "receipts")
 public class Receipt {
 
 	@Id
@@ -20,8 +19,13 @@ public class Receipt {
 	@OneToMany(mappedBy = "receipt")
 	private List<Sale> sales = new ArrayList<>();
 
-	public Receipt() {
-	}
+    @OneToOne
+    @NotNull
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
+    public Receipt() {
+    }
 
 	public Receipt(List<Sale> sales) {
 		this.sales = sales;
@@ -30,6 +34,10 @@ public class Receipt {
 	public Receipt(Sale sale) {
 		sales.add(sale);
 	}
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
 
 	public Long getId() {
 		return id;

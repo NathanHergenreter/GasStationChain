@@ -7,12 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 public class GasStation extends Store {
@@ -21,13 +18,13 @@ public class GasStation extends Store {
 	@OneToMany(mappedBy = "gasStation")
 	private Set<GasStationInventory> inventory;
 
-//    @Cascade({CascadeType.PERSIST})
-	@OneToMany(mappedBy = "sellLocation")
-	private List<Sale> sales = new ArrayList<>();
+    @Cascade({CascadeType.PERSIST})
+    @OneToMany(mappedBy = "sellLocation")
+    private List<Sale> sales = new ArrayList<>();
 
-	@OneToOne
-	@JoinColumn(name = "manager_id", referencedColumnName = "id")
-	private Manager manager;
+    @OneToOne
+    @JoinColumn(name = "manager_id")
+    private Manager manager;
 
 	@Cascade({ CascadeType.PERSIST })
 	@OneToMany(mappedBy = "workplace")

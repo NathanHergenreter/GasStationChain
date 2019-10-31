@@ -42,51 +42,37 @@ public class ServiceMaster {
 	@Autowired
 	private WorkPeriodService workPeriodService;
 
-	public AvailabilityService availability() {
-		return availabilityService;
-	}
+    @Autowired
+    private CreditCardAccountService creditCardAccountService;
 
-	public CashierService cashier() {
-		return cashierService;
-	}
+    @Autowired
+    private DebitAccountService debitAccountService;
 
-	public CorporateService corporate() {
-		return corporateService;
-	}
+    @Autowired
+    private CashPaymentService cashPaymentService;
+	
+	public AvailabilityService availability() { return availabilityService; }
+	public CashierService cashier() { return cashierService; }
+	public CorporateService corporate() { return corporateService; }
+	public ItemService item() { return itemService; }
+	public GasStationInventoryService gasStationInventory() { return gasStationInventoryService; }
+	public GasStationService gasStation() { return gasStationService; }
+	public ManagerService manager() { return managerService; }
+	public ReceiptService receipt() { return receiptService; }
+	public SaleService sale() { return saleService; }
+	public WarehouseInventoryService warehouseInventory() { return warehouseInventoryService; }
+	public WarehouseService warehouse() { return warehouseService; }
+	public WorkPeriodService workPeriod() { return workPeriodService; }
 
-	public ItemService item() {
-		return itemService;
-	}
+    public CreditCardAccountService creditCardAccount() {
+        return creditCardAccountService;
+    }
 
-	public GasStationInventoryService gasStationInventory() {
-		return gasStationInventoryService;
-	}
+    public DebitAccountService debitAccount() {
+        return debitAccountService;
+    }
 
-	public GasStationService gasStation() {
-		return gasStationService;
-	}
-
-	public ManagerService manager() {
-		return managerService;
-	}
-
-	public ReceiptService receipt() {
-		return receiptService;
-	}
-
-	public SaleService sale() {
-		return saleService;
-	}
-
-	public WarehouseInventoryService warehouseInventory() {
-		return warehouseInventoryService;
-	}
-
-	public WarehouseService warehouse() {
-		return warehouseService;
-	}
-
-	public WorkPeriodService workPeriod() {
-		return workPeriodService;
-	}
+    public CashPaymentService cashPayment() {
+        return cashPaymentService;
+    }
 }

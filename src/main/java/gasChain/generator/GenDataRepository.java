@@ -1,12 +1,12 @@
 package gasChain.generator;
 
+import gasChain.entity.GasStation;
+import gasChain.entity.Item;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import gasChain.entity.GasStation;
-import gasChain.entity.Item;
 
 public class GenDataRepository {
 
@@ -15,7 +15,9 @@ public class GenDataRepository {
 	private ArrayList<String> firstNames;
 	private ArrayList<String> lastNames;
 
-	public GenDataRepository(String corePath) throws FileNotFoundException {
+
+	public GenDataRepository(String corePath) throws FileNotFoundException
+	{
 		locations = getLocations(new File(corePath + "\\locationNames"));
 		items = getItems(new File(corePath + "\\itemTypes"));
 		firstNames = getNames(new File(corePath + "\\employeeNamesFirst"));
@@ -38,7 +40,8 @@ public class GenDataRepository {
 		return lastNames;
 	}
 
-	public ArrayList<GasStation> produceGasStations() {
+	public ArrayList<GasStation> produceGasStations()
+	{
 		ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
 		for (LocationStruct location : locations) {
 			gasStations.add(new GasStation(location.location, location.state, location.region));

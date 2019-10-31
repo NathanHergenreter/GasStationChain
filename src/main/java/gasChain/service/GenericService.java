@@ -70,10 +70,9 @@ public abstract class GenericService<T, ID extends Serializable, R extends JpaRe
 		}
 	}
 
-	@Override
-	@Transactional
-	public void save(T entity) {
-		r.save(entity);
-	}
-
+    @Override
+    @Transactional
+    public void save(T entity) {
+        r.save(entity);
+    }
 }

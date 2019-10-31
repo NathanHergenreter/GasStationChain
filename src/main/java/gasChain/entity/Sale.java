@@ -8,97 +8,108 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "sales")
 public class Sale {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
-	@NotNull
-	private int price;
+    @NotNull
+    private int price;
 
-	@CreatedDate
-	private Date sellDate;
+    @CreatedDate
+    private Date sellDate;
 
-	@OneToOne
-	@NotNull
-	@JoinColumn(name = "item_id")
-	private Item item;
+    @OneToOne
+    @NotNull
+    @JoinColumn(name = "item_id")
+    private Item item;
 
-	@OneToOne
-	@NotNull
-	@JoinColumn(name = "gas_station_id")
-	private GasStation sellLocation;
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "gas_station_id")
+    private GasStation sellLocation;
 
-	@ManyToOne
-	@NotNull
-	@JoinColumn(name = "receipt_id")
-	private Receipt receipt;
+    @ManyToOne
+    @NotNull
+    @JoinColumn(name = "receipt_id")
+    private Receipt receipt;
+    
 
-	private boolean isReturned;
+    @ManyToOne
+    @JoinColumn(name = "workplace_id")
+    private CardAccount cardAccount;
 
-	protected Sale() {
-	}
+    private boolean isReturned;
 
-	public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price) {
-		this.receipt = receipt;
-		this.price = price;
-		this.item = item;
-		this.sellLocation = sellLocation;
-		this.isReturned = false;
-		this.sellDate = new Date();
-	}
+    protected Sale() {}
 
-	public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price,
-			Date sellDate) {
-		this(item, sellLocation, receipt, price);
-		this.sellDate = sellDate;
-	}
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price) {
+        this.receipt = receipt;
+        this.price = price;
+        this.item = item;
+        this.sellLocation = sellLocation;
+        this.isReturned = false;
+        this.sellDate = new Date();
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price, Date sellDate) {
+        this(item, sellLocation, receipt, price);
+        this.sellDate = sellDate;
+    }
 
-	public int getPrice() {
-		return price;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Date getSellDate() {
-		return sellDate;
-	}
+    public Receipt getReceipt() {
+        return receipt;
+    }
 
-	public Item getItem() {
-		return item;
-	}
+    public int getPrice() {
+        return price;
+    }
 
-	public GasStation getSellLocation() {
-		return sellLocation;
-	}
+    public Date getSellDate() {
+        return sellDate;
+    }
 
-	public boolean getIsReturned() {
-		return isReturned;
-	}
+    public Item getItem() {
+        return item;
+    }
 
-	public void setIsReturned(boolean isReturned) {
-		this.isReturned = isReturned;
-	}
+    public GasStation getSellLocation() {
+        return sellLocation;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		Sale sale = (Sale) o;
-		return getPrice() == sale.getPrice() && isReturned == sale.isReturned && getId().equals(sale.getId())
-				&& getSellDate().equals(sale.getSellDate()) && getItem().equals(sale.getItem())
-				&& getSellLocation().equals(sale.getSellLocation()) && receipt.equals(sale.receipt);
-	}
+    public boolean getIsReturned() {
+        return isReturned;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(getId(), getPrice(), getSellDate(), getItem(), getSellLocation(), receipt, isReturned);
-	}
+    public void setIsReturned(boolean isReturned) {
+        this.isReturned = isReturned;
+    }
+    
+    public CardAccount getCardAccount() { return cardAccount; }
+    public Sale setCardAccount(CardAccount cardAccount) { this.cardAccount = cardAccount; return this; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Sale sale = (Sale) o;
+        return getPrice() == sale.getPrice() &&
+                isReturned == sale.isReturned &&
+                getId().equals(sale.getId()) &&
+                getSellDate().equals(sale.getSellDate()) &&
+                getItem().equals(sale.getItem()) &&
+                getSellLocation().equals(sale.getSellLocation()) &&
+                receipt.equals(sale.receipt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getPrice(), getSellDate(), getItem(), getSellLocation(), receipt, isReturned);
+    }
 
 }
