@@ -10,5 +10,7 @@ import gasChain.repository.ItemRepository;
 public class ItemService extends GenericService<Item, Long, ItemRepository> {
 
 	@Autowired
-	ItemService(ItemRepository itemRepository) { super(itemRepository); }
+	ItemService(ItemRepository itemRepository) {
+		super(itemRepository);
+	}
 }

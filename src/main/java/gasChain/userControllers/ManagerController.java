@@ -38,6 +38,8 @@ public class ManagerController implements IUserController {
             case "ScheduleEmployees":
                 _managerHelper.getEmployeeSchedule(cmd);
                 break;
+            case "RestockInventory":
+            	_managerHelper.restockGasStationInventory(cmd);
             default:
                 break;
         }

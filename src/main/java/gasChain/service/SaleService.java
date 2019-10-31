@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class SaleService extends GenericService<Sale, Long, SaleRepository> {
 
-    public SaleService(SaleRepository saleRepository) {
-        super(saleRepository);
-    }
+	public SaleService(SaleRepository saleRepository) {
+		super(saleRepository);
+	}
 }

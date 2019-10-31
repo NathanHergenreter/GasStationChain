@@ -9,11 +9,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class GenUtil {
 
-    protected static Random rng = new Random();
-    
+	protected static Random rng = new Random();
+
 	// Produces a random date from the past x years
-	public static Date genDate()
-	{
+	public static Date genDate() {
 		int yearRange = 5;
 		Random rng = new Random();
 		String year = Integer.toString(2019 - rng.nextInt(yearRange));
@@ -25,8 +24,7 @@ public class GenUtil {
 		return Date.valueOf(sdf);
 	}
 
-	public static String genRandomName(ArrayList<String> firstNames, ArrayList<String> lastNames)
-	{
+	public static String genRandomName(ArrayList<String> firstNames, ArrayList<String> lastNames) {
 		return firstNames.get(rng.nextInt(firstNames.size())) + " " + lastNames.get(rng.nextInt(lastNames.size()));
 	}
 }

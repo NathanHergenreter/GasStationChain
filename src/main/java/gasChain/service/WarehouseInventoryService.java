@@ -9,19 +9,20 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 
 @Service
-public class WarehouseInventoryService extends InventoryService<WarehouseInventory, Long, WarehouseInventoryRepository> {
+public class WarehouseInventoryService
+		extends InventoryService<WarehouseInventory, Long, WarehouseInventoryRepository> {
 
-    @Autowired
-    public WarehouseInventoryService(WarehouseInventoryRepository repo) {
-        super(repo);
-    }
+	@Autowired
+	public WarehouseInventoryService(WarehouseInventoryRepository repo) {
+		super(repo);
+	}
 
-    @Override
-    public WarehouseInventoryRepository getRepository() {
-        return super.getRepository();
-    }
+	@Override
+	public WarehouseInventoryRepository getRepository() {
+		return super.getRepository();
+	}
 
-    public Set<WarehouseInventory> findByWarehouse(Warehouse warehouse) {
-        return getRepository().findByWarehouse(warehouse);
-    }
+	public Set<WarehouseInventory> findByWarehouse(Warehouse warehouse) {
+		return getRepository().findByWarehouse(warehouse);
+	}
 }

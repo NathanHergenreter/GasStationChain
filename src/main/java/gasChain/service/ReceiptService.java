@@ -10,6 +10,7 @@ import gasChain.repository.ReceiptRepository;
 public class ReceiptService extends GenericService<Receipt, Long, ReceiptRepository> {
 
 	@Autowired
-	ReceiptService(ReceiptRepository receiptRepository) { super(receiptRepository); }
+	ReceiptService(ReceiptRepository receiptRepository) {
+		super(receiptRepository);
+	}
 }
-

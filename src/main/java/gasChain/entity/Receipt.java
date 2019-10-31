@@ -12,40 +12,39 @@ import java.util.List;
 @Table(name = "receipts")
 public class Receipt {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
 
-    @Cascade({CascadeType.PERSIST})
-    @OneToMany(mappedBy = "receipt")
-    private List<Sale> sales = new ArrayList<>();
+	@Cascade({ CascadeType.PERSIST })
+	@OneToMany(mappedBy = "receipt")
+	private List<Sale> sales = new ArrayList<>();
 
-    public Receipt() {
-    }
-    
-    public Receipt(List<Sale> sales) {
-        this.sales = sales;
-    }
+	public Receipt() {
+	}
 
-    public Receipt(Sale sale) {
-        sales.add(sale);
-    }
+	public Receipt(List<Sale> sales) {
+		this.sales = sales;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Receipt(Sale sale) {
+		sales.add(sale);
+	}
 
-    public List<Sale> getSales() {
-        return sales;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void addSale(Sale sale) {
-        sales.add(sale);
-    }
+	public List<Sale> getSales() {
+		return sales;
+	}
 
-    public void voidSale(Sale sale) {
-        sales.remove(sale);
-    }
+	public void addSale(Sale sale) {
+		sales.add(sale);
+	}
 
+	public void voidSale(Sale sale) {
+		sales.remove(sale);
+	}
 
 }
