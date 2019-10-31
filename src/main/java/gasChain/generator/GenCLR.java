@@ -1,17 +1,8 @@
 package gasChain.generator;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
-
-import javax.validation.constraints.NotNull;
-
+import gasChain.GasStationChainApplication;
+import gasChain.entity.*;
+import gasChain.service.ServiceMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,20 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import gasChain.GasStationChainApplication;
-import gasChain.entity.Cashier;
-import gasChain.entity.Corporate;
-import gasChain.entity.GasStation;
-import gasChain.entity.Item;
-import gasChain.entity.Manager;
-import gasChain.entity.Receipt;
-import gasChain.entity.Sale;
-import gasChain.service.CorporateService;
-import gasChain.service.EmployeeService;
-import gasChain.service.GasStationService;
-import gasChain.service.ManagerService;
-import gasChain.service.SaleService;
-import gasChain.service.ServiceMaster;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 @Order(1)
@@ -83,6 +64,7 @@ public class GenCLR implements CommandLineRunner {
 	// Pulls data for locations, items, and names from txt files for generation, generates database
 	private void generateGasStations(int maxSales, int minEmployees, int maxEmployees)
 	{
+		LOG.info("Starting generateGasStations...");
 		ArrayList<GasStation> gasStations = repo.produceGasStations();
 		for(GasStation gasStation : gasStations)
 		{
@@ -100,6 +82,7 @@ public class GenCLR implements CommandLineRunner {
 
 	private void generateSales(int maxSales, GasStation gasStation, ArrayList<Item> items)
 	{
+		LOG.info("Starting generateSales...");
 		int numSales = GenUtil.rng.nextInt(maxSales);
 		while(numSales > 0)
 		{
@@ -109,17 +92,34 @@ public class GenCLR implements CommandLineRunner {
 			{
 				Sale sale = new Sale(item, gasStation, receipt, 
 									item.getSuggestRetailPrice(), GenUtil.genDate());
-				gasStation.addSale(sale);
 				receipt.addSale(sale);
 				numSales--;
 			}
+			Payment p;
+			try {
+				p = new CreditCardAccount("2238467265875675");
+				service.creditCardAccount().save((CreditCardAccount) p);
+			} catch (Exception e) {
+				p = new CashPayment();
+				service.cashPayment().save((CashPayment) p);
+			}
+			receipt.setPayment(p);
+
 			service.receipt().save(receipt);
+
+
+//			List<Sale> sales = receipt.getSales();
+//			for(Sale s: sales){
+//				service.sale().save(s);
+//			}
+
 		}
 	}
 
 	private void generateCashiers(int minEmployees, int maxEmployees, GasStation gasStation,
 									ArrayList<String> firstNames, ArrayList<String> lastNames)
 	{
+		LOG.info("Starting generateCashiers...");
 		int numEmployees = GenUtil.rng.nextInt(maxEmployees - minEmployees) + minEmployees;
 		float minWage = 8.5f; float maxWage = 15.0f;
 		int minHours = 20; int maxHours = 50;
@@ -139,6 +139,7 @@ public class GenCLR implements CommandLineRunner {
 
 	private void generateManager(GasStation gasStation)
 	{
+		LOG.info("Starting generateManager...");
 		Manager manager = new Manager( gasStation.getLocation() + "_Manager", "password");
 		manager.setStore(gasStation);
 		gasStation.setManager(manager);
@@ -147,6 +148,7 @@ public class GenCLR implements CommandLineRunner {
 
 	private void generateCorporates(int num, ArrayList<String> firstNames, ArrayList<String> lastNames)
 	{
+		LOG.info("Starting generateCorporates...");
 		for(int i = 0; i < num; i++)
 		{
 			String username = GenUtil.genRandomName(firstNames, lastNames).replace(' ', '_')

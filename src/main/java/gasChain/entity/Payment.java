@@ -9,7 +9,7 @@ import java.util.List;
 @Entity
 @Inheritance
 @DiscriminatorColumn(name = "payment_type")
-public class Payment {
+public abstract class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

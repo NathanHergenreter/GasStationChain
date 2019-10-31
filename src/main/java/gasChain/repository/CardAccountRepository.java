@@ -1,10 +1,12 @@
 package gasChain.repository;
 
 import gasChain.entity.CardAccount;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.NoRepositoryBean;
 
 import java.io.Serializable;
 
-public interface CardAccountRepository<T extends CardAccount, ID extends Serializable> extends JpaRepository<T, ID> {
+@NoRepositoryBean
+public interface CardAccountRepository<T extends CardAccount, ID extends Serializable>
+        extends PaymentRepository<T, ID> {
 
 }

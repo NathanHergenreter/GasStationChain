@@ -41,6 +41,15 @@ public class ServiceMaster {
 	
 	@Autowired
 	private WorkPeriodService workPeriodService;
+
+    @Autowired
+    private CreditCardAccountService creditCardAccountService;
+
+    @Autowired
+    private DebitAccountService debitAccountService;
+
+    @Autowired
+    private CashPaymentService cashPaymentService;
 	
 	public AvailabilityService availability() { return availabilityService; }
 	public CashierService cashier() { return cashierService; }
@@ -54,4 +63,16 @@ public class ServiceMaster {
 	public WarehouseInventoryService warehouseInventory() { return warehouseInventoryService; }
 	public WarehouseService warehouse() { return warehouseService; }
 	public WorkPeriodService workPeriod() { return workPeriodService; }
+
+    public CreditCardAccountService creditCardAccount() {
+        return creditCardAccountService;
+    }
+
+    public DebitAccountService debitAccount() {
+        return debitAccountService;
+    }
+
+    public CashPaymentService cashPayment() {
+        return cashPaymentService;
+    }
 }
