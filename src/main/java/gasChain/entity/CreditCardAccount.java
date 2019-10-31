@@ -1,7 +1,6 @@
 package gasChain.entity;
 
 import javax.persistence.Entity;
-import java.util.Set;
 
 @Entity
 public class CreditCardAccount extends CardAccount {
@@ -10,7 +9,7 @@ public class CreditCardAccount extends CardAccount {
         super();
     }
 
-    public CreditCardAccount(String cardNumber, Set<Sale> sales) throws Exception {
-        super(cardNumber, sales);
+    public CreditCardAccount(String cardNumber) throws Exception {
+        super(cardNumber);
     }
 }

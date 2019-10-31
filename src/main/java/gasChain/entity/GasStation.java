@@ -3,25 +3,20 @@ package gasChain.entity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
+@Table(name = "gas_stations")
 public class GasStation extends Store {
 
     @Cascade({CascadeType.ALL})
     @OneToMany(mappedBy = "gasStation")
     private Set<GasStationInventory> inventory;
 
-//    @Cascade({CascadeType.PERSIST})
+    @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
     private List<Sale> sales = new ArrayList<>();
 
