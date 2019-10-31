@@ -15,7 +15,7 @@ import java.util.List;
 public class CashierHelper implements ICashierHelper {
 
     private static CashierHelper cashierHelperSingleton;
-    Cashier _cashier;
+    private Cashier _cashier;
     private WorkPeriodService workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
     private ReceiptService receiptService = ManagersAutoWire.getBean(ReceiptService.class);
     private GasStationInventoryService gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
@@ -49,6 +49,10 @@ public class CashierHelper implements ICashierHelper {
                 _cashier.getWagesHourly(),
                 new Date(System.currentTimeMillis())
         );
+    }
+
+    public void processSale() {
+
     }
 //WIP
 //    @Override
