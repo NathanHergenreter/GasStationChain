@@ -40,7 +40,7 @@ public class ManagerHelper implements IManagerHelper {
                 args.get(1),
                 args.get(2),
                 Integer.parseInt(args.get(3)),
-                Integer.parseInt(args.get(3))
+                Integer.parseInt(args.get(4))
         );
         _cashierService.save(model);
     }

@@ -11,9 +11,9 @@ import org.hibernate.annotations.CascadeType;
 @Entity
 public class Cashier extends Employee {
 
-    private String _name;
-    private int _wagesHourly;
-    private int _hoursWeekly;
+    private String name;
+    private int wagesHourly;
+    private int hoursWeekly;
 
     @ManyToOne
     @JoinColumn(name = "workplace_id")
@@ -34,16 +34,16 @@ public class Cashier extends Employee {
     public Cashier(String username, String password,
                    String name, int wagesHourly, int hoursWeekly) {
         super(username, password);
-        this._name = name;
-        this._wagesHourly = wagesHourly;
-        this._hoursWeekly = hoursWeekly;
+        this.name = name;
+        this.wagesHourly = wagesHourly;
+        this.hoursWeekly = hoursWeekly;
     }
 
     public Cashier(String name, int wagesHourly, int hoursWeekly) {
         super((name.replace(' ', '_') + (Integer.valueOf(wagesHourly + hoursWeekly + name.length())).toString()), "password");
-        this._name = name;
-        this._wagesHourly = wagesHourly;
-        this._hoursWeekly = hoursWeekly;
+        this.name = name;
+        this.wagesHourly = wagesHourly;
+        this.hoursWeekly = hoursWeekly;
     }
 
     public Cashier(String name, int wagesHourly, int hoursWeekly, GasStation workplace) {
@@ -52,19 +52,19 @@ public class Cashier extends Employee {
     }
 
     public String getName() {
-        return _name;
+        return name;
     }
-    public void setName(String name) { _name = name;}
+    public void setName(String name) { this.name = name;}
 
     public int getWagesHourly() {
-        return _wagesHourly;
+        return wagesHourly;
     }
-    public void setWagesHourly(int hourlyWage) { _wagesHourly = hourlyWage; }
+    public void setWagesHourly(int hourlyWage) { wagesHourly = hourlyWage; }
 
     public int getHoursWeekly() {
-        return _hoursWeekly;
+        return hoursWeekly;
     }
-    public void setHoursWeekly(int weeklyHours) { _hoursWeekly = weeklyHours; }
+    public void setHoursWeekly(int weeklyHours) { hoursWeekly = weeklyHours; }
 
     public GasStation getWorkplace() {
         return workplace;

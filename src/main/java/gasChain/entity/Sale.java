@@ -35,6 +35,11 @@ public class Sale {
     @NotNull
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
+    
+
+    @ManyToOne
+    @JoinColumn(name = "workplace_id")
+    private CardAccount cardAccount;
 
     private boolean isReturned;
 
@@ -82,7 +87,9 @@ public class Sale {
     public void setIsReturned(boolean isReturned) {
         this.isReturned = isReturned;
     }
-
+    
+    public CardAccount getCardAccount() { return cardAccount; }
+    public Sale setCardAccount(CardAccount cardAccount) { this.cardAccount = cardAccount; return this; }
 
     @Override
     public boolean equals(Object o) {

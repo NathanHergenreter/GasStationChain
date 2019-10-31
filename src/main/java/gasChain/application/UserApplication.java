@@ -41,43 +41,51 @@ public class UserApplication implements CommandLineRunner {
 	CorporateService corporateService;
 	
 	static Scanner in;
+
+	IUserController _controller;
 	
 	@Override
 	public void run(String... args) throws Exception {
 		in = new Scanner(System.in);
+		boolean hasValidated = false;
 		
-		System.out.println("Enter username: ");
-		String username = in.next();
-		
-		Employee employee = cashierService.findByUsername(username);
-		employee = employee == null ? managerService.findByUsername(username) : employee;
-		employee = employee == null ? corporateService.findByUsername(username) : employee;
-		IUserHelper helper;
-
-		switch(employee.getAuth())
+		while(!hasValidated)
 		{
-			case "cashier":
-				helper = new CashierHelper((Cashier)employee);
-                _controller = new CashierController((CashierHelper)helper);
-                promptUser(in);
-				break;
-			case "manager":
-			    helper = new ManagerHelper((Manager) employee);
-			    _controller = new ManagerController((ManagerHelper)helper);
-                promptUser(in);
-				break;
-			case "corporate":
-                promptUser(in);
-				break;
-			default:
-				System.out.println("Invalid username - User does not exist");
-				break;
+			System.out.println("Enter username: ");
+			String username = in.next();
+			
+			System.out.println("Enter password: ");
+			String password = in.next();
+			
+			IUserHelper helper;
+	
+			Employee employee = validateUser(username, password);
+			hasValidated = true;
+			
+			switch(employee.getAuth())
+			{
+				case "cashier":
+					helper = new CashierHelper((Cashier) employee);
+	                _controller = new CashierController((CashierHelper)helper);
+	                promptUser(in);
+					break;
+				case "manager":
+				    helper = new ManagerHelper((Manager) employee);
+				    _controller = new ManagerController((ManagerHelper)helper);
+	                promptUser(in);
+					break;
+				case "corporate":
+	                promptUser(in);
+					break;
+				default:
+					hasValidated = false;
+					System.out.println("Invalid username or password");
+					break;
+			}
 		}
 		
 		in.close();
 	}
-
-	IUserController _controller;
 
 	public void promptUser(Scanner reader){
 		boolean isSignedIn = true;
@@ -93,5 +101,14 @@ public class UserApplication implements CommandLineRunner {
                 }
             }
 		}
+	}
+	
+	private Employee validateUser(String username, String password)
+	{
+		Employee employee = cashierService.findByUsername(username);
+		employee = employee == null ? managerService.findByUsername(username) : employee;
+		employee = employee == null ? corporateService.findByUsername(username) : employee;
+		
+		return employee.getPassword().equals(password) ? employee : null;
 	}
 }
