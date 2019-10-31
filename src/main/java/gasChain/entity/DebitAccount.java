@@ -15,4 +15,13 @@ public class DebitAccount extends CardAccount {
         super(cardNumber);
         this.accountBalance = accountBalance;
     }
+
+    public int getAccountBalance() {
+        return accountBalance;
+    }
+
+    public int balanceTransaction(int amount) {
+        accountBalance += amount;
+        return accountBalance;
+    }
 }
