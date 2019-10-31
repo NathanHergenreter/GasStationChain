@@ -20,8 +20,11 @@ public class CashierController implements IUserController{
             case "AddWorkPeriod":
                 _cashierHelper.addWorkPeriod(cmd.subList(1,cmd.size()));
                 break;
-            case "BeginNewSale":
+            case "NewSale":
                 _cashierHelper.processSale();
+                break;
+            case "ReturnItems":
+                _cashierHelper.processReturn(cmd.subList(1, cmd.size()));
             default:
                 break;
         }
