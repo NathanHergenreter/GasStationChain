@@ -1,33 +1,25 @@
 package gasChain.application;
 
-import gasChain.coreInterfaces.managers.ICashierHelper;
-import gasChain.coreInterfaces.managers.IManagerHelper;
 import gasChain.coreInterfaces.managers.IUserHelper;
+import gasChain.coreInterfaces.userControllers.IUserController;
 import gasChain.entity.Cashier;
+import gasChain.entity.Employee;
 import gasChain.entity.Manager;
 import gasChain.managers.CashierHelper;
 import gasChain.managers.ManagerHelper;
+import gasChain.service.CashierService;
+import gasChain.service.CorporateService;
+import gasChain.service.ManagerService;
 import gasChain.userControllers.CashierController;
-import java.util.Scanner;
-
 import gasChain.userControllers.ManagerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import gasChain.coreInterfaces.userControllers.IUserController;
-import gasChain.entity.Employee;
-import gasChain.entity.GasStation;
-import gasChain.service.CashierService;
-import gasChain.service.CorporateService;
-import gasChain.service.GasStationService;
-import gasChain.service.ManagerService;
+import java.util.Scanner;
 
 @Component
 @Order(2)
@@ -57,7 +49,7 @@ public class UserApplication implements CommandLineRunner {
 		switch(employee.getAuth())
 		{
 			case "cashier":
-				helper = new CashierHelper((Cashier)employee);
+				helper = CashierHelper.cashierHelper((Cashier) employee);
                 _controller = new CashierController((CashierHelper)helper);
                 promptUser(in);
 				break;

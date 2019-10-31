@@ -1,16 +1,17 @@
 package gasChain.userControllers;
 
+import gasChain.coreInterfaces.managers.ICashierHelper;
+import gasChain.coreInterfaces.userControllers.IUserController;
+
 import java.util.List;
 
-import gasChain.coreInterfaces.userControllers.IUserController;
-import gasChain.coreInterfaces.managers.ICashierHelper;
-
 public class CashierController implements IUserController{
+
+    private ICashierHelper _cashierHelper;
+
     public CashierController(ICashierHelper helper){
         _cashierHelper = helper;
     }
-
-    private ICashierHelper _cashierHelper;
 
     @Override
     public void execute(List<String> cmd) {
@@ -19,6 +20,8 @@ public class CashierController implements IUserController{
             case "AddWorkPeriod":
                 _cashierHelper.addWorkPeriod(cmd.subList(1,cmd.size()));
                 break;
+            case "BeginNewSale":
+                _cashierHelper.processSale();
             default:
                 break;
         }

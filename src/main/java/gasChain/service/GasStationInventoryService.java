@@ -27,6 +27,18 @@ public class GasStationInventoryService extends InventoryService<GasStationInven
     public Set<GasStationInventory> findByGasStation(GasStation gasStation) {
         return getRepository().findByGasStation(gasStation);
     }
+
+	public GasStationInventory findGasStationInventoriesByGasStationAndAndItem(GasStation gasStation, Item item) {
+		return getRepository().findGasStationInventoriesByGasStationAndAndItem(gasStation, item);
+	}
+
+	public GasStationInventory RemoveItemFromInventory(GasStation gasStation, Item item) {
+		GasStationInventory gasStationInventory = getRepository().findGasStationInventoriesByGasStationAndAndItem(gasStation, item);
+		gasStationInventory.setQuantity(gasStationInventory.getQuantity() - 1);
+		getRepository().save(gasStationInventory);
+		return gasStationInventory;
+	}
+
     /*
      * For now this is going to be a 1 click option to restock an inventory for a given gas station
      * For each item in the gas station's inventory we check if there are half or less and restock if that's the case

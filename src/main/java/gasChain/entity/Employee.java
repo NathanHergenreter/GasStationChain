@@ -8,28 +8,38 @@ public abstract class Employee {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long _id;
+    private Long id;
 
-    private String _username;
-    private String _password;
+    private String username;
+    private String password;
 
     Employee() {
     }
 
-    public Employee(String _username, String password) {
-        this._username = _username;
-        this._password = password;
+    public Employee(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
-    public long getId() { return _id; }
+    public long getId() {
+        return id;
+    }
 
     public String getUsername() {
-        return _username;
+        return username;
     }
-    public void setUsername(String username) { _username = username; }
 
-    public String getPassword() { return _password; }
-    public void setPassword(String password) { _password = password; }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public String getAuth() {
         return "generic";
