@@ -26,5 +26,4 @@ public abstract class EmployeeService<T extends Employee, R extends EmployeeRepo
     public boolean hasCorrectAuth(String username, String authority) {
         return hasCorrectAuth(findByUsername(username), authority);
     }
-
 }

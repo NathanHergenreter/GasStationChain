@@ -3,10 +3,7 @@ package gasChain.entity;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
@@ -14,17 +11,17 @@ import org.hibernate.annotations.CascadeType;
 @Entity
 public class Cashier extends Employee {
 
-    private String name;
-    private int wagesHourly;
-    private int hoursWeekly;
+    private String _name;
+    private int _wagesHourly;
+    private int _hoursWeekly;
 
     @ManyToOne
     @JoinColumn(name = "workplace_id")
     private GasStation workplace;
 
     @Cascade({CascadeType.PERSIST})
-    @OneToMany(mappedBy = "cashier")
-    private List<Availability> availabilities = new ArrayList<>();
+    @OneToOne(mappedBy = "cashier")
+    private Availability availability;
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "cashier")
@@ -37,16 +34,16 @@ public class Cashier extends Employee {
     public Cashier(String username, String password,
                    String name, int wagesHourly, int hoursWeekly) {
         super(username, password);
-        this.name = name;
-        this.wagesHourly = wagesHourly;
-        this.hoursWeekly = hoursWeekly;
+        this._name = name;
+        this._wagesHourly = wagesHourly;
+        this._hoursWeekly = hoursWeekly;
     }
 
     public Cashier(String name, int wagesHourly, int hoursWeekly) {
         super((name.replace(' ', '_') + (Integer.valueOf(wagesHourly + hoursWeekly + name.length())).toString()), "password");
-        this.name = name;
-        this.wagesHourly = wagesHourly;
-        this.hoursWeekly = hoursWeekly;
+        this._name = name;
+        this._wagesHourly = wagesHourly;
+        this._hoursWeekly = hoursWeekly;
     }
 
     public Cashier(String name, int wagesHourly, int hoursWeekly, GasStation workplace) {
@@ -55,28 +52,26 @@ public class Cashier extends Employee {
     }
 
     public String getName() {
-        return name;
+        return _name;
     }
+    public void setName(String name) { _name = name;}
 
     public int getWagesHourly() {
-        return wagesHourly;
+        return _wagesHourly;
     }
+    public void setWagesHourly(int hourlyWage) { _wagesHourly = hourlyWage; }
 
     public int getHoursWeekly() {
-        return hoursWeekly;
+        return _hoursWeekly;
     }
+    public void setHoursWeekly(int weeklyHours) { _hoursWeekly = weeklyHours; }
 
     public GasStation getWorkplace() {
         return workplace;
     }
     
-    public List<Availability> getAvailabilities() { return availabilities; }
-    public Cashier addAvailability(Availability availability) { availabilities.add(availability); return this; }
-    public Cashier addAvailabilities(ArrayList<Availability> availabilities)
-    { 
-    	this.availabilities.addAll(availabilities); 
-    	return this; 
-    }
+    public Availability getAvailability() { return availability; }
+    public void setAvailability(Availability availability) { this.availability = availability; }
     
     public List<WorkPeriod> getWorkPeriods() { return workPeriods; }
     public Cashier addWorkPeriod(WorkPeriod workPeriod) { workPeriods.add(workPeriod); return this; }

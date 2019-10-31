@@ -31,4 +31,8 @@ public class WorkPeriod {
     	this.cashier = cashier; this.startHour = startHour; this.endHour = endHour; 
     	this.wages = wages; this.date = date;
     }
+
+    public Date getDate() { return date; }
+    public int getStartHour() { return startHour; }
+    public int getEndHour() { return endHour; }
 }

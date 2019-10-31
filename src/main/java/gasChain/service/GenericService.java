@@ -1,5 +1,6 @@
 package gasChain.service;
 
+import gasChain.entity.Employee;
 import gasChain.service.interfaces.IGenericService;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -76,5 +77,4 @@ public abstract class GenericService<T, ID extends Serializable, R extends JpaRe
     public void save(T entity) {
         r.save(entity);
     }
-
 }

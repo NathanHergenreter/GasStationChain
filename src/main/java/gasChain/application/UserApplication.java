@@ -1,8 +1,16 @@
 package gasChain.application;
 
+import gasChain.coreInterfaces.managers.ICashierHelper;
+import gasChain.coreInterfaces.managers.IManagerHelper;
+import gasChain.coreInterfaces.managers.IUserHelper;
+import gasChain.entity.Cashier;
+import gasChain.entity.Manager;
+import gasChain.managers.CashierHelper;
+import gasChain.managers.ManagerHelper;
 import gasChain.userControllers.CashierController;
 import java.util.Scanner;
 
+import gasChain.userControllers.ManagerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.Ordered;
@@ -44,17 +52,22 @@ public class UserApplication implements CommandLineRunner {
 		Employee employee = cashierService.findByUsername(username);
 		employee = employee == null ? managerService.findByUsername(username) : employee;
 		employee = employee == null ? corporateService.findByUsername(username) : employee;
-		
+		IUserHelper helper;
+
 		switch(employee.getAuth())
 		{
 			case "cashier":
-				promptCashier();
+				helper = new CashierHelper((Cashier)employee);
+                _controller = new CashierController((CashierHelper)helper);
+                promptUser(in);
 				break;
 			case "manager":
-				promptStoreManager();
+			    helper = new ManagerHelper((Manager) employee);
+			    _controller = new ManagerController((ManagerHelper)helper);
+                promptUser(in);
 				break;
 			case "corporate":
-				promptCorporateEmployee();
+                promptUser(in);
 				break;
 			default:
 				System.out.println("Invalid username - User does not exist");
@@ -66,30 +79,19 @@ public class UserApplication implements CommandLineRunner {
 
 	IUserController _controller;
 
-	public void promptCashier(){
+	public void promptUser(Scanner reader){
 		boolean isSignedIn = true;
-		_controller = new CashierController();
-		while(!isSignedIn){
-			//prompt for respective cashier commands
-			//List<String> result = Arrays.asList(Scanner.scan().split("-"));
-			//_controller.execute(result);
-			// ^^^this method should switch on first e in list to find the resp. cmd
-			// and pass in the rest of the params to that method from the given list
 
-		}
-	}
-
-	public void promptStoreManager(){
-		boolean isSignedIn = true;
-		while(!isSignedIn){
-			//prompt for respective cashier commands
-		}
-	}
-
-	public void promptCorporateEmployee(){
-		boolean isSignedIn = true;
-		while(!isSignedIn){
-			//prompt for respective cashier commands
+		while(isSignedIn){
+			List<String> result = Arrays.asList(reader.nextLine().split("-"));
+			isSignedIn = !result.get(0).equals("exit");
+			if (isSignedIn){
+                try{
+                    _controller.execute(result);
+                }catch (Exception e){
+                    System.out.println(e);
+                }
+            }
 		}
 	}
 }
