@@ -9,7 +9,7 @@ public interface IManagerHelper extends IUserHelper {
     void updateCashier(List<String> args) throws Exception;
     void updateCashierAvailability(List<String> args) throws Exception;
     void removeCashier(List<String> args) throws Exception;
-    String getCashierPayroll(List<String> args) throws Exception;
-    String getEmployeePayrolls(List<String> args) throws Exception;
-    String getEmployeeSchedule(List<String> args);
+    void getCashierPayroll(List<String> args) throws Exception;
+    void getEmployeePayrolls(List<String> args) throws Exception;
+    void getEmployeeSchedule(List<String> args);
 }
