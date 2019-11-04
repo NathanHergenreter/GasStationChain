@@ -4,12 +4,8 @@ import gasChain.coreInterfaces.managers.ICashierHelper;
 import gasChain.entity.*;
 import gasChain.service.*;
 
-import java.sql.Date;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class CashierHelper implements ICashierHelper {
@@ -52,7 +48,7 @@ public class CashierHelper implements ICashierHelper {
                 Integer.parseInt(args.get(0)),
                 Integer.parseInt(args.get(1)),
                 _cashier.getWagesHourly(),
-                new Date(System.currentTimeMillis())
+                new java.sql.Date(System.currentTimeMillis())
         );
         _cashier.addWorkPeriod(workPeriod);
         
@@ -172,23 +168,53 @@ public class CashierHelper implements ICashierHelper {
 
     @Override
     public void processReturn(List<String> args) throws Exception {
-        if (args.get(0) == "noReceipt") {
-            if (args.get(1) == "cc") {
-
-            } else if (args.get(1) == "dc") {
-
+        if (args.get(0).equals("noReceipt")) {
+            Receipt returnReceipt;
+            List<Receipt> receipts;
+            Long item_id;
+            if (args.get(1).equals("cc")) {
+                CreditCardAccount cc = creditCardAccountService.findOneByCardNumber(args.get(2));
+                item_id = Long.parseLong(args.get(3));
+                receipts = cc.getTransactionsByItem(item_id);
+            } else if (args.get(1).equals("dc")) {
+                DebitAccount dc = debitAccountService.findOneByCardNumber(args.get(2));
+                item_id = Long.parseLong(args.get(3));
+                receipts = dc.getTransactionsByItem(item_id);
+            } else {
+                System.out.print("Invalid argument given");
+                return;
             }
-        } else if (args.get(0) == "receipt") {
+            if (receipts.size() < 1) {
+                System.out.println("No Item found with given credit card");
+                return;
+            } else if (receipts.size() == 1) {
+                returnReceipt = receipts.get(0);
+            } else {
+                returnReceipt = receipts.get(0);
+                Date date = receipts.get(0).getSales().get(0).getSellDate();
+                for (int i = 0; i < receipts.size(); i++) {
+                    Date temp_date = receipts.get(i).getSales().get(0).getSellDate();
+                    if (temp_date.after(date)) {
+                        date = temp_date;
+                        returnReceipt = receipts.get(i);
+                    }
+                }
+            }
+            for (Sale s : returnReceipt.getSales()) {
+                if (s.getItem().getId().equals(item_id)) {
+                    returnItem(s);
+                    receiptService.save(receipts.get(0));
+                    System.out.println("Item Returned");
+                    return;
+                }
+            }
+        } else if (args.get(0).equals("receipt")) {
             Receipt receipt = receiptService.findById(Long.parseLong(args.get(1)));
             long itemId = Long.parseLong(args.get(2));
             for (Sale s : receipt.getSales()) {
                 if (s.getItem().getId() == itemId) {
-                    GasStationInventory inventoryItem =
-                            gasStationInventoryService.findGasStationInventoriesByGasStationAndAndItem(_cashier.getWorkplace(), s.getItem());
-                    inventoryItem.setQuantity(inventoryItem.getQuantity() + 1);
-                    s.setIsReturned(true);
-                    gasStationInventoryService.save(inventoryItem);
-                    saleService.save(s);
+                    returnItem(s);
+                    System.out.println("Item Returned");
                     break;
                 }
             }
@@ -196,4 +222,14 @@ public class CashierHelper implements ICashierHelper {
         }
     }
 
+    private void returnItem(Sale sale) {
+        GasStationInventory inventoryItem =
+                gasStationInventoryService.findGasStationInventoriesByGasStationAndAndItem(_cashier.getWorkplace(), sale.getItem());
+        inventoryItem.setQuantity(inventoryItem.getQuantity() + 1);
+        sale.setIsReturned(true);
+        gasStationInventoryService.save(inventoryItem);
+        saleService.save(sale);
+    }
 }
+
+

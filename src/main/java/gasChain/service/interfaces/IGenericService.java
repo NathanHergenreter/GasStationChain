@@ -8,6 +8,8 @@ public interface IGenericService<T, ID extends Serializable> {
 	long count();
 
 	boolean isEmpty();
+	
+	void delete(T t);
 
 	void deleteById(ID id);
 
