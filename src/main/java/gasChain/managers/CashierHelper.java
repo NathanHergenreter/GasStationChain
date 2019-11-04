@@ -198,6 +198,7 @@ public class CashierHelper implements ICashierHelper {
                 if (s.getItem().getId().equals(item_id)) {
                     returnItem(s);
                     receiptService.save(receipts.get(0));
+                    System.out.println("Item Returned");
                     return;
                 }
             }
@@ -207,6 +208,7 @@ public class CashierHelper implements ICashierHelper {
             for (Sale s : receipt.getSales()) {
                 if (s.getItem().getId() == itemId) {
                     returnItem(s);
+                    System.out.println("Item Returned");
                     break;
                 }
             }
