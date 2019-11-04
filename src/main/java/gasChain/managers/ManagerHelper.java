@@ -28,16 +28,13 @@ public class ManagerHelper implements IManagerHelper {
 
     Manager _user;
 
-    @Autowired
-    GasStationService _gasStationService;
-    @Autowired
-    CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
-    @Autowired
-    ManagerService _managerService;
-    @Autowired
-    WarehouseInventoryService _warehouseInventoryService;
-    @Autowired
-    GasStationInventoryService _gasStationInventoryService;
+    private GasStationService _gasStationService = ManagersAutoWire.getBean(GasStationService.class);
+    private CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
+    private ManagerService _managerService = ManagersAutoWire.getBean(ManagerService.class);
+    private WarehouseInventoryService _warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
+    private GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
+    private WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
+
 
 
     /*
@@ -60,6 +57,7 @@ public class ManagerHelper implements IManagerHelper {
 
     /*
     args should be ordered: username, password, name, wagesHourly
+    NOTE: this method should NOT re-set the username
      */
     @Override
     public void updateCashier(List<String> args) throws Exception{
@@ -70,7 +68,6 @@ public class ManagerHelper implements IManagerHelper {
 
         Cashier model = (Cashier) _cashierService.findByUsername(args.get(0));
 
-        model.setUsername(args.get(0));
         model.setPassword(args.get(1));
         model.setName(args.get(2));
         model.setWagesHourly(Integer.parseInt(args.get(3)));
@@ -116,7 +113,7 @@ public class ManagerHelper implements IManagerHelper {
     @Override
     public void removeCashier(List<String> args) throws Exception{
         if (_cashierService.existsUser(args.get(0))){
-            Cashier e = (Cashier) _cashierService.findByUsername(args.get(1));
+            Cashier e = (Cashier) _cashierService.findByUsername(args.get(0));
             _cashierService.deleteById(e.getId());
         }else{
             throw new Exception("cmd 'removeCashier': given username does not exist");
@@ -137,9 +134,10 @@ public class ManagerHelper implements IManagerHelper {
         Date startDate = Date.valueOf(args.get(1));
         Date endDate = Date.valueOf(args.get(2));
 
-        if (startDate.compareTo(endDate)<=0)
+        if (startDate.compareTo(endDate)>=0)
             throw new Exception("cmd 'GetCashierPayroll': end-date must occur after start-date");
 
+        //
         List<WorkPeriod> allWorkPeriods = cashier.getWorkPeriods();
         List<WorkPeriod> workPeriods = new ArrayList<>();
         for(int i=0;i<allWorkPeriods.size();i++){

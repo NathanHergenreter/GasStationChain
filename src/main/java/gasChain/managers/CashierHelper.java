@@ -24,6 +24,8 @@ public class CashierHelper implements ICashierHelper {
     private DebitAccountService debitAccountService = ManagersAutoWire.getBean(DebitAccountService.class);
     private CashPaymentService cashPaymentService = ManagersAutoWire.getBean(CashPaymentService.class);
     private SaleService saleService = ManagersAutoWire.getBean(SaleService.class);
+    private CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
+
 
     private CashierHelper(Cashier cashier) {
         _cashier = cashier;
@@ -52,6 +54,10 @@ public class CashierHelper implements ICashierHelper {
                 _cashier.getWagesHourly(),
                 new Date(System.currentTimeMillis())
         );
+        _cashier.addWorkPeriod(workPeriod);
+        
+        this.cashierService.save(_cashier);
+        this.workPeriodService.save(workPeriod);
     }
 
     private String getInput(Scanner in) throws Exception {

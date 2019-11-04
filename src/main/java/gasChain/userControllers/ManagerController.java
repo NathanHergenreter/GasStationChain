@@ -20,8 +20,10 @@ public class ManagerController implements IUserController {
                 break;
             case "UpdateCashier":
                 _managerHelper.updateCashier(cmd.subList(1,cmd.size()));
+                break;
             case "UpdateCashierAvailability":
                 _managerHelper.updateCashierAvailability(cmd.subList(1,cmd.size()));
+                break;
             case "RemoveCashier":
                 _managerHelper.removeCashier(cmd.subList(1,cmd.size()));
                 break;
@@ -36,6 +38,7 @@ public class ManagerController implements IUserController {
                 break;
             case "RestockInventory":
             	_managerHelper.restockGasStationInventory(cmd);
+            	break;
             default:
                 break;
         }
