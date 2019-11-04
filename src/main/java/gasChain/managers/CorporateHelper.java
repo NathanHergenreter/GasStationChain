@@ -28,16 +28,11 @@ public class CorporateHelper implements ICorporateHelper {
 	
 	Corporate user;
 	
-	@Autowired
-	GasStationService gasStationService;
-	@Autowired
-	CorporateService managerService;
-	@Autowired
-	WarehouseInventoryService warehouseInventoryService;
-	@Autowired
-	WarehouseService warehouseService;
-	@Autowired
-	ItemService itemService;
+	private GasStationService gasStationService = ManagersAutoWire.getBean(GasStationService.class);
+	private CorporateService corporateService = ManagersAutoWire.getBean(CorporateService.class);
+	private WarehouseInventoryService warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
+	private WarehouseService warehouseService = ManagersAutoWire.getBean(WarehouseService.class);
+	private ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
 	
 	/*
 	 * Takes name of warehouse as argument along with a list of items and quantities indexed at 0
