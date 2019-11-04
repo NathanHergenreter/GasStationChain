@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -51,7 +52,7 @@ public class GasStationInventoryService
      * trying to decide whether or not to keep a log of what got restocked, probably going to
      */
     public void restockGasStation(GasStation gasStation) {
-    	Set<GasStationInventory> inventory = gasStation.getInventory();
+    	List<GasStationInventory> inventory = gasStation.getInventory();
     	//Set<GasStationInventory> inventory = findByGasStation(gasStation);
     	Iterator<GasStationInventory> iter = inventory.iterator();
     	//Set<Item> items;

@@ -2,10 +2,12 @@ package gasChain.generator;
 
 import gasChain.entity.GasStation;
 import gasChain.entity.Item;
+import gasChain.entity.Warehouse;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class GenDataRepository {
@@ -18,6 +20,7 @@ public class GenDataRepository {
 
 	public GenDataRepository(String corePath) throws FileNotFoundException
 	{
+		GenUtil.rng = new Random();
 		locations = getLocations(new File(corePath + "\\locationNames"));
 		items = getItems(new File(corePath + "\\itemTypes"));
 		firstNames = getNames(new File(corePath + "\\employeeNamesFirst"));
@@ -43,10 +46,20 @@ public class GenDataRepository {
 	public ArrayList<GasStation> produceGasStations()
 	{
 		ArrayList<GasStation> gasStations = new ArrayList<GasStation>();
-		for (LocationStruct location : locations) {
+		for(LocationStruct location : locations) {
 			gasStations.add(new GasStation(location.location, location.state, location.region));
 		}
 		return gasStations;
+	}
+
+	public ArrayList<Warehouse> produceWarehouses(int num)
+	{
+		ArrayList<Warehouse> warehouses = new ArrayList<Warehouse>();
+		for(int i = 0; i < num; i++) {
+			LocationStruct location = locations.get(GenUtil.rng.nextInt(locations.size()));
+			warehouses.add(new Warehouse(location.location, location.state, location.region));
+		}
+		return warehouses;
 	}
 
 	// Produces a list names using the data in employeeFirstNames or

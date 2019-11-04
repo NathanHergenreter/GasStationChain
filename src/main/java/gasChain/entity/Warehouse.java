@@ -7,6 +7,8 @@ import javax.validation.constraints.Pattern;
 
 import com.sun.istack.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,12 +20,7 @@ public class Warehouse extends Store {
 	private String phoneNumber;
 
 	@OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
-	private Set<WarehouseInventory> inventory;
-
-	private String name;
-	private String location;
-	private String state;
-	private String region;
+	private List<WarehouseInventory> inventory = new ArrayList<>();
 	
 	protected Warehouse() {
 		super();
@@ -39,34 +36,14 @@ public class Warehouse extends Store {
 		this.phoneNumber = phoneNumber;
 		for (WarehouseInventory inventory : inventoryItems)
 			inventory.setWarehouse(this);
-		this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
-	}
-
-	public String getName() {
-		return name;
-	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	public String getLocation() {
-		return location;
-	}
-	
-	public String getState() {
-		return state;
-	}
-	
-	public String getRegion() {
-		return region;
+		this.inventory = Stream.of(inventoryItems).collect(Collectors.toList());
 	}
 	
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
 	
-	public Set<WarehouseInventory> getWarehouseInventory() {
+	public List<WarehouseInventory> getWarehouseInventory() {
 		return inventory;
 	}
 	
