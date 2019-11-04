@@ -7,6 +7,8 @@ import java.util.List;
  */
 public interface ICorporateHelper extends IUserHelper {
 
-	int restockWarehouseInventory(List<String> args);
+	void addManager(List<String> args) throws Exception;
+	void removeManager(List<String> args) throws Exception;
+	int restockWarehouseInventory(List<String> args) throws Exception;
 	
 }

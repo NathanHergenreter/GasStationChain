@@ -17,15 +17,22 @@ public class CorporateController implements IUserController {
     private ICorporateHelper corporateHelper;
 
     @Override
-    public void execute(List<String> cmd) {
+    public void execute(List<String> cmd) throws Exception {
         String command = cmd.get(0);
         
         switch (command) {
 	        case "RestockInventory":
 	        	corporateHelper.restockWarehouseInventory(cmd.subList(1,cmd.size()));
 	        	break;
+	        case "AddManager":
+	        	corporateHelper.addManager(cmd.subList(1,cmd.size()));
+	        	break;
+	        case "RemoveManager":
+	        	corporateHelper.removeManager(cmd.subList(1,cmd.size()));
+	        	break;
 	        	
 	        default:
+	        	System.out.println("Invalid command: " + command);
 	            break;
         }
     }
