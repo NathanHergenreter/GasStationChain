@@ -1,6 +1,7 @@
-package gasChain.corporate;
+package gasChain.managers;
 
-import gasChain.coreInterfaces.corporate.ICorporateHelper;
+import gasChain.coreInterfaces.managers.ICorporateHelper;
+import gasChain.entity.Corporate;
 import gasChain.entity.Warehouse;
 import gasChain.entity.WarehouseInventory;
 import gasChain.service.GasStationService;
@@ -15,10 +16,13 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class CorporateHelper implements ICorporateHelper {
-	public CorporateHelper() {
-
+	
+	public CorporateHelper(Corporate user) {
+		this.user = user;
 	}
 
+	Corporate user;
+	
 	@Autowired
 	GasStationService gasStationService;
 	@Autowired
@@ -27,6 +31,9 @@ public class CorporateHelper implements ICorporateHelper {
 	WarehouseInventoryService warehouseInventoryService;
 	@Autowired
 	WarehouseService warehouseService;
+	
+	
+	
 	/*
 	 * Takes name of warehouse as argument along with a list of items and quantities indexed at 0
 	 * Iterates through current warehouse database to find matching item

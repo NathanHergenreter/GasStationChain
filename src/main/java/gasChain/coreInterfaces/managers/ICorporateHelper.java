@@ -1,4 +1,4 @@
-package gasChain.coreInterfaces.corporate;
+package gasChain.coreInterfaces.managers;
 
 import java.util.List;
 

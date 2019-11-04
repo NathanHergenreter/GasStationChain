@@ -58,9 +58,16 @@ public class WarehouseInventory extends Inventory {
 }
 
 class WarehouseInventoryCompositeId implements Serializable {
-	private Item item;
-	private Warehouse warehouse;
+	private Long item;
+	private Long warehouse;
 
+	public WarehouseInventoryCompositeId() {}
+	
+	public WarehouseInventoryCompositeId(Long item, Long warehouse)
+	{
+		this.item = item; this.warehouse = warehouse;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)

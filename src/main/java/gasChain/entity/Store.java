@@ -19,13 +19,13 @@ public abstract class Store {
 //    @NotNull
 //    private double latitude;
 //
-	@NotNull
+//	@NotNull
 	private String name;
 	private String location;
 	private String state;
 	private String region;
 
-	Store() {
+	protected Store() {
 	}
 
 //    public Store(@NotNull double longitude, @NotNull double latitude, String name) {

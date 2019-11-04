@@ -78,9 +78,16 @@ public class GasStationInventory extends Inventory {
 }
 
 class GasStationInventoryCompositeId implements Serializable {
-	private Item item;
-	private GasStation gasStation;
+	private Long item;
+	private Long gasStation;
 
+	public GasStationInventoryCompositeId() {}
+	
+	public GasStationInventoryCompositeId(Long item, Long gasStation)
+	{
+		this.item = item; this.gasStation = gasStation;
+	}
+	
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
