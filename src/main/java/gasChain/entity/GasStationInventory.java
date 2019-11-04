@@ -59,6 +59,8 @@ public class GasStationInventory extends Inventory {
 	public void setGasStation(GasStation gasStation) {
 		this.gasStation = gasStation;
 	}
+	
+	public boolean ofItem(String type) { return item.getName().equals(type); }
 
 	@Override
 	public boolean equals(Object o) {

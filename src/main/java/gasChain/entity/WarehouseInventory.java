@@ -40,6 +40,8 @@ public class WarehouseInventory extends Inventory {
 	public void setWarehouse(Warehouse warehouse) {
 		this.warehouse = warehouse;
 	}
+	
+	public boolean ofItem(String type) { return item.getName().equals(type); }
 
 	@Override
 	public boolean equals(Object o) {

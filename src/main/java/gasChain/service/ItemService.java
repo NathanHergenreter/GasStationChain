@@ -13,4 +13,6 @@ public class ItemService extends GenericService<Item, Long, ItemRepository> {
 	ItemService(ItemRepository itemRepository) {
 		super(itemRepository);
 	}
+	
+	public Item findByName(String name) { return getRepository().findByName(name); }
 }

@@ -68,7 +68,10 @@ public class GenCLR implements CommandLineRunner {
 		LOG.info("...finished database generation in " + ((endTime - startTime) / 1000) + " seconds");
 	}
 
-	private void generateCorporates(int num, ArrayList<String> firstNames, ArrayList<String> lastNames) {
+	private void generateCorporates(int num, ArrayList<String> firstNames, ArrayList<String> lastNames) 
+	{
+		service.corporate().save(new Corporate("Mr._Monopoly", "password"));
+		
 		for (int i = 0; i < num; i++) {
 			String username = GenUtil.genRandomName(firstNames, lastNames).replace(' ', '_')
 					+ (new Integer(GenUtil.rng.nextInt(100))).toString();
