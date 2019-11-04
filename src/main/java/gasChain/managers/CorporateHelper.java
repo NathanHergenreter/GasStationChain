@@ -81,6 +81,43 @@ public class CorporateHelper implements ICorporateHelper {
         managerService.delete(manager);
 	}
 	
+	@Override
+	public void addGasStation(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 3)
+            throw new Exception("Invalid number of args for 'AddGasStation' (3)");
+        
+        String location = args.get(0);
+        String state = args.get(1);
+        String region = args.get(2);
+        
+        if(gasStationService.existsLocation(location))
+            throw new Exception("Gas station at location '" + location + "' already exists.");
+        
+        gasStationService.save(new GasStation(location, state, region));
+	}
+	
+	@Override
+	public void removeGasStation(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 1)
+            throw new Exception("Invalid number of args for 'RemoveGasStation' (1)");
+
+        String location = args.get(0);
+        
+        if(!gasStationService.existsLocation(location))
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        
+        GasStation store = gasStationService.findByLocation(location);
+        Manager manager = store.getManager();
+        
+        if(manager != null) manager.setStore(null);
+        store.setManager(null);
+
+        if(manager != null) managerService.save(manager);
+        gasStationService.delete(store);
+	}
+	
 	/*
 	 * Takes name of warehouse as argument along with a list of items and quantities indexed at 0
 	 * Iterates through current warehouse database to find matching item

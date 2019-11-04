@@ -30,6 +30,12 @@ public class CorporateController implements IUserController {
 	        case "RemoveManager":
 	        	corporateHelper.removeManager(cmd.subList(1,cmd.size()));
 	        	break;
+	        case "AddGasStation":
+	        	corporateHelper.addGasStation(cmd.subList(1,cmd.size()));
+	        	break;
+	        case "RemoveGasStation":
+	        	corporateHelper.removeGasStation(cmd.subList(1,cmd.size()));
+	        	break;
 	        	
 	        default:
 	        	System.out.println("Invalid command: " + command);

@@ -1,5 +1,7 @@
 package gasChain.service;
 
+import javax.transaction.Transactional;
+
 import gasChain.entity.Employee;
 import gasChain.repository.EmployeeRepository;
 
@@ -24,6 +26,12 @@ public abstract class EmployeeService<T extends Employee, R extends EmployeeRepo
 
 	public boolean hasCorrectAuth(String username, String authority) {
 		return hasCorrectAuth(findByUsername(username), authority);
+	}
+	
+	@Override
+	@Transactional
+	public void save(T entity) {
+		if(!existsUser(entity.getUsername())) getRepository().save(entity);
 	}
 
 }

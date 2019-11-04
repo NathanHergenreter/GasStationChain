@@ -9,6 +9,8 @@ public interface ICorporateHelper extends IUserHelper {
 
 	void addManager(List<String> args) throws Exception;
 	void removeManager(List<String> args) throws Exception;
+	void addGasStation(List<String> args) throws Exception;
+	void removeGasStation(List<String> args) throws Exception;
 	int restockWarehouseInventory(List<String> args) throws Exception;
 	
 }

@@ -44,6 +44,11 @@ public class GenCLR implements CommandLineRunner {
 		Path curRelPath = Paths.get("");
 		String corePath = curRelPath.toAbsolutePath().toString() + "\\src\\main\\resources\\dbGeneratorData";
 		repo = new GenDataRepository(corePath);
+		
+		// Generate test users
+		service.cashier().save(new Cashier("test_cashier", "password", "name", 0, 0));
+		service.manager().save(new Manager("test_manager", "password"));
+		service.corporate().save(new Corporate("test_corporate", "password"));
 
 		// Generate items
 		List<Item> items = repo.items();
@@ -70,8 +75,6 @@ public class GenCLR implements CommandLineRunner {
 
 	private void generateCorporates(int num, ArrayList<String> firstNames, ArrayList<String> lastNames) 
 	{
-		service.corporate().save(new Corporate("Mr._Monopoly", "password"));
-		
 		for (int i = 0; i < num; i++) {
 			String username = GenUtil.genRandomName(firstNames, lastNames).replace(' ', '_')
 					+ (new Integer(GenUtil.rng.nextInt(100))).toString();
