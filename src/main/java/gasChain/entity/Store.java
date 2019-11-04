@@ -19,7 +19,7 @@ public abstract class Store {
 //    @NotNull
 //    private double latitude;
 //
-	@NotNull
+
 	private String name;
 	private String location;
 	private String state;

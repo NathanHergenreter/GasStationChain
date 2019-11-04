@@ -8,6 +8,7 @@ import gasChain.service.GasStationInventoryService;
 import gasChain.service.GasStationService;
 import gasChain.service.ManagerService;
 import gasChain.service.WarehouseInventoryService;
+import gasChain.service.WorkPeriodService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,7 +31,7 @@ public class ManagerHelper implements IManagerHelper {
     @Autowired
     GasStationService _gasStationService;
     @Autowired
-    CashierService _cashierService;
+    CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
     @Autowired
     ManagerService _managerService;
     @Autowired
