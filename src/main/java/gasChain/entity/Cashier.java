@@ -1,5 +1,6 @@
 package gasChain.entity;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
@@ -32,11 +33,12 @@ public class Cashier extends Employee {
 
 
     public Cashier(String username, String password,
-                   String name, int wagesHourly, int hoursWeekly) {
+                   String name, int wagesHourly, int hoursWeekly, GasStation workplace) {
         super(username, password);
         this.name = name;
         this.wagesHourly = wagesHourly;
         this.hoursWeekly = hoursWeekly;
+        this.workplace = workplace;
     }
 
     public Cashier(String name, int wagesHourly, int hoursWeekly) {

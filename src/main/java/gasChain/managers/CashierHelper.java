@@ -50,10 +50,9 @@ public class CashierHelper implements ICashierHelper {
                 _cashier.getWagesHourly(),
                 new java.sql.Date(System.currentTimeMillis())
         );
-        _cashier.addWorkPeriod(workPeriod);
         
-        this.cashierService.save(_cashier);
         this.workPeriodService.save(workPeriod);
+        this.cashierService.save(_cashier);
     }
 
     private String getInput(Scanner in) throws Exception {

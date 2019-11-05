@@ -50,7 +50,8 @@ public class ManagerHelper implements IManagerHelper {
                 args.get(1),
                 args.get(2),
                 Integer.parseInt(args.get(3)),
-                Integer.parseInt(args.get(4))
+                Integer.parseInt(args.get(4)),
+                _user.getStore()
         );
         _cashierService.save(model);
     }
@@ -119,6 +120,38 @@ public class ManagerHelper implements IManagerHelper {
             throw new Exception("cmd 'removeCashier': given username does not exist");
         }
     }
+    
+    private List<WorkPeriod> getCashierWorkPeriods(Cashier cashier){
+    	List<WorkPeriod> cashierWorkPeriods = new ArrayList<>();
+    	List<WorkPeriod> workPeriods = _workPeriodService.findAll();
+        for(WorkPeriod period: workPeriods) {
+        	long cashierId = cashier.getId();
+        	long otherId = period.getCashier().getId();
+        	if(cashierId == otherId) {
+        		cashierWorkPeriods.add(period);
+        	}
+        }
+        return cashierWorkPeriods;
+    }
+    
+    private List<Cashier> getStoreCashiers(GasStation gasStation){
+    	List<Cashier> storeCashiers = new ArrayList<>();
+    	List<Cashier> cashiers = _cashierService.findAll();
+        for(Cashier cashier: cashiers) {
+        	long cashierStoreId = cashier.getWorkplace().getId();
+        	long givenStoreId = gasStation.getId();
+        	if(cashierStoreId == givenStoreId) {
+        		storeCashiers.add(cashier);
+        	}
+        }
+        return storeCashiers;
+    }
+    
+    public void listStoreCashiers() {
+    	List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+    	for(Cashier cashier: cashiers)
+    		System.out.println("Username: " + cashier.getUsername() + " Name: " + cashier.getName() + " Hourly Rate: $" + cashier.getWagesHourly());
+    }
 
     /*
     args should be given as -<username> -<startDate> -<endDate>
@@ -138,7 +171,7 @@ public class ManagerHelper implements IManagerHelper {
             throw new Exception("cmd 'GetCashierPayroll': end-date must occur after start-date");
 
         //
-        List<WorkPeriod> allWorkPeriods = cashier.getWorkPeriods();
+        List<WorkPeriod> allWorkPeriods = getCashierWorkPeriods(cashier);
         List<WorkPeriod> workPeriods = new ArrayList<>();
         for(int i=0;i<allWorkPeriods.size();i++){
             if(allWorkPeriods.get(i).getDate().compareTo(startDate) >= 0)
@@ -155,7 +188,7 @@ public class ManagerHelper implements IManagerHelper {
                 totalHoursWorked += endTime - startTime;
         }
 
-        System.out.println("Employee: "+cashier.getName()+" Payroll: "+(totalHoursWorked*cashier.getWagesHourly())+"\n");
+        System.out.println("Employee: "+cashier.getName()+" -Payroll: $"+(totalHoursWorked*cashier.getWagesHourly())+"\n");
     }
 
     /*
@@ -168,7 +201,7 @@ public class ManagerHelper implements IManagerHelper {
         if (args.size()!=2)
             throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (2)");
 
-        List<Cashier> cashiers = _user.getStore().getCashiers();
+        List<Cashier> cashiers = getStoreCashiers(_user.getStore());
         for(int i=0;i<cashiers.size();i++){
             List<String> newArgs = new ArrayList<>();
             newArgs.add(cashiers.get(i).getUsername());
@@ -186,7 +219,7 @@ public class ManagerHelper implements IManagerHelper {
         Date s = Date.valueOf(args.get(0));
         Date e = Date.valueOf(args.get(1));
         int numDays = Math.abs(s.toLocalDate().getDayOfYear() -e.toLocalDate().getDayOfYear());
-        List<Cashier> cashiers = _user.getStore().getCashiers();
+        List<Cashier> cashiers = getStoreCashiers(_user.getStore());
 
         String schedule = "Daily Schedule\n\n";
         for(int day=0;day<numDays;day++){
@@ -201,63 +234,11 @@ public class ManagerHelper implements IManagerHelper {
                 //finds nextAvailableCashier with smallest availability difference
                 for(int j=1; j<cashiers.size();j++){
                     Cashier curCashier = cashiers.get(j);
-                    switch (day%7){
-                        case 0:
-                            int sunStart = curCashier.getAvailability().getSunStart();
-                            int sunDiff = sunStart - nextHour;
-                            if(sunDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = sunDiff;
-                            }
-                            break;
-                        case 1:
-                            int monStart = curCashier.getAvailability().getMonStart();
-                            int monDiff = monStart - nextHour;
-                            if(monDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = monDiff;
-                            }
-                            break;
-                        case 2:
-                            int tueStart = curCashier.getAvailability().getSunStart();
-                            int tueDiff = tueStart - nextHour;
-                            if(tueDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = tueDiff;
-                            }
-                            break;
-                        case 3:
-                            int wedStart = curCashier.getAvailability().getSunStart();
-                            int wedDiff = wedStart - nextHour;
-                            if(wedDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = wedDiff;
-                            }
-                            break;
-                        case 4:
-                            int thrStart = curCashier.getAvailability().getSunStart();
-                            int thrDiff = thrStart - nextHour;
-                            if(thrDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = thrDiff;
-                            }
-                            break;
-                        case 5:
-                            int friStart = curCashier.getAvailability().getSunStart();
-                            int friDiff = friStart - nextHour;
-                            if(friDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = friDiff;
-                            }
-                            break;
-                        case 6:
-                            int satStart = curCashier.getAvailability().getSunStart();
-                            int satDiff = satStart - nextHour;
-                            if(satDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = satDiff;
-                            }
-                            break;
+                    int start = getCashierStartOfShift(day%7,curCashier);
+                    int diff = start - nextHour;
+                    if (diff < availabilityDiff) {
+                    	nextAvailableCashier = curCashier;
+                    	availabilityDiff = diff;
                     }
                 }
 
@@ -321,6 +302,35 @@ public class ManagerHelper implements IManagerHelper {
         return availabilityDiff;
     }
 
+    private int getCashierStartOfShift(int day, Cashier cashier){
+        int endOfShift = 0;
+        Availability availability = cashier.getAvailability();
+        switch (day%7){
+            case 0:
+                endOfShift = availability.getSunStart();
+                break;
+            case 1:
+                endOfShift = availability.getMonStart();
+                break;
+            case 2:
+                endOfShift = availability.getTueStart();
+                break;
+            case 3:
+                endOfShift = availability.getWedStart();
+                break;
+            case 4:
+                endOfShift = availability.getThrStart();
+                break;
+            case 5:
+                endOfShift = availability.getFriStart();
+                break;
+            case 6:
+                endOfShift = availability.getSatStart();
+                break;
+        }
+        return endOfShift;
+    }
+    
     private int getCashierEndOfShift(int day, Cashier cashier){
         int endOfShift = 0;
         Availability availability = cashier.getAvailability();

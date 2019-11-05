@@ -27,6 +27,9 @@ public class ManagerController implements IUserController {
             case "RemoveCashier":
                 _managerHelper.removeCashier(cmd.subList(1,cmd.size()));
                 break;
+            case "ListStoreCashiers":
+            	_managerHelper.listStoreCashiers();
+            	break;
             case "GetCashierPayroll":
                 _managerHelper.getCashierPayroll(cmd.subList(1,cmd.size()));
                 break;
