@@ -7,5 +7,4 @@ import gasChain.entity.WorkPeriod;
 
 @Repository
 public interface WorkPeriodRepository extends JpaRepository<WorkPeriod, Long> {
-
 }
