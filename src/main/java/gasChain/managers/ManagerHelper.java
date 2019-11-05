@@ -399,7 +399,7 @@ public class ManagerHelper implements IManagerHelper {
         
         GasStation gasStation = _gasStationService.findByLocation(location);
         Item item = _itemService.findByName(type);
-        
+
         if(gasStation == null)
             throw new Exception("Gas station at location '" + location + "' does not exist.");
         
@@ -408,8 +408,10 @@ public class ManagerHelper implements IManagerHelper {
         
         GasStationInventory inventory = new GasStationInventory(item, item.getSuggestRetailPrice(), quantity, maxQuantity);
         inventory.setGasStation(gasStation);
+//        gasStation.addInventory(inventory);
         _gasStationInventoryService.save(inventory);
-//        warehouse.addInventory(inventory);
+//        _gasStationService.save(gasStation);
+        
 	}
 	
 	@Override
@@ -452,7 +454,9 @@ public class ManagerHelper implements IManagerHelper {
 			GasStationInventory inventory = iter.next();
 			if (((float) inventory.getQuantity() / (float) inventory.getMaxQuantity()) <= .5) {
 				int desiredQuantity = inventory.getMaxQuantity() - inventory.getQuantity();
-				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+				//TODO
+//				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+				Set<WarehouseInventory> warehouseInventory = null;
 				Iterator<WarehouseInventory> warehouseIterator = warehouseInventory.iterator();
 				while (warehouseIterator.hasNext() && desiredQuantity > 0) {
 					WarehouseInventory i = warehouseIterator.next();

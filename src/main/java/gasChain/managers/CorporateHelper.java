@@ -54,12 +54,13 @@ public class CorporateHelper implements ICorporateHelper {
         
         if(store == null)
             throw new Exception("Location '" + location + "' does not exist.");
-        
+
         Manager manager = new Manager(username, password);
         manager.setStore(store);
         managerService.save(manager);
         store.setManager(manager);
         gasStationService.save(store);
+//        managerService.save(manager);
 	}
 
 	@Override
@@ -172,7 +173,6 @@ public class CorporateHelper implements ICorporateHelper {
         WarehouseInventory inventory = new WarehouseInventory(item, item.getSuggestRetailPrice(), quantity);
         inventory.setWarehouse(warehouse);
         warehouseInventoryService.save(inventory);
-//        warehouse.addInventory(inventory);
 	}
 	
 	@Override

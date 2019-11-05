@@ -12,11 +12,11 @@ public class Item {
 	@GeneratedValue(strategy = GenerationType.SEQUENCE)
 	private Long id;
 
-	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-	private Set<WarehouseInventory> inWarehouses = new HashSet<>();
-
-	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
-	private Set<GasStationInventory> inGasStations = new HashSet<>();
+//	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+//	private Set<WarehouseInventory> inWarehouses = new HashSet<>();
+//
+//	@OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+//	private Set<GasStationInventory> inGasStations = new HashSet<>();
 
 	private String description;
 	private String name;
@@ -64,13 +64,13 @@ public class Item {
 		this.description = description;
 	}
 
-	public Set<WarehouseInventory> getInWarehouses() {
-		return inWarehouses;
-	}
-
-	public Set<GasStationInventory> getInGasStations() {
-		return inGasStations;
-	}
+//	public Set<WarehouseInventory> getInWarehouses() {
+//		return inWarehouses;
+//	}
+//
+//	public Set<GasStationInventory> getInGasStations() {
+//		return inGasStations;
+//	}
 
 	public int getSuggestRetailPrice() {
 		return suggestRetailPrice;
