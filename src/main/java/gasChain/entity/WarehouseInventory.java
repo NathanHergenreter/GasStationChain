@@ -1,6 +1,7 @@
 package gasChain.entity;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
 import java.util.Objects;
 

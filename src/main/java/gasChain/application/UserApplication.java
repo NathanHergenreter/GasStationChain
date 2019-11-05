@@ -91,8 +91,8 @@ public class UserApplication implements CommandLineRunner {
 
 		while(isSignedIn){
 			System.out.println("Enter a command: ");
-			String cmd = reader.next();
-			List<String> result = Arrays.asList(cmd.split("_"));
+			String cmd = reader.nextLine();
+			List<String> result = Arrays.asList(cmd.split(";"));
 			isSignedIn = !result.get(0).equals("exit");
 			if (isSignedIn){
                 try{

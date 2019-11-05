@@ -117,6 +117,93 @@ public class CorporateHelper implements ICorporateHelper {
         if(manager != null) managerService.save(manager);
         gasStationService.delete(store);
 	}
+
+	@Override
+	public void addWarehouse(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 3)
+            throw new Exception("Invalid number of args for 'AddWarehouse' (3)");
+        
+        String location = args.get(0);
+        String state = args.get(1);
+        String region = args.get(2);
+        
+        if(warehouseService.existsLocation(location))
+            throw new Exception("Warehouse at location '" + location + "' already exists.");
+        
+        warehouseService.save(new Warehouse(location, state, region));
+	}
+	
+	@Override
+	public void removeWarehouse(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 1)
+            throw new Exception("Invalid number of args for 'RemoveWarehouse' (1)");
+
+        String location = args.get(0);
+
+        Warehouse warehouse = warehouseService.findByLocation(location);
+        
+        if(warehouse == null)
+            throw new Exception("Warehouse at location '" + location + "' does not exist.");
+        
+        warehouseService.delete(warehouse);
+	}
+	
+	@Override
+	public void addWarehouseInventory(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 3)
+            throw new Exception("Invalid number of args for 'AddWarehouseInventory' (3)");
+        
+        String location = args.get(0);
+        String type = args.get(1);
+        int quantity = new Integer(args.get(2));
+        
+        Warehouse warehouse = warehouseService.findByLocation(location);
+        Item item = itemService.findByName(type);
+        
+        if(warehouse == null)
+            throw new Exception("Warehouse at location '" + location + "' does not exist.");
+        
+        if(item == null)
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        
+        WarehouseInventory inventory = new WarehouseInventory(item, item.getSuggestRetailPrice(), quantity);
+        inventory.setWarehouse(warehouse);
+        warehouseInventoryService.save(inventory);
+//        warehouse.addInventory(inventory);
+	}
+	
+	@Override
+	public void removeWarehouseInventory(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 2)
+            throw new Exception("Invalid number of args for 'RemoveWarehouseInventory' (1)");
+
+        String location = args.get(0);
+        String type = args.get(1);
+        
+        Warehouse warehouse = warehouseService.findByLocation(location);
+        Item item = itemService.findByName(type);
+        
+        if(warehouse == null)
+            throw new Exception("Warehouse at location '" + location + "' does not exist.");
+        
+        if(item == null)
+            throw new Exception("Item of type '" + type + "' does not exist.");
+
+//        Set<WarehouseInventory> inventorySet = warehouseInventoryService.findByWarehouse(warehouse);
+        WarehouseInventory inventory = warehouseInventoryService.findWarehouseInventoriesByWarehouseAndAndItem(warehouse, item);
+
+        if(inventory == null)
+            throw new Exception("Inventory of item '" + type + "' is not present at '" + location +".");
+        
+        warehouse.removeInventory(inventory);
+        inventory.setWarehouse(null);
+        warehouseInventoryService.delete(inventory);
+        warehouseService.save(warehouse);
+	}
 	
 	/*
 	 * Takes name of warehouse as argument along with a list of items and quantities indexed at 0
@@ -188,5 +275,12 @@ public class CorporateHelper implements ICorporateHelper {
 			
 		}
 		return total;
+	}
+	
+
+	private WarehouseInventory findWarehouseInventory(Set<WarehouseInventory> inventory, Item item)
+	{
+		for(WarehouseInventory inventoryItem : inventory) if(inventoryItem.ofItem(item.getName())) return inventoryItem;
+		return null;
 	}
 }

@@ -1,5 +1,7 @@
 package gasChain.service;
 
+import gasChain.entity.GasStation;
+import gasChain.entity.GasStationInventory;
 import gasChain.entity.Item;
 import gasChain.entity.Warehouse;
 import gasChain.entity.WarehouseInventory;
@@ -28,7 +30,11 @@ public class WarehouseInventoryService
     public Set<WarehouseInventory> findByWarehouse(Warehouse warehouse) {
         return getRepository().findByWarehouse(warehouse);
     }
-    
+
+	public WarehouseInventory findWarehouseInventoriesByWarehouseAndAndItem(Warehouse warehouse, Item item) {
+		return getRepository().findWarehouseInventoriesByWarehouseAndAndItem(warehouse, item);
+	}
+
     /*
      * Given a list of items and quantities. Stocks the given warehouse with these items.
      */

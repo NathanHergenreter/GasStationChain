@@ -2,6 +2,7 @@ package gasChain.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Pattern;
 
@@ -19,7 +20,7 @@ public class Warehouse extends Store {
 	@Pattern(regexp = "(^$|[0-9]{10})")
 	private String phoneNumber;
 
-	@OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "warehouse", cascade = CascadeType.ALL)
 	private List<WarehouseInventory> inventory = new ArrayList<>();
 	
 	protected Warehouse() {
@@ -50,5 +51,16 @@ public class Warehouse extends Store {
 	public Warehouse addInventory(WarehouseInventory item) {
 		inventory.add(item);
 		return this;
+	}
+	
+	public Warehouse removeInventory(WarehouseInventory item) {
+		inventory.remove(item);
+		return this;
+	}
+
+	public WarehouseInventory findWarehouseInventory(Item item)
+	{
+		for(WarehouseInventory inventoryItem : inventory) if(inventoryItem.ofItem(item.getName())) return inventoryItem;
+		return null;
 	}
 }
