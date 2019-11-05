@@ -102,9 +102,13 @@ public class GasStationGenerator {
 			int hours = GenUtil.rng.nextInt(maxHours - minHours) + minHours;
 			String name = GenUtil.genRandomName(firstNames, lastNames);
 			Cashier cashier = new Cashier(name, (int) (wage * 100), hours, gasStation);
-			gasStation.addCashier(cashier);
-			service.cashier().save(cashier);
-			numEmployees--;
+			
+			if(!service.cashier().existsUser(cashier.getUsername()))
+			{
+				gasStation.addCashier(cashier);
+				service.cashier().save(cashier);
+				numEmployees--;
+			}
 		}
 	}
 
