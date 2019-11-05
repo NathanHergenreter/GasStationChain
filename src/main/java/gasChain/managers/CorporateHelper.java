@@ -54,12 +54,13 @@ public class CorporateHelper implements ICorporateHelper {
         
         if(store == null)
             throw new Exception("Location '" + location + "' does not exist.");
-        
+
         Manager manager = new Manager(username, password);
         manager.setStore(store);
         managerService.save(manager);
         store.setManager(manager);
         gasStationService.save(store);
+//        managerService.save(manager);
 	}
 
 	@Override
@@ -172,7 +173,6 @@ public class CorporateHelper implements ICorporateHelper {
         WarehouseInventory inventory = new WarehouseInventory(item, item.getSuggestRetailPrice(), quantity);
         inventory.setWarehouse(warehouse);
         warehouseInventoryService.save(inventory);
-//        warehouse.addInventory(inventory);
 	}
 	
 	@Override
@@ -193,16 +193,14 @@ public class CorporateHelper implements ICorporateHelper {
         if(item == null)
             throw new Exception("Item of type '" + type + "' does not exist.");
 
-//        Set<WarehouseInventory> inventorySet = warehouseInventoryService.findByWarehouse(warehouse);
         WarehouseInventory inventory = warehouseInventoryService.findWarehouseInventoriesByWarehouseAndAndItem(warehouse, item);
 
         if(inventory == null)
             throw new Exception("Inventory of item '" + type + "' is not present at '" + location +".");
         
-        warehouse.removeInventory(inventory);
+        warehouseService.removeInventory(warehouse, inventory);
         inventory.setWarehouse(null);
         warehouseInventoryService.delete(inventory);
-        warehouseService.save(warehouse);
 	}
 	
 	/*
@@ -224,8 +222,8 @@ public class CorporateHelper implements ICorporateHelper {
         if(args != null && args.size() % 2 == 0)
             throw new Exception("Invalid number of inventory args for 'RestockInventory' (Must be even)");
 
-		String name = args.get(0);
-		Warehouse warehouse = warehouseService.findByName(name);
+		String location = args.get(0);
+		Warehouse warehouse = warehouseService.findByLocation(location);
     	List<String> items = new ArrayList<String>();
     	List<Integer> quantities = new ArrayList<Integer>();
     	

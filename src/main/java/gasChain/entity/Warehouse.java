@@ -54,7 +54,14 @@ public class Warehouse extends Store {
 	}
 	
 	public Warehouse removeInventory(WarehouseInventory item) {
-		inventory.remove(item);
+		String itemType = item.getItem().getName();
+		
+		for(int idx = 0; idx < inventory.size(); idx++)
+		{
+			WarehouseInventory curItem = inventory.get(idx);
+			String curItemType = curItem.getItem().getName();
+			if(curItemType.equals(itemType)) { inventory.remove(idx); break; }
+		}
 		return this;
 	}
 

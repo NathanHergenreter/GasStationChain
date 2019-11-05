@@ -11,6 +11,8 @@ public interface IManagerHelper extends IUserHelper {
     void getCashierPayroll(List<String> args) throws Exception;
     void getEmployeePayrolls(List<String> args) throws Exception;
     void getEmployeeSchedule(List<String> args);
-    boolean restockGasStationInventory(List<String> args);
+    void addGasStationInventory(List<String> args) throws Exception;
+    void removeGasStationInventory(List<String> args) throws Exception;
+    boolean restockGasStationInventory(List<String> args) throws Exception;
     void addItem(List<String> args);
 }

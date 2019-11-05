@@ -7,6 +7,7 @@ import gasChain.service.AvailabilityService;
 import gasChain.service.CashierService;
 import gasChain.service.GasStationInventoryService;
 import gasChain.service.GasStationService;
+import gasChain.service.ItemService;
 import gasChain.service.ManagerService;
 import gasChain.service.WarehouseInventoryService;
 import gasChain.service.WorkPeriodService;
@@ -36,6 +37,7 @@ public class ManagerHelper implements IManagerHelper {
     private GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
     private WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
     private AvailabilityService _availabilityService = ManagersAutoWire.getBean(AvailabilityService.class);
+    private ItemService _itemService = ManagersAutoWire.getBean(ItemService.class);
 
 
 
@@ -382,6 +384,40 @@ public class ManagerHelper implements IManagerHelper {
 	public void addItem(List<String> args) {
 
 	}
+
+    // TODO - check if inventory already contains item
+	@Override
+	public void addGasStationInventory(List<String> args) throws Exception
+	{
+        if (args == null || args.size() != 3)
+            throw new Exception("Invalid number of args for 'AddGasStationInventory' (3)");
+        
+        String location = _user.getStore().getLocation();
+        String type = args.get(0);
+        int quantity = new Integer(args.get(1));
+        int maxQuantity = new Integer(args.get(2));
+        
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+
+        if(gasStation == null)
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        
+        if(item == null)
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        
+        GasStationInventory inventory = new GasStationInventory(item, item.getSuggestRetailPrice(), quantity, maxQuantity);
+        inventory.setGasStation(gasStation);
+//        gasStation.addInventory(inventory);
+        _gasStationInventoryService.save(inventory);
+//        _gasStationService.save(gasStation);
+        
+	}
+	
+	@Override
+	public void removeGasStationInventory(List<String> args) throws Exception {
+	}
+    
 	/*
 	 * This beast of a function takes a list of args but the format is such that you're just supposed to supply a location or manager name
 	 * If the manager name exists then we find gasStation by manager else if location then by location else return false, ie bad input
@@ -396,22 +432,31 @@ public class ManagerHelper implements IManagerHelper {
 	 */
 
 	@Override
-	public boolean restockGasStationInventory(List<String> args) {
-		GasStation gasStation = null;
-		if (_managerService.existsUser(args.get(0))) {
-			gasStation = _gasStationService.findByManager((Manager) _managerService.findByUsername(args.get(0)));
-		} else if (_gasStationService.existsLocation(args.get(0))) {
-			gasStation = _gasStationService.findByLocation(args.get(0));
-		} else {
-			return false;
-		}
+	public boolean restockGasStationInventory(List<String> args) throws Exception {
+//		GasStation gasStation = null;
+//		if (_managerService.existsUser(args.get(0))) {
+//			gasStation = _gasStationService.findByManager((Manager) _managerService.findByUsername(args.get(0)));
+//		} else if (_gasStationService.existsLocation(args.get(0))) {
+//			gasStation = _gasStationService.findByLocation(args.get(0));
+//		} else {
+//			return false;
+//		}
+		
+		String location = _user.getStore().getLocation();
+		GasStation gasStation = _gasStationService.findByLocation(location);
+
+        if(location == null)
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+		
 		Set<GasStationInventory> gasStationInventory = _gasStationInventoryService.findByGasStation(gasStation);
 		Iterator<GasStationInventory> iter = gasStationInventory.iterator();
 		while (iter.hasNext()) {
 			GasStationInventory inventory = iter.next();
 			if (((float) inventory.getQuantity() / (float) inventory.getMaxQuantity()) <= .5) {
 				int desiredQuantity = inventory.getMaxQuantity() - inventory.getQuantity();
-				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+				//TODO
+//				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+				Set<WarehouseInventory> warehouseInventory = null;
 				Iterator<WarehouseInventory> warehouseIterator = warehouseInventory.iterator();
 				while (warehouseIterator.hasNext() && desiredQuantity > 0) {
 					WarehouseInventory i = warehouseIterator.next();

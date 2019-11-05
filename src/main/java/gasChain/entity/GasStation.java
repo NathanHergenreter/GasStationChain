@@ -4,6 +4,7 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -14,14 +15,15 @@ import java.util.Set;
 @Entity
 public class GasStation extends Store {
 
-	@Cascade({ CascadeType.MERGE })
-	@OneToMany(mappedBy = "gasStation")
+	@Cascade({ CascadeType.ALL })
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
 	private List<GasStationInventory> inventory = new ArrayList<>();
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
     private List<Sale> sales = new ArrayList<>();
 
+    @Cascade({CascadeType.PERSIST})
     @OneToOne
     @JoinColumn(name = "manager_id")
     private Manager manager;
