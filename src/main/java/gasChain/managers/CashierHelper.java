@@ -112,8 +112,9 @@ public class CashierHelper implements ICashierHelper {
             gasStationInventoryService.save(i);
 
         }
-        System.out.println("End of Sale");
         receiptService.save(receipt);
+        System.out.println("End of Sale -- Receipt Id: " + receipt.getId());
+
     }
 
     private Payment processPayment(int i, Scanner in, int price) throws Exception {
