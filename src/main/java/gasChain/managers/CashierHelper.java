@@ -184,7 +184,7 @@ public class CashierHelper implements ICashierHelper {
                 return;
             }
             if (receipts.size() < 1) {
-                System.out.println("No Item found with given credit card");
+                System.out.println("No Item found with given card number");
                 return;
             } else if (receipts.size() == 1) {
                 returnReceipt = receipts.get(0);
