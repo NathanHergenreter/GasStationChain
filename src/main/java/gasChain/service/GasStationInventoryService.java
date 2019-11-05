@@ -30,14 +30,13 @@ public class GasStationInventoryService
 		return getRepository().findByGasStation(gasStation);
 	}
 
-	public GasStationInventory findGasStationInventoriesByGasStationAndAndItem(GasStation gasStation, Item item) {
-		return getRepository().findGasStationInventoriesByGasStationAndAndItem(gasStation, item);
+	public GasStationInventory findGasStationInventoryByGasStationAndItem(GasStation gasStation, Item item) {
+		return getRepository().findGasStationInventoryByGasStationAndItem(gasStation, item);
 	}
 
 	public GasStationInventory RemoveItemFromInventory(GasStation gasStation, Item item) {
-		GasStationInventory gasStationInventory = getRepository().findGasStationInventoriesByGasStationAndAndItem(gasStation, item);
+		GasStationInventory gasStationInventory = getRepository().findGasStationInventoryByGasStationAndItem(gasStation, item);
 		gasStationInventory.setQuantity(gasStationInventory.getQuantity() - 1);
-		getRepository().save(gasStationInventory);
 		return gasStationInventory;
 	}
 

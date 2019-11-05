@@ -12,7 +12,7 @@ public interface GasStationInventoryRepository extends InventoryRepository<GasSt
 
     Set<GasStationInventory> findByGasStation(GasStation gasStation);
 
-    GasStationInventory findGasStationInventoriesByGasStationAndAndItem(GasStation gasStation, Item item);
+    GasStationInventory findGasStationInventoryByGasStationAndItem(GasStation gasStation, Item item);
 
 
 }

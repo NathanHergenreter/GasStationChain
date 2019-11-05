@@ -30,8 +30,7 @@ public class Sale {
     @JoinColumn(name = "gas_station_id")
     private GasStation sellLocation;
 
-    @ManyToOne
-    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
     
@@ -44,7 +43,7 @@ public class Sale {
 
     protected Sale() {}
 
-    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price) {
+    public Sale(@NotNull Item item, @NotNull GasStation sellLocation, Receipt receipt, int price) {
         this.receipt = receipt;
         this.price = price;
         this.item = item;

@@ -82,16 +82,21 @@ public class CashierHelper implements ICashierHelper {
         boolean isEndSale = false;
         while (!isEndSale) {
             Item item = itemService.findById(id);
-            GasStationInventory gsi = gasStationInventoryService.findGasStationInventoriesByGasStationAndAndItem(gasStation, item);
+            System.out.println(item.getId());
+            GasStationInventory gsi = gasStationInventoryService.findGasStationInventoryByGasStationAndItem(gasStation, item);
             InventoryItems.add(gsi);
             int price = gsi.getPrice();
             total += price;
-            receipt.addSale(new Sale(item, gasStation, receipt, price));
+            Sale s = new Sale(item, gasStation, null, price);
+//            saleService.save((s));
+            receipt.addSale(s);
             System.out.println(item.getId() + " --- " + item.getName() + " ---  $" + df.format(price / 100.0) + " --- Total = " + df.format(total / 100.0));
 
             String input = in.nextLine();
             isEndSale = input.equals("/end");
-            id = Long.parseLong(input);
+            if (!isEndSale) {
+                id = Long.parseLong(input);
+            }
         }
         System.out.println("Shopping Cart Total is: " + df.format(total / 100.0));
         System.out.println("How will the customer be paying today?");
@@ -100,10 +105,14 @@ public class CashierHelper implements ICashierHelper {
         System.out.println("3 - Cash");
         int input = Integer.parseInt(getInput(in));
         Payment p = processPayment(input, in, total);
+
         receipt.setPayment(p);
         for (GasStationInventory i : InventoryItems) {
             gasStationInventoryService.RemoveItemFromInventory(i.getGasStation(), i.getItem());
+            gasStationInventoryService.save(i);
+
         }
+        System.out.println("End of Sale");
         receiptService.save(receipt);
     }
 
@@ -121,6 +130,7 @@ public class CashierHelper implements ICashierHelper {
                     invalidCard(i, in, price);
                 }
             }
+            creditCardAccountService.save(cc);
             return cc;
         } else if (i == 2) {
             System.out.println("Enter Debit Card Number: ");
@@ -141,19 +151,21 @@ public class CashierHelper implements ICashierHelper {
                 System.out.println("Enter /end to exit or");
                 processPayment(i, in, price);
             }
+
+            debitAccountService.save(da);
             return da;
         } else if (i == 3) {
-
             int paymentTotal = 0;
             while (paymentTotal < price) {
                 System.out.println("Enter Payment amount: ");
                 paymentTotal += Integer.parseInt(getInput(in));
                 if (paymentTotal < price) {
-                    System.out.println(df.format(price - paymentTotal) + " Still remaining");
+                    System.out.println("$" + df.format((price - paymentTotal) / 100) + " Still remaining");
                 }
             }
-            System.out.println("Total Change: " + df.format(paymentTotal - price));
+            System.out.println("Total Change: $" + df.format((paymentTotal - price) / 100));
             CashPayment cp = new CashPayment();
+            cashPaymentService.save(cp);
             return cp;
         }
         return null;
@@ -223,7 +235,7 @@ public class CashierHelper implements ICashierHelper {
 
     private void returnItem(Sale sale) {
         GasStationInventory inventoryItem =
-                gasStationInventoryService.findGasStationInventoriesByGasStationAndAndItem(_cashier.getWorkplace(), sale.getItem());
+                gasStationInventoryService.findGasStationInventoryByGasStationAndItem(_cashier.getWorkplace(), sale.getItem());
         inventoryItem.setQuantity(inventoryItem.getQuantity() + 1);
         sale.setIsReturned(true);
         gasStationInventoryService.save(inventoryItem);

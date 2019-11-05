@@ -4,7 +4,6 @@ import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +19,6 @@ public class Receipt {
 	private List<Sale> sales = new ArrayList<>();
 
     @OneToOne
-    @NotNull
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
