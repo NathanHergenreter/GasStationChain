@@ -3,6 +3,7 @@ package gasChain.managers;
 import gasChain.coreInterfaces.managers.IManagerHelper;
 
 import gasChain.entity.*;
+import gasChain.service.AvailabilityService;
 import gasChain.service.CashierService;
 import gasChain.service.GasStationInventoryService;
 import gasChain.service.GasStationService;
@@ -34,6 +35,7 @@ public class ManagerHelper implements IManagerHelper {
     private WarehouseInventoryService _warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
     private GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
     private WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
+    private AvailabilityService _availabilityService = ManagersAutoWire.getBean(AvailabilityService.class);
 
 
 
@@ -98,14 +100,15 @@ public class ManagerHelper implements IManagerHelper {
                 Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(1)),//Sunday hours
                 Integer.parseInt(hours.get(1).get(0)), Integer.parseInt(hours.get(1).get(1)),//Monday hours
                 Integer.parseInt(hours.get(2).get(0)), Integer.parseInt(hours.get(2).get(1)),//Tuesday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0)),//Wednesday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0)),//Thursday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0)),//Friday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0))//Saturday hours
+                Integer.parseInt(hours.get(3).get(0)), Integer.parseInt(hours.get(3).get(1)),//Wednesday hours
+                Integer.parseInt(hours.get(4).get(0)), Integer.parseInt(hours.get(4).get(1)),//Thursday hours
+                Integer.parseInt(hours.get(5).get(0)), Integer.parseInt(hours.get(5).get(1)),//Friday hours
+                Integer.parseInt(hours.get(6).get(0)), Integer.parseInt(hours.get(6).get(1))//Saturday hours
         );
 
         cashier.setAvailability(availability);
         _cashierService.save(cashier);
+        _availabilityService.save(availability);
     }
 
     /*
@@ -213,6 +216,7 @@ public class ManagerHelper implements IManagerHelper {
 
     /*
     args: -<startDate> -<endDate>
+    NOTE: startDate must begin on a sunday
      */
     @Override
     public void getEmployeeSchedule(List<String> args) {
@@ -220,6 +224,7 @@ public class ManagerHelper implements IManagerHelper {
         Date e = Date.valueOf(args.get(1));
         int numDays = Math.abs(s.toLocalDate().getDayOfYear() -e.toLocalDate().getDayOfYear());
         List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+        cashiers = getCashiersWithAvailabilities(cashiers);
 
         String schedule = "Daily Schedule\n\n";
         for(int day=0;day<numDays;day++){
@@ -234,11 +239,16 @@ public class ManagerHelper implements IManagerHelper {
                 //finds nextAvailableCashier with smallest availability difference
                 for(int j=1; j<cashiers.size();j++){
                     Cashier curCashier = cashiers.get(j);
-                    int start = getCashierStartOfShift(day%7,curCashier);
+                    int start = getCashierStartOfShift(day%7,curCashier);                    
                     int diff = start - nextHour;
-                    if (diff < availabilityDiff) {
-                    	nextAvailableCashier = curCashier;
-                    	availabilityDiff = diff;
+                    if (!(diff<0)) {
+                    	if (diff < availabilityDiff || (availabilityDiff<0 && diff>=0)) {
+                        	nextAvailableCashier = curCashier;
+                        	availabilityDiff = diff;
+                        }
+                    }else {
+                        int end = getCashierEndOfShift(day%7,curCashier);
+                        diff = nextHour - end;
                     }
                 }
 
@@ -255,6 +265,15 @@ public class ManagerHelper implements IManagerHelper {
         System.out.println(schedule);
     }
 
+    private List<Cashier> getCashiersWithAvailabilities(List<Cashier> cashiers){
+    	List<Cashier> result = new ArrayList<>();
+    	for(Cashier cashier: cashiers) {
+    		if (cashier.getAvailability()!=null)
+    			result.add(cashier);
+    	}
+    	return result;
+    }
+    
     // Generic function to randomize a list in Java using Fisher–Yates shuffle
     public static<T> void shuffle(List<T> list)
     {

@@ -44,11 +44,6 @@ public class GenCLR implements CommandLineRunner {
 		Path curRelPath = Paths.get("");
 		String corePath = curRelPath.toAbsolutePath().toString() + "\\src\\main\\resources\\dbGeneratorData";
 		repo = new GenDataRepository(corePath);
-		
-		// Generate test users
-		service.cashier().save(new Cashier("test_cashier", "password", "name", 0, 0));
-		service.manager().save(new Manager("test_manager", "password"));
-		service.corporate().save(new Corporate("test_corporate", "password"));
 
 		// Generate items
 		List<Item> items = repo.items();
@@ -68,6 +63,13 @@ public class GenCLR implements CommandLineRunner {
 		// Generate gas stations and their employees, sales, and inventory
 		LOG.info("Starting generation of gas stations...");
 		new GasStationGenerator(service, repo).execute();
+		
+		// Generate test users
+		GasStation gs = service.gasStation().findByLocation("Montgomery");
+		service.cashier().save(new Cashier("test_cashier", "password", "name", 0, 0, gs));
+		service.gasStation().save(gs);
+		service.manager().save(new Manager("test_manager", "password"));
+		service.corporate().save(new Corporate("test_corporate", "password"));
 
 		long endTime = System.currentTimeMillis();
 		LOG.info("...finished database generation in " + ((endTime - startTime) / 1000) + " seconds");
