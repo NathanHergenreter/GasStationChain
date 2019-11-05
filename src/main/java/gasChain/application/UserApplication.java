@@ -39,11 +39,11 @@ public class UserApplication implements CommandLineRunner {
 	@Override
 	public void run(String... args) throws Exception {
 		in = new Scanner(System.in);
-		boolean hasValidated = false;
-		
-		while(!hasValidated)
+		boolean exit = false;
+
+		System.out.println();
+		while(!exit)
 		{
-			System.out.println();
 			System.out.println("Enter username: ");
 			String username = in.nextLine();
 			
@@ -54,7 +54,6 @@ public class UserApplication implements CommandLineRunner {
 	
 			Employee employee = validateUser(username, password);
 			String auth = employee != null ? employee.getAuth() : "INVALID";
-			hasValidated = true;
 			
 			switch(auth)
 			{
@@ -74,12 +73,17 @@ public class UserApplication implements CommandLineRunner {
 	                promptUser(in);
 					break;
 				default:
-					hasValidated = false;
+					System.out.println();
 					System.out.println("Invalid username or password");
+					System.out.println();
 					break;
 			}
+
+			System.out.println("Enter 'exit' to close application, anything else to continue: ");
+			if(in.nextLine().equals("exit")) exit = true;
 		}
 
+		System.out.println("\nClosing application...\n");
 		in.close();
 	}
 
@@ -88,6 +92,7 @@ public class UserApplication implements CommandLineRunner {
 		
 		System.out.println();
 		System.out.println("Welcome! Enter 'exit' to sign out.");
+		System.out.println();
 
 		while(isSignedIn){
 			System.out.println("Enter a command: ");

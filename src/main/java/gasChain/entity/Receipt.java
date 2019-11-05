@@ -20,7 +20,7 @@ public class Receipt {
 	private List<Sale> sales = new ArrayList<>();
 
     @OneToOne
-    @NotNull
+//    @NotNull
     @JoinColumn(name = "payment_id")
     private Payment payment;
 

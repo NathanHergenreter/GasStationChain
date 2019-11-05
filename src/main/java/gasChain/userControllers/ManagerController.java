@@ -39,8 +39,12 @@ public class ManagerController implements IUserController {
             case "ScheduleEmployees":
                 _managerHelper.getEmployeeSchedule(cmd.subList(1,cmd.size()));
                 break;
+            case "AddGasStationInventory":
+            	_managerHelper.addGasStationInventory(cmd.subList(1,cmd.size()));
+            case "RemoveGasStationInventory":
+            	_managerHelper.removeGasStationInventory(cmd.subList(1,cmd.size()));
             case "RestockInventory":
-            	_managerHelper.restockGasStationInventory(cmd);
+            	_managerHelper.restockGasStationInventory(cmd.subList(1,cmd.size()));
             	break;
             default:
                 break;

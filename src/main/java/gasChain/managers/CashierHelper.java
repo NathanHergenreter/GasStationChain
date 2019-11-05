@@ -91,7 +91,7 @@ public class CashierHelper implements ICashierHelper {
 
             String input = in.nextLine();
             isEndSale = input.equals("/end");
-            id = Long.parseLong(input);
+            if(!isEndSale) id = Long.parseLong(input);
         }
         System.out.println("Shopping Cart Total is: " + df.format(total / 100.0));
         System.out.println("How will the customer be paying today?");
