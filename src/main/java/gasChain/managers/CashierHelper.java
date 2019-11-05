@@ -87,7 +87,7 @@ public class CashierHelper implements ICashierHelper {
             InventoryItems.add(gsi);
             int price = gsi.getPrice();
             total += price;
-            Sale s = new Sale(item, gasStation, null, price);
+            Sale s = new Sale(item, gasStation, receipt, price);
 //            saleService.save((s));
             receipt.addSale(s);
             System.out.println(item.getId() + " --- " + item.getName() + " ---  $" + df.format(price / 100.0) + " --- Total = " + df.format(total / 100.0));
@@ -229,6 +229,7 @@ public class CashierHelper implements ICashierHelper {
                     break;
                 }
             }
+            System.out.print("Item Returned");
             receiptService.save(receipt);
         }
     }
