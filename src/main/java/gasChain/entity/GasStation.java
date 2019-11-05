@@ -14,9 +14,9 @@ import java.util.Set;
 @Entity
 public class GasStation extends Store {
 
-	@Cascade({ CascadeType.ALL })
+	@Cascade({ CascadeType.MERGE })
 	@OneToMany(mappedBy = "gasStation")
-	private Set<GasStationInventory> inventory;
+	private List<GasStationInventory> inventory = new ArrayList<>();
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
@@ -29,10 +29,6 @@ public class GasStation extends Store {
 	@Cascade({ CascadeType.PERSIST })
 	@OneToMany(mappedBy = "workplace")
 	private List<Cashier> cashiers = new ArrayList<>();
-
-	private String location;
-	private String state;
-	private String region;
 
 	protected GasStation() {
 		super();
@@ -48,21 +44,11 @@ public class GasStation extends Store {
 //        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
 //    }
 
-	public String getLocation() {
-		return location;
-	}
-
-	public String getState() {
-		return state;
-	}
-
-	public String getRegion() {
-		return region;
-	}
-
-	public Set<GasStationInventory> getInventory() {
+	public List<GasStationInventory> getInventory() {
 		return inventory;
 	}
+	
+	public GasStation addInventory(GasStationInventory item) { inventory.add(item); return this; }
 
 	public List<Sale> getSales() {
 		return sales;

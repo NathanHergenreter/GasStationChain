@@ -29,6 +29,12 @@ public abstract class GenericService<T, ID extends Serializable, R extends JpaRe
 	public boolean isEmpty() {
 		return r.count() <= 0;
 	}
+	
+	@Override
+	@Transactional
+	public void delete(T t) {
+		r.delete(t);
+	}
 
 	@Override
 	@Transactional

@@ -14,7 +14,7 @@ public class CashierController implements IUserController{
     }
 
     @Override
-    public void execute(List<String> cmd) {
+    public void execute(List<String> cmd) throws Exception {
         String command = cmd.get(0);
         switch (command){
             case "AddWorkPeriod":

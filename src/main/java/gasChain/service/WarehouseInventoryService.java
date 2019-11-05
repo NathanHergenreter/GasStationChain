@@ -1,11 +1,17 @@
 package gasChain.service;
 
+import gasChain.entity.GasStation;
+import gasChain.entity.GasStationInventory;
+import gasChain.entity.Item;
 import gasChain.entity.Warehouse;
 import gasChain.entity.WarehouseInventory;
 import gasChain.repository.WarehouseInventoryRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -24,5 +30,25 @@ public class WarehouseInventoryService
 
     public Set<WarehouseInventory> findByWarehouse(Warehouse warehouse) {
         return getRepository().findByWarehouse(warehouse);
+    }
+
+	public WarehouseInventory findWarehouseInventoriesByWarehouseAndAndItem(Warehouse warehouse, Item item) {
+		return getRepository().findWarehouseInventoriesByWarehouseAndAndItem(warehouse, item);
+	}
+
+    /*
+     * Given a list of items and quantities. Stocks the given warehouse with these items.
+     */
+    public void stockWarehouse(Warehouse warehouse, List<Item> items, List<Integer> quantity) {
+    	Set<WarehouseInventory> inventory = findByWarehouse(warehouse);
+    	Iterator<WarehouseInventory> iter = inventory.iterator();
+    	for (int i = 0; i < items.size(); i++) {
+    		while (iter.hasNext()) {
+    			WarehouseInventory item = iter.next();
+    			if (item.getItem().equals(items.get(i))) {
+    				item.setQuantity(item.getQuantity() + quantity.get(i));
+    			}
+    		}
+    	}
     }
 }

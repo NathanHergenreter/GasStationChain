@@ -3,14 +3,18 @@ package gasChain.application;
 import gasChain.coreInterfaces.managers.IUserHelper;
 import gasChain.coreInterfaces.userControllers.IUserController;
 import gasChain.entity.Cashier;
+import gasChain.entity.Corporate;
 import gasChain.entity.Employee;
 import gasChain.entity.Manager;
 import gasChain.managers.CashierHelper;
+import gasChain.managers.CorporateHelper;
 import gasChain.managers.ManagerHelper;
 import gasChain.service.CashierService;
 import gasChain.service.CorporateService;
 import gasChain.service.ManagerService;
+import gasChain.service.ServiceMaster;
 import gasChain.userControllers.CashierController;
+import gasChain.userControllers.CorporateController;
 import gasChain.userControllers.ManagerController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -26,11 +30,7 @@ import java.util.Scanner;
 public class UserApplication implements CommandLineRunner {
 
 	@Autowired
-	CashierService cashierService;
-	@Autowired
-	ManagerService managerService;
-	@Autowired
-	CorporateService corporateService;
+	ServiceMaster service;
 
 	static Scanner in;
 
@@ -43,18 +43,20 @@ public class UserApplication implements CommandLineRunner {
 		
 		while(!hasValidated)
 		{
+			System.out.println();
 			System.out.println("Enter username: ");
-			String username = in.next();
+			String username = in.nextLine();
 			
 			System.out.println("Enter password: ");
-			String password = in.next();
+			String password = in.nextLine();
 			
 			IUserHelper helper;
 	
 			Employee employee = validateUser(username, password);
+			String auth = employee != null ? employee.getAuth() : "INVALID";
 			hasValidated = true;
 			
-			switch(employee.getAuth())
+			switch(auth)
 			{
 				case "cashier":
 					helper = CashierHelper.cashierHelper((Cashier) employee);
@@ -67,6 +69,8 @@ public class UserApplication implements CommandLineRunner {
 	                promptUser(in);
 					break;
 				case "corporate":
+					helper = new CorporateHelper((Corporate) employee);
+					_controller = new CorporateController((CorporateHelper) helper);
 	                promptUser(in);
 					break;
 				default:
@@ -81,9 +85,14 @@ public class UserApplication implements CommandLineRunner {
 
 	public void promptUser(Scanner reader){
 		boolean isSignedIn = true;
+		
+		System.out.println();
+		System.out.println("Welcome! Enter 'exit' to sign out.");
 
 		while(isSignedIn){
-			List<String> result = Arrays.asList(reader.nextLine().split("-"));
+			System.out.println("Enter a command: ");
+			String cmd = reader.nextLine();
+			List<String> result = Arrays.asList(cmd.split(";"));
 			isSignedIn = !result.get(0).equals("exit");
 			if (isSignedIn){
                 try{
@@ -92,15 +101,19 @@ public class UserApplication implements CommandLineRunner {
                     System.out.println(e);
                 }
             }
+			else
+			{
+				System.out.println("\nSigning out...\n");
+			}
 		}
 	}
 	
 	private Employee validateUser(String username, String password)
 	{
-		Employee employee = cashierService.findByUsername(username);
-		employee = employee == null ? managerService.findByUsername(username) : employee;
-		employee = employee == null ? corporateService.findByUsername(username) : employee;
+		Employee employee = service.cashier().findByUsername(username);
+		employee = employee == null ? service.manager().findByUsername(username) : employee;
+		employee = employee == null ? service.corporate().findByUsername(username) : employee;
 		
-		return employee.getPassword().equals(password) ? employee : null;
+		return (employee != null && employee.getPassword().equals(password)) ? employee : null;
 	}
 }

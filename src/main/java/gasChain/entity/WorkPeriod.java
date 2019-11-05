@@ -35,4 +35,5 @@ public class WorkPeriod {
     public Date getDate() { return date; }
     public int getStartHour() { return startHour; }
     public int getEndHour() { return endHour; }
+    public Cashier getCashier() { return cashier;}
 }

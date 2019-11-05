@@ -3,11 +3,13 @@ package gasChain.managers;
 import gasChain.coreInterfaces.managers.IManagerHelper;
 
 import gasChain.entity.*;
+import gasChain.service.AvailabilityService;
 import gasChain.service.CashierService;
 import gasChain.service.GasStationInventoryService;
 import gasChain.service.GasStationService;
 import gasChain.service.ManagerService;
 import gasChain.service.WarehouseInventoryService;
+import gasChain.service.WorkPeriodService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,16 +29,14 @@ public class ManagerHelper implements IManagerHelper {
 
     Manager _user;
 
-    @Autowired
-    GasStationService _gasStationService;
-    @Autowired
-    CashierService _cashierService;
-    @Autowired
-    ManagerService _managerService;
-    @Autowired
-    WarehouseInventoryService _warehouseInventoryService;
-    @Autowired
-    GasStationInventoryService _gasStationInventoryService;
+    private GasStationService _gasStationService = ManagersAutoWire.getBean(GasStationService.class);
+    private CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
+    private ManagerService _managerService = ManagersAutoWire.getBean(ManagerService.class);
+    private WarehouseInventoryService _warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
+    private GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
+    private WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
+    private AvailabilityService _availabilityService = ManagersAutoWire.getBean(AvailabilityService.class);
+
 
 
     /*
@@ -52,13 +52,15 @@ public class ManagerHelper implements IManagerHelper {
                 args.get(1),
                 args.get(2),
                 Integer.parseInt(args.get(3)),
-                Integer.parseInt(args.get(4))
+                Integer.parseInt(args.get(4)),
+                _user.getStore()
         );
         _cashierService.save(model);
     }
 
     /*
     args should be ordered: username, password, name, wagesHourly
+    NOTE: this method should NOT re-set the username
      */
     @Override
     public void updateCashier(List<String> args) throws Exception{
@@ -69,7 +71,6 @@ public class ManagerHelper implements IManagerHelper {
 
         Cashier model = (Cashier) _cashierService.findByUsername(args.get(0));
 
-        model.setUsername(args.get(0));
         model.setPassword(args.get(1));
         model.setName(args.get(2));
         model.setWagesHourly(Integer.parseInt(args.get(3)));
@@ -99,14 +100,15 @@ public class ManagerHelper implements IManagerHelper {
                 Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(1)),//Sunday hours
                 Integer.parseInt(hours.get(1).get(0)), Integer.parseInt(hours.get(1).get(1)),//Monday hours
                 Integer.parseInt(hours.get(2).get(0)), Integer.parseInt(hours.get(2).get(1)),//Tuesday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0)),//Wednesday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0)),//Thursday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0)),//Friday hours
-                Integer.parseInt(hours.get(0).get(0)), Integer.parseInt(hours.get(0).get(0))//Saturday hours
+                Integer.parseInt(hours.get(3).get(0)), Integer.parseInt(hours.get(3).get(1)),//Wednesday hours
+                Integer.parseInt(hours.get(4).get(0)), Integer.parseInt(hours.get(4).get(1)),//Thursday hours
+                Integer.parseInt(hours.get(5).get(0)), Integer.parseInt(hours.get(5).get(1)),//Friday hours
+                Integer.parseInt(hours.get(6).get(0)), Integer.parseInt(hours.get(6).get(1))//Saturday hours
         );
 
         cashier.setAvailability(availability);
         _cashierService.save(cashier);
+        _availabilityService.save(availability);
     }
 
     /*
@@ -115,11 +117,43 @@ public class ManagerHelper implements IManagerHelper {
     @Override
     public void removeCashier(List<String> args) throws Exception{
         if (_cashierService.existsUser(args.get(0))){
-            Cashier e = (Cashier) _cashierService.findByUsername(args.get(1));
+            Cashier e = (Cashier) _cashierService.findByUsername(args.get(0));
             _cashierService.deleteById(e.getId());
         }else{
             throw new Exception("cmd 'removeCashier': given username does not exist");
         }
+    }
+    
+    private List<WorkPeriod> getCashierWorkPeriods(Cashier cashier){
+    	List<WorkPeriod> cashierWorkPeriods = new ArrayList<>();
+    	List<WorkPeriod> workPeriods = _workPeriodService.findAll();
+        for(WorkPeriod period: workPeriods) {
+        	long cashierId = cashier.getId();
+        	long otherId = period.getCashier().getId();
+        	if(cashierId == otherId) {
+        		cashierWorkPeriods.add(period);
+        	}
+        }
+        return cashierWorkPeriods;
+    }
+    
+    private List<Cashier> getStoreCashiers(GasStation gasStation){
+    	List<Cashier> storeCashiers = new ArrayList<>();
+    	List<Cashier> cashiers = _cashierService.findAll();
+        for(Cashier cashier: cashiers) {
+        	long cashierStoreId = cashier.getWorkplace().getId();
+        	long givenStoreId = gasStation.getId();
+        	if(cashierStoreId == givenStoreId) {
+        		storeCashiers.add(cashier);
+        	}
+        }
+        return storeCashiers;
+    }
+    
+    public void listStoreCashiers() {
+    	List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+    	for(Cashier cashier: cashiers)
+    		System.out.println("Username: " + cashier.getUsername() + " Name: " + cashier.getName() + " Hourly Rate: $" + cashier.getWagesHourly());
     }
 
     /*
@@ -136,10 +170,11 @@ public class ManagerHelper implements IManagerHelper {
         Date startDate = Date.valueOf(args.get(1));
         Date endDate = Date.valueOf(args.get(2));
 
-        if (startDate.compareTo(endDate)<=0)
+        if (startDate.compareTo(endDate)>=0)
             throw new Exception("cmd 'GetCashierPayroll': end-date must occur after start-date");
 
-        List<WorkPeriod> allWorkPeriods = cashier.getWorkPeriods();
+        //
+        List<WorkPeriod> allWorkPeriods = getCashierWorkPeriods(cashier);
         List<WorkPeriod> workPeriods = new ArrayList<>();
         for(int i=0;i<allWorkPeriods.size();i++){
             if(allWorkPeriods.get(i).getDate().compareTo(startDate) >= 0)
@@ -156,7 +191,7 @@ public class ManagerHelper implements IManagerHelper {
                 totalHoursWorked += endTime - startTime;
         }
 
-        System.out.println("Employee: "+cashier.getName()+" Payroll: "+(totalHoursWorked*cashier.getWagesHourly())+"\n");
+        System.out.println("Employee: "+cashier.getName()+" -Payroll: $"+(totalHoursWorked*cashier.getWagesHourly())+"\n");
     }
 
     /*
@@ -169,7 +204,7 @@ public class ManagerHelper implements IManagerHelper {
         if (args.size()!=2)
             throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (2)");
 
-        List<Cashier> cashiers = _user.getStore().getCashiers();
+        List<Cashier> cashiers = getStoreCashiers(_user.getStore());
         for(int i=0;i<cashiers.size();i++){
             List<String> newArgs = new ArrayList<>();
             newArgs.add(cashiers.get(i).getUsername());
@@ -181,13 +216,15 @@ public class ManagerHelper implements IManagerHelper {
 
     /*
     args: -<startDate> -<endDate>
+    NOTE: startDate must begin on a sunday
      */
     @Override
     public void getEmployeeSchedule(List<String> args) {
         Date s = Date.valueOf(args.get(0));
         Date e = Date.valueOf(args.get(1));
         int numDays = Math.abs(s.toLocalDate().getDayOfYear() -e.toLocalDate().getDayOfYear());
-        List<Cashier> cashiers = _user.getStore().getCashiers();
+        List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+        cashiers = getCashiersWithAvailabilities(cashiers);
 
         String schedule = "Daily Schedule\n\n";
         for(int day=0;day<numDays;day++){
@@ -202,63 +239,16 @@ public class ManagerHelper implements IManagerHelper {
                 //finds nextAvailableCashier with smallest availability difference
                 for(int j=1; j<cashiers.size();j++){
                     Cashier curCashier = cashiers.get(j);
-                    switch (day%7){
-                        case 0:
-                            int sunStart = curCashier.getAvailability().getSunStart();
-                            int sunDiff = sunStart - nextHour;
-                            if(sunDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = sunDiff;
-                            }
-                            break;
-                        case 1:
-                            int monStart = curCashier.getAvailability().getMonStart();
-                            int monDiff = monStart - nextHour;
-                            if(monDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = monDiff;
-                            }
-                            break;
-                        case 2:
-                            int tueStart = curCashier.getAvailability().getSunStart();
-                            int tueDiff = tueStart - nextHour;
-                            if(tueDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = tueDiff;
-                            }
-                            break;
-                        case 3:
-                            int wedStart = curCashier.getAvailability().getSunStart();
-                            int wedDiff = wedStart - nextHour;
-                            if(wedDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = wedDiff;
-                            }
-                            break;
-                        case 4:
-                            int thrStart = curCashier.getAvailability().getSunStart();
-                            int thrDiff = thrStart - nextHour;
-                            if(thrDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = thrDiff;
-                            }
-                            break;
-                        case 5:
-                            int friStart = curCashier.getAvailability().getSunStart();
-                            int friDiff = friStart - nextHour;
-                            if(friDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = friDiff;
-                            }
-                            break;
-                        case 6:
-                            int satStart = curCashier.getAvailability().getSunStart();
-                            int satDiff = satStart - nextHour;
-                            if(satDiff < availabilityDiff){
-                                nextAvailableCashier = curCashier;
-                                availabilityDiff = satDiff;
-                            }
-                            break;
+                    int start = getCashierStartOfShift(day%7,curCashier);                    
+                    int diff = start - nextHour;
+                    if (!(diff<0)) {
+                    	if (diff < availabilityDiff || (availabilityDiff<0 && diff>=0)) {
+                        	nextAvailableCashier = curCashier;
+                        	availabilityDiff = diff;
+                        }
+                    }else {
+                        int end = getCashierEndOfShift(day%7,curCashier);
+                        diff = nextHour - end;
                     }
                 }
 
@@ -275,6 +265,15 @@ public class ManagerHelper implements IManagerHelper {
         System.out.println(schedule);
     }
 
+    private List<Cashier> getCashiersWithAvailabilities(List<Cashier> cashiers){
+    	List<Cashier> result = new ArrayList<>();
+    	for(Cashier cashier: cashiers) {
+    		if (cashier.getAvailability()!=null)
+    			result.add(cashier);
+    	}
+    	return result;
+    }
+    
     // Generic function to randomize a list in Java using Fisher–Yates shuffle
     public static<T> void shuffle(List<T> list)
     {
@@ -322,6 +321,35 @@ public class ManagerHelper implements IManagerHelper {
         return availabilityDiff;
     }
 
+    private int getCashierStartOfShift(int day, Cashier cashier){
+        int endOfShift = 0;
+        Availability availability = cashier.getAvailability();
+        switch (day%7){
+            case 0:
+                endOfShift = availability.getSunStart();
+                break;
+            case 1:
+                endOfShift = availability.getMonStart();
+                break;
+            case 2:
+                endOfShift = availability.getTueStart();
+                break;
+            case 3:
+                endOfShift = availability.getWedStart();
+                break;
+            case 4:
+                endOfShift = availability.getThrStart();
+                break;
+            case 5:
+                endOfShift = availability.getFriStart();
+                break;
+            case 6:
+                endOfShift = availability.getSatStart();
+                break;
+        }
+        return endOfShift;
+    }
+    
     private int getCashierEndOfShift(int day, Cashier cashier){
         int endOfShift = 0;
         Availability availability = cashier.getAvailability();

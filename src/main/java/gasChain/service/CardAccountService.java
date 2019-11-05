@@ -12,4 +12,9 @@ public abstract class CardAccountService<T extends CardAccount, ID extends Seria
     public CardAccountService(R r) {
         super(r);
     }
+
+    public T findOneByCardNumber(String number) {
+        return getRepository().findOneByCardNumber(number);
+    }
+
 }

@@ -9,4 +9,8 @@ import java.io.Serializable;
 public interface CardAccountRepository<T extends CardAccount, ID extends Serializable>
         extends PaymentRepository<T, ID> {
 
+    T findOneByCardNumber(String cardNumber);
+
+
+
 }
