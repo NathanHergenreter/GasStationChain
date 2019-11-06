@@ -1,6 +1,5 @@
 package gasChain.entity;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 

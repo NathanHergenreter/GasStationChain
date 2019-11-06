@@ -33,13 +33,6 @@ public class Sale {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
-    
-
-    @ManyToOne
-    @JoinColumn(name = "workplace_id")
-    private CardAccount cardAccount;
-
-    private boolean isReturned;
 
     protected Sale() {}
 
@@ -48,13 +41,18 @@ public class Sale {
         this.price = price;
         this.item = item;
         this.sellLocation = sellLocation;
-        this.isReturned = false;
         this.sellDate = new Date();
     }
 
     public Sale(@NotNull Item item, @NotNull GasStation sellLocation, @NotNull Receipt receipt, int price, Date sellDate) {
         this(item, sellLocation, receipt, price);
         this.sellDate = sellDate;
+    }
+    
+    // Copy constructor for returns
+    public Sale(Sale copySale, Receipt receipt, int price)
+    {
+    	this(copySale.item, copySale.sellLocation, receipt, price);
     }
 
     public Long getId() {
@@ -81,24 +79,12 @@ public class Sale {
         return sellLocation;
     }
 
-    public boolean getIsReturned() {
-        return isReturned;
-    }
-
-    public void setIsReturned(boolean isReturned) {
-        this.isReturned = isReturned;
-    }
-    
-    public CardAccount getCardAccount() { return cardAccount; }
-    public Sale setCardAccount(CardAccount cardAccount) { this.cardAccount = cardAccount; return this; }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Sale sale = (Sale) o;
         return getPrice() == sale.getPrice() &&
-                isReturned == sale.isReturned &&
                 getId().equals(sale.getId()) &&
                 getSellDate().equals(sale.getSellDate()) &&
                 getItem().equals(sale.getItem()) &&
@@ -108,7 +94,7 @@ public class Sale {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getPrice(), getSellDate(), getItem(), getSellLocation(), receipt, isReturned);
+        return Objects.hash(getId(), getPrice(), getSellDate(), getItem(), getSellLocation(), receipt);
     }
 
 }

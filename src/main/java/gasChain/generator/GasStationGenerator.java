@@ -3,17 +3,13 @@ package gasChain.generator;
 import java.util.ArrayList;
 
 
-import gasChain.entity.CashPayment;
 import gasChain.entity.Cashier;
-import gasChain.entity.CreditCardAccount;
 import gasChain.entity.GasStation;
 import gasChain.entity.GasStationInventory;
 import gasChain.entity.Item;
 import gasChain.entity.Manager;
-import gasChain.entity.Payment;
 import gasChain.entity.Receipt;
 import gasChain.entity.Sale;
-import gasChain.entity.WarehouseInventory;
 import gasChain.util.ServiceMaster;
 
 public class GasStationGenerator {
@@ -58,33 +54,22 @@ public class GasStationGenerator {
 
 	private void generateSales(int maxSales, GasStation gasStation, ArrayList<Item> items) {
 		int numSales = GenUtil.rng.nextInt(maxSales);
+		
 		while (numSales > 0) {
 			Receipt receipt = new Receipt();
 			Item item = service.item().findAll().get(GenUtil.rng.nextInt(items.size()));
+			
 			for (int numReceipt = GenUtil.rng.nextInt(8); numReceipt > 0; numReceipt--) {
 				Sale sale = new Sale(item, gasStation, receipt, item.getSuggestRetailPrice(), GenUtil.genDate());
 				gasStation.addSale(sale);
 				receipt.addSale(sale);
 				numSales--;
 			}
-			Payment p;
-			try {
-				p = new CreditCardAccount("2238467265875675");
-				service.creditCardAccount().save((CreditCardAccount) p);
-			} catch (Exception e) {
-				p = new CashPayment();
-				service.cashPayment().save((CashPayment) p);
-			}
-			receipt.setPayment(p);
+			
+			int paymentType = GenUtil.rng.nextInt(3) + 1;
+			receipt.setPayment(Receipt.Payment.values()[paymentType]);
 
 			service.receipt().save(receipt);
-
-
-//			List<Sale> sales = receipt.getSales();
-//			for(Sale s: sales){
-//				service.sale().save(s);
-//			}
-
 		}
 	}
 
