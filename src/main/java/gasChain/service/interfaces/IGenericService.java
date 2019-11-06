@@ -17,6 +17,6 @@ public interface IGenericService<T, ID extends Serializable> {
 
 	T findById(ID id);
 
-	void save(T entity);
+	T save(T entity);
 
 }

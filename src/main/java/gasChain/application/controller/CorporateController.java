@@ -1,12 +1,9 @@
-package gasChain.userControllers;
+package gasChain.application.controller;
 
-import gasChain.coreInterfaces.managers.ICorporateHelper;
-import gasChain.coreInterfaces.userControllers.IUserController;
-import gasChain.entity.Employee;
+import gasChain.application.manager.interfaces.ICorporateHelper;
+import gasChain.application.controller.interfaces.IUserController;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class CorporateController implements IUserController {
 	

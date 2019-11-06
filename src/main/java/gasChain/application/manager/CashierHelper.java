@@ -1,6 +1,7 @@
-package gasChain.managers;
+package gasChain.application.manager;
 
-import gasChain.coreInterfaces.managers.ICashierHelper;
+import gasChain.application.manager.interfaces.ICashierHelper;
+import gasChain.util.ServiceAutoWire;
 import gasChain.entity.*;
 import gasChain.service.*;
 
@@ -12,15 +13,15 @@ public class CashierHelper implements ICashierHelper {
 
     private static CashierHelper cashierHelperSingleton;
     private Cashier _cashier;
-    private WorkPeriodService workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
-    private ReceiptService receiptService = ManagersAutoWire.getBean(ReceiptService.class);
-    private GasStationInventoryService gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
-    private ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
-    private CreditCardAccountService creditCardAccountService = ManagersAutoWire.getBean(CreditCardAccountService.class);
-    private DebitAccountService debitAccountService = ManagersAutoWire.getBean(DebitAccountService.class);
-    private CashPaymentService cashPaymentService = ManagersAutoWire.getBean(CashPaymentService.class);
-    private SaleService saleService = ManagersAutoWire.getBean(SaleService.class);
-    private CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
+    private WorkPeriodService workPeriodService = ServiceAutoWire.getBean(WorkPeriodService.class);
+    private ReceiptService receiptService = ServiceAutoWire.getBean(ReceiptService.class);
+    private GasStationInventoryService gasStationInventoryService = ServiceAutoWire.getBean(GasStationInventoryService.class);
+    private ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
+    private CreditCardAccountService creditCardAccountService = ServiceAutoWire.getBean(CreditCardAccountService.class);
+    private DebitAccountService debitAccountService = ServiceAutoWire.getBean(DebitAccountService.class);
+    private CashPaymentService cashPaymentService = ServiceAutoWire.getBean(CashPaymentService.class);
+    private SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
+    private CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
 
 
     private CashierHelper(Cashier cashier) {

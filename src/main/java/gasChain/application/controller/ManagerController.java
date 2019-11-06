@@ -1,7 +1,7 @@
-package gasChain.userControllers;
+package gasChain.application.controller;
 
-import gasChain.coreInterfaces.managers.IManagerHelper;
-import gasChain.coreInterfaces.userControllers.IUserController;
+import gasChain.application.manager.interfaces.IManagerHelper;
+import gasChain.application.controller.interfaces.IUserController;
 import java.util.List;
 
 public class ManagerController implements IUserController {

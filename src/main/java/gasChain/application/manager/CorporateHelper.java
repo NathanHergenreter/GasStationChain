@@ -1,6 +1,7 @@
-package gasChain.managers;
+package gasChain.application.manager;
 
-import gasChain.coreInterfaces.managers.ICorporateHelper;
+import gasChain.application.manager.interfaces.ICorporateHelper;
+import gasChain.util.ServiceAutoWire;
 import gasChain.entity.Corporate;
 import gasChain.entity.GasStation;
 import gasChain.entity.Item;
@@ -28,13 +29,13 @@ public class CorporateHelper implements ICorporateHelper {
 	
 	Corporate user;
 	
-	private GasStationService gasStationService = ManagersAutoWire.getBean(GasStationService.class);
-	private CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
-	private CorporateService corporateService = ManagersAutoWire.getBean(CorporateService.class);
-	private ManagerService managerService = ManagersAutoWire.getBean(ManagerService.class);
-	private WarehouseInventoryService warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
-	private WarehouseService warehouseService = ManagersAutoWire.getBean(WarehouseService.class);
-	private ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
+	private GasStationService gasStationService = ServiceAutoWire.getBean(GasStationService.class);
+	private CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
+	private CorporateService corporateService = ServiceAutoWire.getBean(CorporateService.class);
+	private ManagerService managerService = ServiceAutoWire.getBean(ManagerService.class);
+	private WarehouseInventoryService warehouseInventoryService = ServiceAutoWire.getBean(WarehouseInventoryService.class);
+	private WarehouseService warehouseService = ServiceAutoWire.getBean(WarehouseService.class);
+	private ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
 	
 	@Override
 	public void addManager(List<String> args) throws Exception {

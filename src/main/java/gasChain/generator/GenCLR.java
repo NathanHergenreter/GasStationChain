@@ -2,7 +2,7 @@ package gasChain.generator;
 
 import gasChain.GasStationChainApplication;
 import gasChain.entity.*;
-import gasChain.service.ServiceMaster;
+import gasChain.util.ServiceMaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

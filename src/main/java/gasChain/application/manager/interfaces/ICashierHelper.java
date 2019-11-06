@@ -1,8 +1,8 @@
-package gasChain.coreInterfaces.managers;
+package gasChain.application.manager.interfaces;
 
 import java.util.List;
 
-public interface ICashierHelper extends IUserHelper{
+public interface ICashierHelper extends IUserHelper {
 
     void addWorkPeriod(List<String> args);
 

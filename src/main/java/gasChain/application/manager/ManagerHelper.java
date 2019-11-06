@@ -1,6 +1,7 @@
-package gasChain.managers;
+package gasChain.application.manager;
 
-import gasChain.coreInterfaces.managers.IManagerHelper;
+import gasChain.application.manager.interfaces.IManagerHelper;
+import gasChain.util.ServiceAutoWire;
 
 import gasChain.entity.*;
 import gasChain.service.AvailabilityService;
@@ -11,8 +12,6 @@ import gasChain.service.ItemService;
 import gasChain.service.ManagerService;
 import gasChain.service.WarehouseInventoryService;
 import gasChain.service.WorkPeriodService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Iterator;
 import java.util.List;
@@ -30,14 +29,14 @@ public class ManagerHelper implements IManagerHelper {
 
     Manager _user;
 
-    private GasStationService _gasStationService = ManagersAutoWire.getBean(GasStationService.class);
-    private CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
-    private ManagerService _managerService = ManagersAutoWire.getBean(ManagerService.class);
-    private WarehouseInventoryService _warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
-    private GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
-    private WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
-    private AvailabilityService _availabilityService = ManagersAutoWire.getBean(AvailabilityService.class);
-    private ItemService _itemService = ManagersAutoWire.getBean(ItemService.class);
+    private GasStationService _gasStationService = ServiceAutoWire.getBean(GasStationService.class);
+    private CashierService _cashierService = ServiceAutoWire.getBean(CashierService.class);
+    private ManagerService _managerService = ServiceAutoWire.getBean(ManagerService.class);
+    private WarehouseInventoryService _warehouseInventoryService = ServiceAutoWire.getBean(WarehouseInventoryService.class);
+    private GasStationInventoryService _gasStationInventoryService = ServiceAutoWire.getBean(GasStationInventoryService.class);
+    private WorkPeriodService _workPeriodService = ServiceAutoWire.getBean(WorkPeriodService.class);
+    private AvailabilityService _availabilityService = ServiceAutoWire.getBean(AvailabilityService.class);
+    private ItemService _itemService = ServiceAutoWire.getBean(ItemService.class);
 
 
 

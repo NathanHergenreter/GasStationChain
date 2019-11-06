@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import gasChain.entity.Item;
 import gasChain.entity.Warehouse;
 import gasChain.entity.WarehouseInventory;
-import gasChain.service.ServiceMaster;
+import gasChain.util.ServiceMaster;
 
 public class WarehouseGenerator {
 

@@ -14,7 +14,7 @@ import gasChain.entity.Payment;
 import gasChain.entity.Receipt;
 import gasChain.entity.Sale;
 import gasChain.entity.WarehouseInventory;
-import gasChain.service.ServiceMaster;
+import gasChain.util.ServiceMaster;
 
 public class GasStationGenerator {
 

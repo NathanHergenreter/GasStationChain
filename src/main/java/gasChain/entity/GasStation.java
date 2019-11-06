@@ -10,12 +10,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class GasStation extends Store {
 
-	@Cascade({ CascadeType.ALL })
+	@Cascade({CascadeType.PERSIST,CascadeType.REMOVE})
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
 	private List<GasStationInventory> inventory = new ArrayList<>();
 
@@ -28,8 +27,8 @@ public class GasStation extends Store {
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
-	@Cascade({ CascadeType.PERSIST })
 	@OneToMany(mappedBy = "workplace")
+    @Cascade({CascadeType.SAVE_UPDATE})
 	private List<Cashier> cashiers = new ArrayList<>();
 
 	protected GasStation() {
@@ -49,6 +48,8 @@ public class GasStation extends Store {
 	public List<GasStationInventory> getInventory() {
 		return inventory;
 	}
+	
+	public GasStation setInventory(List<GasStationInventory> inventory) { this.inventory = inventory; return this; }
 	
 	public GasStation addInventory(GasStationInventory item) { inventory.add(item); return this; }
 

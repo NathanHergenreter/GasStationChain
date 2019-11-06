@@ -1,7 +1,23 @@
-package gasChain.service;
+package gasChain.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import gasChain.service.AvailabilityService;
+import gasChain.service.CashPaymentService;
+import gasChain.service.CashierService;
+import gasChain.service.CorporateService;
+import gasChain.service.CreditCardAccountService;
+import gasChain.service.DebitAccountService;
+import gasChain.service.GasStationInventoryService;
+import gasChain.service.GasStationService;
+import gasChain.service.ItemService;
+import gasChain.service.ManagerService;
+import gasChain.service.ReceiptService;
+import gasChain.service.SaleService;
+import gasChain.service.WarehouseInventoryService;
+import gasChain.service.WarehouseService;
+import gasChain.service.WorkPeriodService;
 
 @Service
 public class ServiceMaster {
