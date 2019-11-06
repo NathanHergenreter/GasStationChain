@@ -39,12 +39,6 @@ public class GasStation extends Store {
 		super(location, state, region);
 	}
 
-//    public GasStation(@NotNull double longitude, @NotNull double latitude, String name, GasStationInventory... inventoryItems) {
-//        super(longitude, latitude, name);
-//        for (GasStationInventory inventory : inventoryItems) inventory.setGasStation(this);
-//        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
-//    }
-
 	public List<GasStationInventory> getInventory() {
 		return inventory;
 	}

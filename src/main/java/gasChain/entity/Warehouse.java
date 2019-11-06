@@ -17,9 +17,6 @@ import java.util.stream.Stream;
 @Entity
 public class Warehouse extends Store {
 
-	@Pattern(regexp = "(^$|[0-9]{10})")
-	private String phoneNumber;
-
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "warehouse", cascade = CascadeType.ALL)
 	private List<WarehouseInventory> inventory = new ArrayList<>();
 	
@@ -31,17 +28,11 @@ public class Warehouse extends Store {
 		super(location, state, region);
 	}
 
-	public Warehouse(@NotNull double longitude, @NotNull double latitude, String name,
-			@Pattern(regexp = "(^$|[0-9]{10})") String phoneNumber, WarehouseInventory... inventoryItems) {
+	public Warehouse(@NotNull double longitude, @NotNull double latitude, String name, WarehouseInventory... inventoryItems) {
 		super();
-		this.phoneNumber = phoneNumber;
 		for (WarehouseInventory inventory : inventoryItems)
 			inventory.setWarehouse(this);
 		this.inventory = Stream.of(inventoryItems).collect(Collectors.toList());
-	}
-	
-	public String getPhoneNumber() {
-		return phoneNumber;
 	}
 	
 	public List<WarehouseInventory> getWarehouseInventory() {
