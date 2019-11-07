@@ -1,6 +1,6 @@
 package gasChain.managers;
 
-import gasChain.coreInterfaces.managers.ICashierHelper;
+import gasChain.annotation.CashierUser;
 import gasChain.entity.*;
 import gasChain.service.*;
 
@@ -8,32 +8,21 @@ import java.text.DecimalFormat;
 import java.util.*;
 
 
-public class CashierHelper implements ICashierHelper {
+public class CashierHelper {
 
-    private static CashierHelper cashierHelperSingleton;
-    private Cashier _cashier;
-    private WorkPeriodService workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
-    private ReceiptService receiptService = ManagersAutoWire.getBean(ReceiptService.class);
-    private GasStationInventoryService gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
-    private ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
-    private CreditCardAccountService creditCardAccountService = ManagersAutoWire.getBean(CreditCardAccountService.class);
-    private DebitAccountService debitAccountService = ManagersAutoWire.getBean(DebitAccountService.class);
-    private CashPaymentService cashPaymentService = ManagersAutoWire.getBean(CashPaymentService.class);
-    private SaleService saleService = ManagersAutoWire.getBean(SaleService.class);
-    private CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
+    private static WorkPeriodService workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
+    private static ReceiptService receiptService = ManagersAutoWire.getBean(ReceiptService.class);
+    private static GasStationInventoryService gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
+    private static ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
+    private static CreditCardAccountService creditCardAccountService = ManagersAutoWire.getBean(CreditCardAccountService.class);
+    private static DebitAccountService debitAccountService = ManagersAutoWire.getBean(DebitAccountService.class);
+    private static CashPaymentService cashPaymentService = ManagersAutoWire.getBean(CashPaymentService.class);
+    private static SaleService saleService = ManagersAutoWire.getBean(SaleService.class);
+    private static CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
 
 
-    private CashierHelper(Cashier cashier) {
-        _cashier = cashier;
-    }
 
-    public static CashierHelper cashierHelper(Cashier cashier) {
-        if (cashierHelperSingleton == null) {
-            return new CashierHelper(cashier);
-        } else {
-            return cashierHelperSingleton;
-        }
-    }
+
 
 
     /*
@@ -41,37 +30,29 @@ public class CashierHelper implements ICashierHelper {
     NOTE: given hours should be on a 24 hour basis, also assumed shifts will not be greater than 24 hour period
     args: -startHour -endHour
      */
-    @Override
-    public void addWorkPeriod(List<String> args) {
+    @CashierUser(command = "AddWorkPeriod")
+    public static void addWorkPeriod(List<String> args, Cashier cashier) {
         WorkPeriod workPeriod = new WorkPeriod(
-                _cashier,
+                cashier,
                 Integer.parseInt(args.get(0)),
                 Integer.parseInt(args.get(1)),
-                _cashier.getWagesHourly(),
+                cashier.getWagesHourly(),
                 new java.sql.Date(System.currentTimeMillis())
         );
-        
-        this.workPeriodService.save(workPeriod);
-        this.cashierService.save(_cashier);
+
+        workPeriodService.save(workPeriod);
+        cashierService.save(cashier);
     }
 
-    private String getInput(Scanner in) throws Exception {
-        String input = in.nextLine();
-        if (input.equals("/end")) {
-            throw new Exception("/endCalled");
-        } else return input;
-    }
-
-    @Override
-    public void processSale() throws Exception {
+    @CashierUser(command = "NewSale")
+    public static void processSale(List<String> cmd, Cashier cashier) throws Exception {
         Scanner in = new Scanner(System.in);
-
         Receipt receipt = new Receipt();
         int total = 0;
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
 
-        GasStation gasStation = _cashier.getWorkplace();
+        GasStation gasStation = cashier.getWorkplace();
 
         System.out.println("New Order Started With ID: " + receipt.getId());
         System.out.println("Please proceed to enter item ID");
@@ -88,7 +69,6 @@ public class CashierHelper implements ICashierHelper {
             int price = gsi.getPrice();
             total += price;
             Sale s = new Sale(item, gasStation, receipt, price);
-//            saleService.save((s));
             receipt.addSale(s);
             System.out.println(item.getId() + " --- " + item.getName() + " ---  $" + df.format(price / 100.0) + " --- Total = " + df.format(total / 100.0));
 
@@ -117,7 +97,7 @@ public class CashierHelper implements ICashierHelper {
 
     }
 
-    private Payment processPayment(int i, Scanner in, int price) throws Exception {
+    private static Payment processPayment(int i, Scanner in, int price) throws Exception {
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         if (i == 1) {
@@ -139,7 +119,7 @@ public class CashierHelper implements ICashierHelper {
             DebitAccount da = debitAccountService.findOneByCardNumber(input);
             if (da == null) {
                 try {
-                    da = new DebitAccount(input, new Random().nextInt(100000));
+                    da = new DebitAccount(input, new Random().nextInt(500000));
                 } catch (Exception e) {
                     invalidCard(i, in, price);
                 }
@@ -172,18 +152,25 @@ public class CashierHelper implements ICashierHelper {
         return null;
     }
 
-    private void invalidCard(int i, Scanner in, int price) throws Exception {
+    private static void invalidCard(int i, Scanner in, int price) throws Exception {
         System.out.println("Invalid Card Number");
         System.out.println("Enter /end to exit or");
         processPayment(i, in, price);
     }
 
-    @Override
-    public void processReturn(List<String> args) throws Exception {
+    private static String getInput(Scanner in) throws Exception {
+        String input = in.nextLine();
+        if (input.equals("/end")) {
+            throw new Exception("/endCalled");
+        } else return input;
+    }
+
+    @CashierUser(command = "ReturnItems")
+    public static void processReturn(List<String> args, Cashier cashier) throws Exception {
         if (args.get(0).equals("noReceipt")) {
             Receipt returnReceipt;
             List<Receipt> receipts;
-            Long item_id;
+            long item_id;
             if (args.get(1).equals("cc")) {
                 CreditCardAccount cc = creditCardAccountService.findOneByCardNumber(args.get(2));
                 item_id = Long.parseLong(args.get(3));
@@ -214,7 +201,7 @@ public class CashierHelper implements ICashierHelper {
             }
             for (Sale s : returnReceipt.getSales()) {
                 if (s.getItem().getId().equals(item_id)) {
-                    returnItem(s);
+                    returnItem(s, cashier);
                     receiptService.save(receipts.get(0));
                     System.out.println("Item Returned");
                     return;
@@ -225,24 +212,24 @@ public class CashierHelper implements ICashierHelper {
             long itemId = Long.parseLong(args.get(2));
             for (Sale s : receipt.getSales()) {
                 if (s.getItem().getId() == itemId) {
-                    returnItem(s);
+                    returnItem(s, cashier);
                     System.out.println("Item Returned");
                     break;
                 }
             }
-            System.out.print("Item Returned");
+            System.out.println("Item Returned");
             receiptService.save(receipt);
+        } else {
+            System.out.println("Please enter valid input: receipt or noReceipt");
         }
     }
 
-    private void returnItem(Sale sale) {
+    private static void returnItem(Sale sale, Cashier cashier) {
         GasStationInventory inventoryItem =
-                gasStationInventoryService.findGasStationInventoryByGasStationAndItem(_cashier.getWorkplace(), sale.getItem());
+                gasStationInventoryService.findGasStationInventoryByGasStationAndItem(cashier.getWorkplace(), sale.getItem());
         inventoryItem.setQuantity(inventoryItem.getQuantity() + 1);
         sale.setIsReturned(true);
         gasStationInventoryService.save(inventoryItem);
         saleService.save(sale);
     }
 }
-
-

@@ -1,43 +1,27 @@
 package gasChain.managers;
 
-import gasChain.coreInterfaces.managers.ICorporateHelper;
-import gasChain.entity.Corporate;
-import gasChain.entity.GasStation;
-import gasChain.entity.Item;
-import gasChain.entity.Manager;
-import gasChain.entity.Warehouse;
-import gasChain.entity.WarehouseInventory;
-import gasChain.service.GasStationService;
-import gasChain.service.ItemService;
-import gasChain.service.CashierService;
-import gasChain.service.CorporateService;
-import gasChain.service.ManagerService;
-import gasChain.service.WarehouseInventoryService;
-import gasChain.service.WarehouseService;
+import gasChain.annotation.CorporateUser;
+import gasChain.entity.*;
+import gasChain.service.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class CorporateHelper implements ICorporateHelper {
-	
-	public CorporateHelper(Corporate employee) {
-		this.user = employee;
-	}
-	
-	Corporate user;
-	
-	private GasStationService gasStationService = ManagersAutoWire.getBean(GasStationService.class);
-	private CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
-	private CorporateService corporateService = ManagersAutoWire.getBean(CorporateService.class);
-	private ManagerService managerService = ManagersAutoWire.getBean(ManagerService.class);
-	private WarehouseInventoryService warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
-	private WarehouseService warehouseService = ManagersAutoWire.getBean(WarehouseService.class);
-	private ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
-	
-	@Override
-	public void addManager(List<String> args) throws Exception {
+public class CorporateHelper {
+
+
+	private static GasStationService gasStationService = ManagersAutoWire.getBean(GasStationService.class);
+	private static CashierService cashierService = ManagersAutoWire.getBean(CashierService.class);
+	private static CorporateService corporateService = ManagersAutoWire.getBean(CorporateService.class);
+	private static ManagerService managerService = ManagersAutoWire.getBean(ManagerService.class);
+	private static WarehouseInventoryService warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
+	private static WarehouseService warehouseService = ManagersAutoWire.getBean(WarehouseService.class);
+	private static ItemService itemService = ManagersAutoWire.getBean(ItemService.class);
+
+	@CorporateUser(command = "AddManager")
+	public static void addManager(List<String> args, Corporate corporate) throws Exception {
         if (args == null || args.size() != 3)
             throw new Exception("Invalid number of args for 'AddManager' (3)");
 		
@@ -63,8 +47,8 @@ public class CorporateHelper implements ICorporateHelper {
 //        managerService.save(manager);
 	}
 
-	@Override
-	public void removeManager(List<String> args) throws Exception {
+	@CorporateUser(command = "RemoveManager")
+	public static void removeManager(List<String> args, Corporate corporate) throws Exception {
         if (args == null || args.size() != 1)
             throw new Exception("Invalid number of args for 'RemoveManager' (1)");
 
@@ -81,9 +65,9 @@ public class CorporateHelper implements ICorporateHelper {
         if(store != null) gasStationService.save(store);
         managerService.delete(manager);
 	}
-	
-	@Override
-	public void addGasStation(List<String> args) throws Exception
+
+	@CorporateUser(command = "AddGasStation")
+	public static void addGasStation(List<String> args, Corporate corporate) throws Exception
 	{
         if (args == null || args.size() != 3)
             throw new Exception("Invalid number of args for 'AddGasStation' (3)");
@@ -97,30 +81,45 @@ public class CorporateHelper implements ICorporateHelper {
         
         gasStationService.save(new GasStation(location, state, region));
 	}
-	
-	@Override
-	public void removeGasStation(List<String> args) throws Exception
-	{
-        if (args == null || args.size() != 1)
-            throw new Exception("Invalid number of args for 'RemoveGasStation' (1)");
+
+	@CorporateUser(command = "RemoveGasStation")
+	public static void removeGasStation(List<String> args, Corporate corporate) throws Exception {
+		System.out.println("RemoveGasStation1");
+		System.out.println(args);
+		if (args == null || args.size() != 1) {
+			System.out.println("RemoveGasStation1e");
+			throw new Exception("Invalid number of args for 'RemoveGasStation' (1)");
+		}
+		System.out.println("RemoveGasStation2");
 
         String location = args.get(0);
-        
-        if(!gasStationService.existsLocation(location))
-            throw new Exception("Gas station at location '" + location + "' does not exist.");
-        
+
+		if (!gasStationService.existsLocation(location)) {
+			System.out.println("RemoveGasStation2e");
+			throw new Exception("Gas station at location '" + location + "' does not exist.");
+		}
+		System.out.println("RemoveGasStation3");
         GasStation store = gasStationService.findByLocation(location);
         Manager manager = store.getManager();
-        
-        if(manager != null) manager.setStore(null);
-        store.setManager(null);
 
-        if(manager != null) managerService.save(manager);
+		if (manager != null) {
+			System.out.println("RemoveGasStation4m");
+			manager.setStore(null);
+		}
+		System.out.println("RemoveGasStation5");
+		store.setManager(null);
+
+		if (manager != null) {
+			System.out.println("RemoveGasStation5m");
+			managerService.save(manager);
+		}
+		System.out.println("RemoveGasStation6");
         gasStationService.delete(store);
+		System.out.println("RemoveGasStation7");
 	}
 
-	@Override
-	public void addWarehouse(List<String> args) throws Exception
+	@CorporateUser(command = "AddWareHouse")
+	public static void addWarehouse(List<String> args, Corporate corporate) throws Exception
 	{
         if (args == null || args.size() != 3)
             throw new Exception("Invalid number of args for 'AddWarehouse' (3)");
@@ -134,9 +133,9 @@ public class CorporateHelper implements ICorporateHelper {
         
         warehouseService.save(new Warehouse(location, state, region));
 	}
-	
-	@Override
-	public void removeWarehouse(List<String> args) throws Exception
+
+	@CorporateUser(command = "RemoveWarehouse")
+	public static void removeWarehouse(List<String> args, Corporate corporate) throws Exception
 	{
         if (args == null || args.size() != 1)
             throw new Exception("Invalid number of args for 'RemoveWarehouse' (1)");
@@ -150,9 +149,9 @@ public class CorporateHelper implements ICorporateHelper {
         
         warehouseService.delete(warehouse);
 	}
-	
-	@Override
-	public void addWarehouseInventory(List<String> args) throws Exception
+
+	@CorporateUser(command = "AddWarehouseInventory")
+	public static void addWarehouseInventory(List<String> args, Corporate corporate) throws Exception
 	{
         if (args == null || args.size() != 3)
             throw new Exception("Invalid number of args for 'AddWarehouseInventory' (3)");
@@ -174,9 +173,9 @@ public class CorporateHelper implements ICorporateHelper {
         inventory.setWarehouse(warehouse);
         warehouseInventoryService.save(inventory);
 	}
-	
-	@Override
-	public void removeWarehouseInventory(List<String> args) throws Exception
+
+	@CorporateUser(command = "RemoveWarehouseInventory")
+	public static void removeWarehouseInventory(List<String> args, Corporate corporate) throws Exception
 	{
         if (args == null || args.size() != 2)
             throw new Exception("Invalid number of args for 'RemoveWarehouseInventory' (1)");
@@ -214,8 +213,8 @@ public class CorporateHelper implements ICorporateHelper {
 	 * @see gasChain.coreInterfaces.corporate.ICorporateHelper#restockWarehouseInventory(java.lang.String, java.util.List, java.util.List)
 	 */
 
-	@Override
-	public int restockWarehouseInventory(List<String> args) throws Exception
+	@CorporateUser(command = "RestockInventory")
+	public static int restockWarehouseInventory(List<String> args, Corporate corporate) throws Exception
 	{
         if (args == null || args.size() < 1)
             throw new Exception("Invalid minimum number of args for 'RestockInventory' (1 + 2n)");
@@ -235,8 +234,8 @@ public class CorporateHelper implements ICorporateHelper {
     	
     	return restockWarehouseInventory2(warehouse, items, quantities);
 	}
-	
-	public int restockWarehouseInventory2(Warehouse warehouse, List<String> items, List<Integer> quantities) 
+
+	public static int restockWarehouseInventory2(Warehouse warehouse, List<String> items, List<Integer> quantities)
 	{
 		Set<WarehouseInventory> warehouseInventory = warehouseInventoryService.findByWarehouse(warehouse);
 		int total = 0;
@@ -274,9 +273,9 @@ public class CorporateHelper implements ICorporateHelper {
 		}
 		return total;
 	}
-	
 
-	private WarehouseInventory findWarehouseInventory(Set<WarehouseInventory> inventory, Item item)
+
+	private static WarehouseInventory findWarehouseInventory(Set<WarehouseInventory> inventory, Item item)
 	{
 		for(WarehouseInventory inventoryItem : inventory) if(inventoryItem.ofItem(item.getName())) return inventoryItem;
 		return null;

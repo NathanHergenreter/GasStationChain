@@ -1,20 +1,10 @@
 package gasChain.generator;
 
-import java.util.ArrayList;
-
-
-import gasChain.entity.CashPayment;
-import gasChain.entity.Cashier;
-import gasChain.entity.CreditCardAccount;
-import gasChain.entity.GasStation;
-import gasChain.entity.GasStationInventory;
-import gasChain.entity.Item;
-import gasChain.entity.Manager;
-import gasChain.entity.Payment;
-import gasChain.entity.Receipt;
-import gasChain.entity.Sale;
-import gasChain.entity.WarehouseInventory;
+import gasChain.entity.*;
 import gasChain.service.ServiceMaster;
+import gasChain.util.Luhn;
+
+import java.util.ArrayList;
 
 public class GasStationGenerator {
 
@@ -69,7 +59,7 @@ public class GasStationGenerator {
 			}
 			Payment p;
 			try {
-				p = new CreditCardAccount("2238467265875675");
+				p = new CreditCardAccount(Luhn.generateLuhn(16));
 				service.creditCardAccount().save((CreditCardAccount) p);
 			} catch (Exception e) {
 				p = new CashPayment();

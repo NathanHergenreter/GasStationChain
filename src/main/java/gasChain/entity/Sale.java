@@ -30,10 +30,9 @@ public class Sale {
     @JoinColumn(name = "gas_station_id")
     private GasStation sellLocation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne//(fetch = FetchType.LAZY)
     @JoinColumn(name = "receipt_id")
     private Receipt receipt;
-    
 
     @ManyToOne
     @JoinColumn(name = "workplace_id")

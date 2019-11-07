@@ -1,51 +1,31 @@
 package gasChain.managers;
 
-import gasChain.coreInterfaces.managers.IManagerHelper;
-
+import gasChain.annotation.ManagerUser;
 import gasChain.entity.*;
-import gasChain.service.AvailabilityService;
-import gasChain.service.CashierService;
-import gasChain.service.GasStationInventoryService;
-import gasChain.service.GasStationService;
-import gasChain.service.ItemService;
-import gasChain.service.ManagerService;
-import gasChain.service.WarehouseInventoryService;
-import gasChain.service.WorkPeriodService;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import gasChain.service.*;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
+import java.util.*;
 
-public class ManagerHelper implements IManagerHelper {
-    public ManagerHelper(Manager user){
-        _user = user;
-    }
+public class ManagerHelper {
 
-    Manager _user;
 
-    private GasStationService _gasStationService = ManagersAutoWire.getBean(GasStationService.class);
-    private CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
-    private ManagerService _managerService = ManagersAutoWire.getBean(ManagerService.class);
-    private WarehouseInventoryService _warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
-    private GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
-    private WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
-    private AvailabilityService _availabilityService = ManagersAutoWire.getBean(AvailabilityService.class);
-    private ItemService _itemService = ManagersAutoWire.getBean(ItemService.class);
+    private static GasStationService _gasStationService = ManagersAutoWire.getBean(GasStationService.class);
+    private static CashierService _cashierService = ManagersAutoWire.getBean(CashierService.class);
+    private static ManagerService _managerService = ManagersAutoWire.getBean(ManagerService.class);
+    private static WarehouseInventoryService _warehouseInventoryService = ManagersAutoWire.getBean(WarehouseInventoryService.class);
+    private static GasStationInventoryService _gasStationInventoryService = ManagersAutoWire.getBean(GasStationInventoryService.class);
+    private static WorkPeriodService _workPeriodService = ManagersAutoWire.getBean(WorkPeriodService.class);
+    private static AvailabilityService _availabilityService = ManagersAutoWire.getBean(AvailabilityService.class);
+    private static ItemService _itemService = ManagersAutoWire.getBean(ItemService.class);
 
 
 
     /*
     args should be ordered: username, password, name, wagesHourly, hoursWeekly
      */
-    @Override
-    public void addCashier(List<String> args) throws Exception{
+    @ManagerUser(command = "AddCashier")
+    public static void addCashier(List<String> args, Manager manager) throws Exception {
         if(args.size()!=5){
             throw new Exception("cmd 'addCashier' does not have the proper number of args (5)");
         }
@@ -55,7 +35,7 @@ public class ManagerHelper implements IManagerHelper {
                 args.get(2),
                 Integer.parseInt(args.get(3)),
                 Integer.parseInt(args.get(4)),
-                _user.getStore()
+                manager.getStore()
         );
         _cashierService.save(model);
     }
@@ -64,8 +44,8 @@ public class ManagerHelper implements IManagerHelper {
     args should be ordered: username, password, name, wagesHourly
     NOTE: this method should NOT re-set the username
      */
-    @Override
-    public void updateCashier(List<String> args) throws Exception{
+    @ManagerUser(command = "UpdateCashier")
+    public static void updateCashier(List<String> args, Manager manager) throws Exception {
         if (args == null)
             throw new Exception("cmd 'updateCashier' does not have the proper number of args (4)");
         if(args.size()!=4)
@@ -83,8 +63,8 @@ public class ManagerHelper implements IManagerHelper {
     /*
     args should be given as '-'<username> (' -')-delimited list <startHour>'>'<endHour> or '0' for no available hours
      */
-    @Override
-    public void updateCashierAvailability(List<String> args) throws Exception {
+    @ManagerUser(command = "UpdateCashierAvailability")
+    public static void updateCashierAvailability(List<String> args, Manager manager) throws Exception {
         if (args == null)
             throw new Exception("cmd 'updateCashierAvailability' does not have the proper number of args (7)");
         if (args.size()!=8)
@@ -116,8 +96,8 @@ public class ManagerHelper implements IManagerHelper {
     /*
     'username' only required arg
      */
-    @Override
-    public void removeCashier(List<String> args) throws Exception{
+    @ManagerUser(command = "RemoveCashier")
+    public static void removeCashier(List<String> args, Manager manager) throws Exception {
         if (_cashierService.existsUser(args.get(0))){
             Cashier e = (Cashier) _cashierService.findByUsername(args.get(0));
             _cashierService.deleteById(e.getId());
@@ -125,8 +105,8 @@ public class ManagerHelper implements IManagerHelper {
             throw new Exception("cmd 'removeCashier': given username does not exist");
         }
     }
-    
-    private List<WorkPeriod> getCashierWorkPeriods(Cashier cashier){
+
+    private static List<WorkPeriod> getCashierWorkPeriods(Cashier cashier) {
     	List<WorkPeriod> cashierWorkPeriods = new ArrayList<>();
     	List<WorkPeriod> workPeriods = _workPeriodService.findAll();
         for(WorkPeriod period: workPeriods) {
@@ -138,8 +118,8 @@ public class ManagerHelper implements IManagerHelper {
         }
         return cashierWorkPeriods;
     }
-    
-    private List<Cashier> getStoreCashiers(GasStation gasStation){
+
+    private static List<Cashier> getStoreCashiers(GasStation gasStation) {
     	List<Cashier> storeCashiers = new ArrayList<>();
     	List<Cashier> cashiers = _cashierService.findAll();
         for(Cashier cashier: cashiers) {
@@ -151,9 +131,10 @@ public class ManagerHelper implements IManagerHelper {
         }
         return storeCashiers;
     }
-    
-    public void listStoreCashiers() {
-    	List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+
+    @ManagerUser(command = "ListStoreCashiers")
+    public static void listStoreCashiers(Manager manager) {
+        List<Cashier> cashiers = getStoreCashiers(manager.getStore());
     	for(Cashier cashier: cashiers)
     		System.out.println("Username: " + cashier.getUsername() + " Name: " + cashier.getName() + " Hourly Rate: $" + cashier.getWagesHourly());
     }
@@ -161,8 +142,8 @@ public class ManagerHelper implements IManagerHelper {
     /*
     args should be given as -<username> -<startDate> -<endDate>
      */
-    @Override
-    public void getCashierPayroll(List<String> args) throws Exception {
+    @ManagerUser(command = "GetCashierPayroll")
+    public static void getCashierPayroll(List<String> args, Manager manager) throws Exception {
         if (args == null)
             throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (3)");
         if (args.size()!=3)
@@ -199,20 +180,20 @@ public class ManagerHelper implements IManagerHelper {
     /*
     args: -<startDate> -<endDate>
      */
-    @Override
-    public void getEmployeePayrolls(List<String> args) throws Exception {
+    @ManagerUser(command = "GetEmployeePayrolls")
+    public static void getEmployeePayrolls(List<String> args, Manager manager) throws Exception {
         if (args == null)
             throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (2)");
         if (args.size()!=2)
             throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (2)");
 
-        List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+        List<Cashier> cashiers = getStoreCashiers(manager.getStore());
         for(int i=0;i<cashiers.size();i++){
             List<String> newArgs = new ArrayList<>();
             newArgs.add(cashiers.get(i).getUsername());
             newArgs.add(args.get(0));
             newArgs.add(args.get(1));
-            getCashierPayroll(newArgs);
+            getCashierPayroll(newArgs, manager);
         }
     }
 
@@ -220,12 +201,12 @@ public class ManagerHelper implements IManagerHelper {
     args: -<startDate> -<endDate>
     NOTE: startDate must begin on a sunday
      */
-    @Override
-    public void getEmployeeSchedule(List<String> args) {
+    @ManagerUser(command = "ScheduleEmployees")
+    public static void getEmployeeSchedule(List<String> args, Manager manager) {
         Date s = Date.valueOf(args.get(0));
         Date e = Date.valueOf(args.get(1));
         int numDays = Math.abs(s.toLocalDate().getDayOfYear() -e.toLocalDate().getDayOfYear());
-        List<Cashier> cashiers = getStoreCashiers(_user.getStore());
+        List<Cashier> cashiers = getStoreCashiers(manager.getStore());
         cashiers = getCashiersWithAvailabilities(cashiers);
 
         String schedule = "Daily Schedule\n\n";
@@ -267,7 +248,7 @@ public class ManagerHelper implements IManagerHelper {
         System.out.println(schedule);
     }
 
-    private List<Cashier> getCashiersWithAvailabilities(List<Cashier> cashiers){
+    private static List<Cashier> getCashiersWithAvailabilities(List<Cashier> cashiers) {
     	List<Cashier> result = new ArrayList<>();
     	for(Cashier cashier: cashiers) {
     		if (cashier.getAvailability()!=null)
@@ -295,7 +276,7 @@ public class ManagerHelper implements IManagerHelper {
         }
     }
 
-    private int getNextAvailabilityDiff(int day, int nextHour, Cashier nextAvailableCashier){
+    private static int getNextAvailabilityDiff(int day, int nextHour, Cashier nextAvailableCashier) {
         int availabilityDiff  = 0;
         switch (day%7){
             case 0:
@@ -323,7 +304,7 @@ public class ManagerHelper implements IManagerHelper {
         return availabilityDiff;
     }
 
-    private int getCashierStartOfShift(int day, Cashier cashier){
+    private static int getCashierStartOfShift(int day, Cashier cashier) {
         int endOfShift = 0;
         Availability availability = cashier.getAvailability();
         switch (day%7){
@@ -351,8 +332,8 @@ public class ManagerHelper implements IManagerHelper {
         }
         return endOfShift;
     }
-    
-    private int getCashierEndOfShift(int day, Cashier cashier){
+
+    private static int getCashierEndOfShift(int day, Cashier cashier) {
         int endOfShift = 0;
         Availability availability = cashier.getAvailability();
         switch (day%7){
@@ -380,19 +361,20 @@ public class ManagerHelper implements IManagerHelper {
         }
         return endOfShift;
     }
-    @Override
-	public void addItem(List<String> args) {
+
+    @ManagerUser(command = "TODO")
+    public static void addItem(List<String> args, Manager manager) {
 
 	}
 
     // TODO - check if inventory already contains item
-	@Override
-	public void addGasStationInventory(List<String> args) throws Exception
+    @ManagerUser(command = "AddGasStationInventory")
+    public static void addGasStationInventory(List<String> args, Manager manager) throws Exception
 	{
         if (args == null || args.size() != 3)
             throw new Exception("Invalid number of args for 'AddGasStationInventory' (3)");
-        
-        String location = _user.getStore().getLocation();
+
+        String location = manager.getStore().getLocation();
         String type = args.get(0);
         int quantity = new Integer(args.get(1));
         int maxQuantity = new Integer(args.get(2));
@@ -413,9 +395,9 @@ public class ManagerHelper implements IManagerHelper {
 //        _gasStationService.save(gasStation);
         
 	}
-	
-	@Override
-	public void removeGasStationInventory(List<String> args) throws Exception {
+
+    @ManagerUser(command = "RemoveGasStationInventory")
+    public static void removeGasStationInventory(List<String> args, Manager manager) throws Exception {
 	}
     
 	/*
@@ -431,8 +413,8 @@ public class ManagerHelper implements IManagerHelper {
 	 * @see gasChain.coreInterfaces.managers.IManagerHelper#restockGasStationInventory(java.util.List)
 	 */
 
-	@Override
-	public boolean restockGasStationInventory(List<String> args) throws Exception {
+    @ManagerUser(command = "RestockInventory")
+    public static boolean restockGasStationInventory(List<String> args, Manager manager) throws Exception {
 //		GasStation gasStation = null;
 //		if (_managerService.existsUser(args.get(0))) {
 //			gasStation = _gasStationService.findByManager((Manager) _managerService.findByUsername(args.get(0)));
@@ -441,8 +423,8 @@ public class ManagerHelper implements IManagerHelper {
 //		} else {
 //			return false;
 //		}
-		
-		String location = _user.getStore().getLocation();
+
+        String location = manager.getStore().getLocation();
 		GasStation gasStation = _gasStationService.findByLocation(location);
 
         if(location == null)
