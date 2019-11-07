@@ -19,37 +19,31 @@ public abstract class GenericService<T, ID extends Serializable, R extends JpaRe
 	}
 
 	@Override
-	@Transactional
 	public long count() {
 		return r.count();
 	}
 
 	@Override
-	@Transactional
 	public boolean isEmpty() {
 		return r.count() <= 0;
 	}
 	
 	@Override
-	@Transactional
 	public void delete(T t) {
 		r.delete(t);
 	}
 
 	@Override
-	@Transactional
 	public void deleteById(ID id) {
 		r.deleteById(id);
 	}
 
 	@Override
-	@Transactional
 	public List<T> findAll() {
 		return r.findAll();
 	}
 
 	@Override
-	@Transactional
 	@NotNull
 	public T findById(ID id) {
 		Optional<T> t = r.findById(id);
@@ -77,7 +71,6 @@ public abstract class GenericService<T, ID extends Serializable, R extends JpaRe
 	}
 
     @Override
-    @Transactional
     public T save(T entity) {
         return r.save(entity);
     }

@@ -34,20 +34,4 @@ public class WarehouseInventoryService
 	public WarehouseInventory findWarehouseInventoriesByWarehouseAndAndItem(Warehouse warehouse, Item item) {
 		return getRepository().findWarehouseInventoriesByWarehouseAndAndItem(warehouse, item);
 	}
-
-    /*
-     * Given a list of items and quantities. Stocks the given warehouse with these items.
-     */
-    public void stockWarehouse(Warehouse warehouse, List<Item> items, List<Integer> quantity) {
-    	Set<WarehouseInventory> inventory = findByWarehouse(warehouse);
-    	Iterator<WarehouseInventory> iter = inventory.iterator();
-    	for (int i = 0; i < items.size(); i++) {
-    		while (iter.hasNext()) {
-    			WarehouseInventory item = iter.next();
-    			if (item.getItem().equals(items.get(i))) {
-    				item.setQuantity(item.getQuantity() + quantity.get(i));
-    			}
-    		}
-    	}
-    }
 }

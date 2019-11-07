@@ -29,7 +29,6 @@ public abstract class EmployeeService<T extends Employee, R extends EmployeeRepo
 	}
 	
 	@Override
-	@Transactional
 	public T save(T entity) {
 		if(!existsUser(entity.getUsername())) return getRepository().save(entity);
 		return null;
