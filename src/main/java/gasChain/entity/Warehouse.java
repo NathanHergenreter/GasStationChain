@@ -4,15 +4,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Pattern;
-
-import com.sun.istack.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Entity
 public class Warehouse extends Store {
@@ -26,13 +20,6 @@ public class Warehouse extends Store {
 
 	public Warehouse(String location, String state, String region) {
 		super(location, state, region);
-	}
-
-	public Warehouse(@NotNull double longitude, @NotNull double latitude, String name, WarehouseInventory... inventoryItems) {
-		super();
-		for (WarehouseInventory inventory : inventoryItems)
-			inventory.setWarehouse(this);
-		this.inventory = Stream.of(inventoryItems).collect(Collectors.toList());
 	}
 	
 	public List<WarehouseInventory> getWarehouseInventory() {
