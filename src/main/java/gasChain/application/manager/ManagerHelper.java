@@ -22,11 +22,8 @@ public class ManagerHelper {
     /*
     args should be ordered: username, password, name, wagesHourly, hoursWeekly
      */
-    @ManagerUser(command = "AddCashier")
-    public static void addCashier(List<String> args, Manager manager) throws Exception {
-        if (args.size() != 5) {
-            throw new Exception("cmd 'addCashier' does not have the proper number of args (5)");
-        }
+    @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
+    public static void addCashier(List<String> args, Manager manager) {
         Cashier model = new Cashier(
                 args.get(0),
                 args.get(1),
@@ -42,14 +39,8 @@ public class ManagerHelper {
     args should be ordered: username, password, name, wagesHourly
     NOTE: this method should NOT re-set the username
      */
-    @ManagerUser(command = "UpdateCashier")
-    public static void updateCashier(List<String> args, Manager manager) throws Exception {
-        if (args == null) {
-            throw new Exception("cmd 'updateCashier' does not have the proper number of args (4)");
-        }
-        if (args.size() != 4) {
-            throw new Exception("cmd 'updateCashier' does not have the proper number of args (4)");
-        }
+    @ManagerUser(command = "UpdateCashier", parameterEquation = "p == 4")
+    public static void updateCashier(List<String> args, Manager manager) {
 
         Cashier model = (Cashier) _cashierService.findByUsername(args.get(0));
 
@@ -63,16 +54,10 @@ public class ManagerHelper {
     /*
     args should be given as '-'<username> (' -')-delimited list <startHour>'>'<endHour> or '0' for no available hours
      */
-    @ManagerUser(command = "UpdateCashierAvailability")
-    public static void updateCashierAvailability(List<String> args, Manager manager) throws Exception {
-        if (args == null) {
-            throw new Exception("cmd 'updateCashierAvailability' does not have the proper number of args (7)");
-        }
-        if (args.size() != 8) {
-            throw new Exception("cmd 'updateCashierAvailability' does not have the proper number of args (7)");
-        }
+    @ManagerUser(command = "UpdateCashierAvailability", parameterEquation = "p == 8")
+    public static void updateCashierAvailability(List<String> args, Manager manager) {
 
-        List<List<String>> hours = new ArrayList<List<String>>();
+        List<List<String>> hours = new ArrayList<>();
         for (int i = 1; i < args.size(); i++) {
             List<String> nums = Arrays.asList(args.get(i).split(">"));
             hours.add(nums);
@@ -98,7 +83,7 @@ public class ManagerHelper {
     /*
     'username' only required arg
      */
-    @ManagerUser(command = "RemoveCashier")
+    @ManagerUser(command = "RemoveCashier", parameterEquation = "p == 1")
     public static void removeCashier(List<String> args, Manager manager) throws Exception {
         if (_cashierService.existsUser(args.get(0))) {
             Cashier e = (Cashier) _cashierService.findByUsername(args.get(0));
@@ -145,15 +130,8 @@ public class ManagerHelper {
     /*
     args should be given as -<username> -<startDate> -<endDate>
      */
-    @ManagerUser(command = "GetCashierPayroll")
+    @ManagerUser(command = "GetCashierPayroll", parameterEquation = "p == 3")
     public static void getCashierPayroll(List<String> args, Manager manager) throws Exception {
-        if (args == null) {
-            throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (3)");
-        }
-        if (args.size() != 3) {
-            throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (3)");
-        }
-
         Cashier cashier = (Cashier) _cashierService.findByUsername(args.get(0));
         Date startDate = Date.valueOf(args.get(1));
         Date endDate = Date.valueOf(args.get(2));
@@ -165,16 +143,16 @@ public class ManagerHelper {
         //
         List<WorkPeriod> allWorkPeriods = getCashierWorkPeriods(cashier);
         List<WorkPeriod> workPeriods = new ArrayList<>();
-        for (int i = 0; i < allWorkPeriods.size(); i++) {
-            if (allWorkPeriods.get(i).getDate().compareTo(startDate) >= 0) {
-                workPeriods.add(allWorkPeriods.get(i));
+        for (WorkPeriod allWorkPeriod : allWorkPeriods) {
+            if (allWorkPeriod.getDate().compareTo(startDate) >= 0) {
+                workPeriods.add(allWorkPeriod);
             }
         }
 
         int totalHoursWorked = 0;
-        for (int i = 0; i < workPeriods.size(); i++) {
-            int startTime = workPeriods.get(i).getStartHour();
-            int endTime = workPeriods.get(i).getEndHour();
+        for (WorkPeriod workPeriod : workPeriods) {
+            int startTime = workPeriod.getStartHour();
+            int endTime = workPeriod.getEndHour();
             if (startTime > endTime) {
                 totalHoursWorked += (24 - startTime) + endTime;
             } else {
@@ -188,19 +166,12 @@ public class ManagerHelper {
     /*
     args: -<startDate> -<endDate>
      */
-    @ManagerUser(command = "GetEmployeePayrolls")
+    @ManagerUser(command = "GetEmployeePayrolls", parameterEquation = "p == 2")
     public static void getEmployeePayrolls(List<String> args, Manager manager) throws Exception {
-        if (args == null) {
-            throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (2)");
-        }
-        if (args.size() != 2) {
-            throw new Exception("cmd 'GetCashierPayroll': does not have the proper number of args (2)");
-        }
-
         List<Cashier> cashiers = getStoreCashiers(manager.getStore());
-        for (int i = 0; i < cashiers.size(); i++) {
+        for (Cashier cashier : cashiers) {
             List<String> newArgs = new ArrayList<>();
-            newArgs.add(cashiers.get(i).getUsername());
+            newArgs.add(cashier.getUsername());
             newArgs.add(args.get(0));
             newArgs.add(args.get(1));
             getCashierPayroll(newArgs, manager);
@@ -211,7 +182,7 @@ public class ManagerHelper {
     args: -<startDate> -<endDate>
     NOTE: startDate must begin on a sunday
      */
-    @ManagerUser(command = "ScheduleEmployees")
+    @ManagerUser(command = "ScheduleEmployees", parameterEquation = "p == 2")
     public static void getEmployeeSchedule(List<String> args, Manager manager) {
         Date s = Date.valueOf(args.get(0));
         Date e = Date.valueOf(args.get(1));
@@ -219,12 +190,12 @@ public class ManagerHelper {
         List<Cashier> cashiers = getStoreCashiers(manager.getStore());
         cashiers = getCashiersWithAvailabilities(cashiers);
 
-        String schedule = "Daily Schedule\n\n";
+        StringBuilder schedule = new StringBuilder("Daily Schedule\n\n");
         for (int day = 0; day < numDays; day++) {
             shuffle(cashiers);
             int availabilityDiff = 0;
             int nextHour = 0;
-            schedule += "Day " + (day + 1) + ":\n";
+            schedule.append("Day ").append(day + 1).append(":\n");
             while (nextHour < 24) {
                 Cashier nextAvailableCashier = cashiers.get(0);
                 availabilityDiff = getNextAvailabilityDiff(day, nextHour, nextAvailableCashier);
@@ -235,7 +206,7 @@ public class ManagerHelper {
                     int start = getCashierStartOfShift(day % 7, curCashier);
                     int diff = start - nextHour;
                     if (!(diff < 0)) {
-                        if (diff < availabilityDiff || (availabilityDiff < 0 && diff >= 0)) {
+                        if (diff < availabilityDiff || availabilityDiff < 0) {
                             nextAvailableCashier = curCashier;
                             availabilityDiff = diff;
                         }
@@ -249,7 +220,7 @@ public class ManagerHelper {
                     nextHour = 24;
                 } else {
                     int cashierEndOfShift = getCashierEndOfShift(day, nextAvailableCashier);
-                    schedule += "Cashier: " + nextAvailableCashier.getName() + "\tShift: " + (nextHour + availabilityDiff) + "-" + cashierEndOfShift + "\n";
+                    schedule.append("Cashier: ").append(nextAvailableCashier.getName()).append("\tShift: ").append(nextHour + availabilityDiff).append("-").append(cashierEndOfShift).append("\n");
                     nextHour += availabilityDiff + cashierEndOfShift;
                 }
             }
@@ -269,7 +240,7 @@ public class ManagerHelper {
     }
 
     // Generic function to randomize a list in Java using Fisher–Yates shuffle
-    public static <T> void shuffle(List<T> list) {
+    private static <T> void shuffle(List<T> list) {
         Random random = new Random();
 
         // start from end of the list
@@ -377,16 +348,13 @@ public class ManagerHelper {
     }
 
     // TODO - check if inventory already contains item
-    @ManagerUser(command = "AddGasStationInventory")
+    @ManagerUser(command = "AddGasStationInventory", parameterEquation = "p == 3")
     public static void addGasStationInventory(List<String> args, Manager manager) throws Exception {
-        if (args == null || args.size() != 3) {
-            throw new Exception("Invalid number of args for 'AddGasStationInventory' (3)");
-        }
 
         String location = manager.getStore().getLocation();
         String type = args.get(0);
-        int quantity = new Integer(args.get(1));
-        int maxQuantity = new Integer(args.get(2));
+        int quantity = Integer.parseInt(args.get(1));
+        int maxQuantity = Integer.parseInt(args.get(2));
 
         GasStation gasStation = _gasStationService.findByLocation(location);
         Item item = _itemService.findByName(type);
@@ -401,14 +369,12 @@ public class ManagerHelper {
 
         GasStationInventory inventory = new GasStationInventory(item, item.getSuggestRetailPrice(), quantity, maxQuantity);
         inventory.setGasStation(gasStation);
-//        gasStation.addInventory(inventory);
         _gasStationInventoryService.save(inventory);
-//        _gasStationService.save(gasStation);
-
+        System.out.println("Add Gas Station Complete");
     }
 
     @ManagerUser(command = "RemoveGasStationInventory")
-    public static void removeGasStationInventory(List<String> args, Manager manager) throws Exception {
+    public static void removeGasStationInventory(List<String> args, Manager manager) {
     }
 
     /*
@@ -439,7 +405,7 @@ public class ManagerHelper {
         GasStation gasStation = _gasStationService.findByLocation(location);
 
         if (location == null) {
-            throw new Exception("Gas station at location '" + location + "' does not exist.");
+            throw new Exception("Gas station at location does not exist");
         }
 
         Set<GasStationInventory> gasStationInventory = _gasStationInventoryService.findByGasStation(gasStation);

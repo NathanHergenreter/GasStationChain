@@ -18,20 +18,27 @@ import java.util.Scanner;
 @Order(2)
 public class UserApplication implements CommandLineRunner {
 
-    static Scanner in;
-    @Autowired
+    private static Scanner in;
+
     CashierService cashierService;
-    @Autowired
+
     CorporateService corporateService;
-    @Autowired
+
     ManagerService managerService;
+
+    @Autowired
+    public UserApplication(CashierService cashierService, CorporateService corporateService, ManagerService managerService) {
+        this.cashierService = cashierService;
+        this.corporateService = corporateService;
+        this.managerService = managerService;
+    }
 
     @Override
     public void run(String... args) {
 
         in = new Scanner(System.in);
         boolean exit = false;
-        Employee employee = user_login(in);
+        Employee employee = user_login(in, args);
         System.out.println("Enter 'exit' to close application");
         String input;
         while (!exit) {
@@ -43,23 +50,26 @@ public class UserApplication implements CommandLineRunner {
                 exit = true;
             } else {
                 List<String> result = Arrays.asList(input.split(";"));
-                for (String s : result) {
-                    System.out.println("Results: " + s);
-                }
                 MethodScanner.runEmployeeCommand(result, employee);
             }
         }
     }
 
-    private Employee user_login(Scanner in) {
+    private Employee user_login(Scanner in, String... args) {
         Employee employee = null;
+        if (args.length >= 2) {
+            employee = validateUser(args[0], args[1]);
+            if (employee != null) {
+                System.out.println("Authentication success for User: " + args[0]);
+            } else {
+                System.out.println("Invalid username or password");
+            }
+        }
         while (employee == null) {
             System.out.println("Enter username: ");
             String username = in.nextLine();
-
             System.out.println("Enter password: ");
             String password = in.nextLine();
-
             employee = validateUser(username, password);
             if (employee == null) {
                 System.out.println();

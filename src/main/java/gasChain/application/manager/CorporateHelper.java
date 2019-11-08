@@ -20,13 +20,8 @@ public class CorporateHelper {
     private static WarehouseService warehouseService = ServiceAutoWire.getBean(WarehouseService.class);
     private static ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
 
-    @CorporateUser(command = "AddManager")
+    @CorporateUser(command = "AddManager", parameterEquation = "p == 3")
     public static void addManager(List<String> args, Corporate corporate) throws Exception {
-        System.out.println("Add Manager");
-        if (args == null || args.size() != 3) {
-            throw new Exception("Invalid number of args for 'AddManager' (3)");
-        }
-
         String username = args.get(0);
         String password = args.get(1);
         String location = args.get(2);
@@ -51,11 +46,8 @@ public class CorporateHelper {
 //        managerService.save(manager);
     }
 
-    @CorporateUser(command = "RemoveManager")
+    @CorporateUser(command = "RemoveManager", parameterEquation = "p == 1")
     public static void removeManager(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() != 1) {
-            throw new Exception("Invalid number of args for 'RemoveManager' (1)");
-        }
 
         String username = args.get(0);
 
@@ -76,11 +68,8 @@ public class CorporateHelper {
         managerService.delete(manager);
     }
 
-    @CorporateUser(command = "AddGasStation")
+    @CorporateUser(command = "AddGasStation", parameterEquation = "p == 3")
     public static void addGasStation(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() != 3) {
-            throw new Exception("Invalid number of args for 'AddGasStation' (3)");
-        }
 
         String location = args.get(0);
         String state = args.get(1);
@@ -89,51 +78,39 @@ public class CorporateHelper {
         if (gasStationService.existsLocation(location)) {
             throw new Exception("Gas station at location '" + location + "' already exists.");
         }
-
         gasStationService.save(new GasStation(location, state, region));
     }
 
-    @CorporateUser(command = "RemoveGasStation")
+    @CorporateUser(command = "RemoveGasStation", parameterEquation = "p == 1")
     public static void removeGasStation(List<String> args, Corporate corporate) throws Exception {
-        System.out.println("RemoveGasStation1");
-        System.out.println(args);
-        if (args == null || args.size() != 1) {
-            System.out.println("RemoveGasStation1e");
-            throw new Exception("Invalid number of args for 'RemoveGasStation' (1)");
-        }
-        System.out.println("RemoveGasStation2");
 
         String location = args.get(0);
 
         if (!gasStationService.existsLocation(location)) {
-            System.out.println("RemoveGasStation2e");
+
             throw new Exception("Gas station at location '" + location + "' does not exist.");
         }
-        System.out.println("RemoveGasStation3");
+
         GasStation store = gasStationService.findByLocation(location);
         Manager manager = store.getManager();
 
         if (manager != null) {
-            System.out.println("RemoveGasStation4m");
+
             manager.setStore(null);
         }
         System.out.println("RemoveGasStation5");
         store.setManager(null);
 
         if (manager != null) {
-            System.out.println("RemoveGasStation5m");
+
             managerService.save(manager);
         }
-        System.out.println("RemoveGasStation6");
+
         gasStationService.delete(store);
-        System.out.println("RemoveGasStation7");
     }
 
-    @CorporateUser(command = "AddWareHouse")
+    @CorporateUser(command = "AddWareHouse", parameterEquation = "p == 3")
     public static void addWarehouse(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() != 3) {
-            throw new Exception("Invalid number of args for 'AddWarehouse' (3)");
-        }
 
         String location = args.get(0);
         String state = args.get(1);
@@ -146,11 +123,8 @@ public class CorporateHelper {
         warehouseService.save(new Warehouse(location, state, region));
     }
 
-    @CorporateUser(command = "RemoveWarehouse")
+    @CorporateUser(command = "RemoveWarehouse", parameterEquation = "p == 1")
     public static void removeWarehouse(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() != 1) {
-            throw new Exception("Invalid number of args for 'RemoveWarehouse' (1)");
-        }
 
         String location = args.get(0);
 
@@ -163,15 +137,12 @@ public class CorporateHelper {
         warehouseService.delete(warehouse);
     }
 
-    @CorporateUser(command = "AddWarehouseInventory")
+    @CorporateUser(command = "AddWarehouseInventory", parameterEquation = "p == 3")
     public static void addWarehouseInventory(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() != 3) {
-            throw new Exception("Invalid number of args for 'AddWarehouseInventory' (3)");
-        }
 
         String location = args.get(0);
         String type = args.get(1);
-        int quantity = new Integer(args.get(2));
+        int quantity = Integer.parseInt(args.get(2));
 
         Warehouse warehouse = warehouseService.findByLocation(location);
         Item item = itemService.findByName(type);
@@ -189,11 +160,8 @@ public class CorporateHelper {
         warehouseInventoryService.save(inventory);
     }
 
-    @CorporateUser(command = "RemoveWarehouseInventory")
+    @CorporateUser(command = "RemoveWarehouseInventory", parameterEquation = "p == 2")
     public static void removeWarehouseInventory(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() != 2) {
-            throw new Exception("Invalid number of args for 'RemoveWarehouseInventory' (1)");
-        }
 
         String location = args.get(0);
         String type = args.get(1);
@@ -231,23 +199,16 @@ public class CorporateHelper {
      * @see gasChain.coreInterfaces.corporate.ICorporateHelper#restockWarehouseInventory(java.lang.String, java.util.List, java.util.List)
      */
 
-    @CorporateUser(command = "RestockInventory")
+    @CorporateUser(command = "RestockInventory", parameterEquation = "p%2 == 1 && p>0")
     public static int restockWarehouseInventory(List<String> args, Corporate corporate) throws Exception {
-        if (args == null || args.size() < 1) {
-            throw new Exception("Invalid minimum number of args for 'RestockInventory' (1 + 2n)");
-        }
-        if (args != null && args.size() % 2 == 0) {
-            throw new Exception("Invalid number of inventory args for 'RestockInventory' (Must be even)");
-        }
-
         String location = args.get(0);
         Warehouse warehouse = warehouseService.findByLocation(location);
-        List<String> items = new ArrayList<String>();
-        List<Integer> quantities = new ArrayList<Integer>();
+        List<String> items = new ArrayList<>();
+        List<Integer> quantities = new ArrayList<>();
 
         for (int idx = 1; idx < args.size() - 1; idx += 2) {
             items.add(args.get(idx));
-            quantities.add(new Integer(args.get(idx + 1)));
+            quantities.add(Integer.valueOf(args.get(idx + 1)));
         }
 
         return restockWarehouseInventory2(warehouse, items, quantities);

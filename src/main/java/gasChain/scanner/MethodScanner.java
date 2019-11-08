@@ -11,93 +11,123 @@ import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class MethodScanner {
 
-    private static Reflections r = new Reflections(new ConfigurationBuilder()
-            .setUrls(ClasspathHelper.forPackage("gasChain"))
-            .setScanners(new MethodAnnotationsScanner()));
+    private static Reflections r = getReflections();
 
     private static HashMap<String, Method> cashierCommands = getCashierMethods();
     private static HashMap<String, Method> corporateCommands = getCorporateMethods();
     private static HashMap<String, Method> managerCommands = getManagerMethods();
 
-    private static HashMap<String, Method> getCashierMethods() {
-        Set<Method> methods = r.getMethodsAnnotatedWith(CashierUser.class);
-        HashMap<String, Method> cashierMethodHashMap = new HashMap<>();
-        for (Method m : methods) {
-            String command = m.getAnnotation(CashierUser.class).command();
-            cashierMethodHashMap.put(command, m);
+    private static Reflections getReflections() {
+        if (r == null) {
+            return new Reflections(new ConfigurationBuilder()
+                    .setUrls(ClasspathHelper.forPackage("gasChain"))
+                    .setScanners(new MethodAnnotationsScanner()));
+        } else {
+            return r;
         }
-        return cashierMethodHashMap;
+    }
+
+    private static HashMap<String, Method> getCashierMethods() {
+        if (cashierCommands == null) {
+            Set<Method> methods = r.getMethodsAnnotatedWith(CashierUser.class);
+            HashMap<String, Method> cashierMethodHashMap = new HashMap<>();
+            for (Method m : methods) {
+                String command = m.getAnnotation(CashierUser.class).command().toLowerCase();
+                cashierMethodHashMap.put(command, m);
+            }
+            return cashierMethodHashMap;
+        } else {
+            return cashierCommands;
+        }
     }
 
     private static HashMap<String, Method> getCorporateMethods() {
-        System.out.println("Get CORP");
-        Set<Method> methods = r.getMethodsAnnotatedWith(CorporateUser.class);
-        HashMap<String, Method> corporateMethodHashMap = new HashMap<>();
-        for (Method m : methods) {
-            String command = m.getAnnotation(CorporateUser.class).command();
-            System.out.println("Get CORP command: " + command);
-            corporateMethodHashMap.put(command, m);
+        if (corporateCommands == null) {
+            Set<Method> methods = r.getMethodsAnnotatedWith(CorporateUser.class);
+            HashMap<String, Method> corporateMethodHashMap = new HashMap<>();
+            for (Method m : methods) {
+                String command = m.getAnnotation(CorporateUser.class).command().toLowerCase();
+                corporateMethodHashMap.put(command, m);
+            }
+            return corporateMethodHashMap;
+        } else {
+            return corporateCommands;
         }
-        for (Method m : corporateMethodHashMap.values()) {
-            System.out.println("Get CORP Method: " + m.getName());
-        }
-        return corporateMethodHashMap;
     }
 
     private static HashMap<String, Method> getManagerMethods() {
-        Set<Method> methods = r.getMethodsAnnotatedWith(ManagerUser.class);
-        HashMap<String, Method> managerMethodHashMap = new HashMap<>();
-        for (Method m : methods) {
-            String command = m.getAnnotation(ManagerUser.class).command();
-            managerMethodHashMap.put(command, m);
+        if (managerCommands == null) {
+            Set<Method> methods = r.getMethodsAnnotatedWith(ManagerUser.class);
+            HashMap<String, Method> managerMethodHashMap = new HashMap<>();
+            for (Method m : methods) {
+                String command = m.getAnnotation(ManagerUser.class).command().toLowerCase();
+                managerMethodHashMap.put(command, m);
+            }
+            return managerMethodHashMap;
+        } else {
+            return managerCommands;
         }
-        return managerMethodHashMap;
     }
 
     public static Object runEmployeeCommand(List<String> cmd, Employee employee) {
-        Method m;
-        for (String s : corporateCommands.keySet()) {
-            System.out.println("Run Forloop-- Method:" + corporateCommands.get(s) + " Command: " + s);
-        }
+        Method m = null;
+        String parameterEquation = "";
+        List<String> params = cmd.subList(1, cmd.size());
+        String command = cmd.get(0).toLowerCase();
         try {
             if (employee.getClass().equals(Cashier.class)) {
-                System.out.println("RUN CASHIER");
-                m = cashierCommands.get(cmd.get(0));
-            } else if (employee.getClass().equals(Corporate.class)) {
-                System.out.println("RUN CORP");
-                m = managerCommands.get(cmd.get(0));
+                m = cashierCommands.get(command);
+                parameterEquation = m.getAnnotation(CashierUser.class).parameterEquation();
             } else if (employee.getClass().equals(Manager.class)) {
-                System.out.println("RUN MANGER");
-                m = corporateCommands.get(cmd.get(0));
-            } else {
-                return null;
+                m = managerCommands.get(command);
+                parameterEquation = m.getAnnotation(ManagerUser.class).parameterEquation();
+            } else if (employee.getClass().equals(Corporate.class)) {
+                m = corporateCommands.get(command);
+                parameterEquation = m.getAnnotation(CorporateUser.class).parameterEquation();
             }
-            System.out.println("Method: " + m.getName());
         } catch (NullPointerException e) {
-            System.out.println("Invalid command. Type /help to see list of commands");
+            System.out.println("Invalid command. Type /help to see available commands");
             return null;
         }
+        if (!checkParams(params, parameterEquation)) {
+            System.out.println("Invalid number of arguments given for the command " + command);
+        }
         try {
-            return m.invoke(null, cmd.subList(1, cmd.size()), employee);
+            return m.invoke(null, params, employee);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             if (e.getCause() instanceof Exception) {
-                //ignore
+                System.out.println("Runner: ITE: " + e.getMessage());
             }
         } catch (Exception e) {
-            System.out.println("Runner Exception E: " + e.getMessage());
+            System.out.println("Runner Exception E: " + e.getMessage() + " : " + e.toString());
         }
         return null;
+    }
+
+    private static boolean checkParams(List<String> params, String parameterEquation) {
+        String p = String.valueOf(params.size());
+        String equation = parameterEquation.replace(" ", "")
+                .replace("p", p)
+                .replace("||", "|")
+                .replace("&&", "&")
+                .toLowerCase();
+
+        ExpressionParser parser = new SpelExpressionParser();
+        return (boolean) parser.parseExpression(equation).getValue();
     }
 
     public static void printCommands(Employee employee) {
@@ -111,7 +141,7 @@ public class MethodScanner {
         } else {
             hm = null;
         }
-        for (String s : hm.keySet()) {
+        for (String s : new TreeSet<>(hm.keySet())) {
             System.out.println(s);
         }
     }

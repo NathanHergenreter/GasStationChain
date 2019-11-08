@@ -77,7 +77,7 @@ public class GenCLR implements CommandLineRunner {
     private void generateCorporates(int num, ArrayList<String> firstNames, ArrayList<String> lastNames) {
         for (int i = 0; i < num; i++) {
             String username = GenUtil.genRandomName(firstNames, lastNames).replace(' ', '_')
-                    + (new Integer(GenUtil.rng.nextInt(100))).toString();
+                    + (Integer.valueOf(GenUtil.rng.nextInt(100))).toString();
 
             service.corporate().save(new Corporate(username, "password"));
         }

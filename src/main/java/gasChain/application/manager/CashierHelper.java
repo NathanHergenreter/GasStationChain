@@ -74,7 +74,7 @@ public class CashierHelper {
 
     private static ArrayList<GasStationInventory> processSaleGetInventory(Scanner in,
                                                                           GasStation gasStation, Receipt receipt, DecimalFormat df) {
-        ArrayList<GasStationInventory> inventoryItems = new ArrayList<GasStationInventory>();
+        ArrayList<GasStationInventory> inventoryItems = new ArrayList<>();
 
         System.out.println("New Order Started With ID: " + receipt.getId());
         System.out.println("Please proceed to enter item type");
@@ -111,7 +111,7 @@ public class CashierHelper {
             String input = getInput(in);
 
             if (!input.equals("/end")) {
-                paymentType = Receipt.Payment.values()[new Integer(input)];
+                paymentType = Receipt.Payment.values()[Integer.parseInt(input)];
 
                 invalid = processPayment(in, paymentType, df);
 
@@ -129,7 +129,7 @@ public class CashierHelper {
         int modDenominator = 1000;    // Effectively 1 in modDenominator card numbers will be invalid
 
         boolean continueProcessing = true;
-        while (continueProcessing) {
+        while (true) {
             switch (paymentType) {
                 case CREDIT:
                 case DEBIT: {
@@ -152,23 +152,22 @@ public class CashierHelper {
                     return false;
             }
         }
-        return false;
     }
 
     // Returns true if /end was not entered (i.e. cancel the processing, otherwise retry)
-    private static boolean invalidCard(Scanner in, String cardNumber) throws Exception {
+    private static boolean invalidCard(Scanner in, String cardNumber) {
         System.out.println("Invalid Card Number " + cardNumber);
         System.out.println("Enter /end to exit, otherwise to retry");
         return !in.nextLine().equals("/end");
     }
 
-    @CashierUser(command = "ReturnItems")
+    @CashierUser(command = "ReturnItems", parameterEquation = "p>2")
     public static void processReturn(List<String> args, Cashier cashier) throws Exception {
         if (args == null || args.size() <= 2) {
             throw new Exception("Invalid minimum number of args for 'ReturnItems' (2)");
         }
 
-        Long id = new Long(args.get(0));
+        Long id = Long.valueOf(args.get(0));
         Receipt saleReceipt = receiptService.findById(id);
 
         if (saleReceipt == null) {
