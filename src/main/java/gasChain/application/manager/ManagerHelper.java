@@ -1,12 +1,15 @@
 package gasChain.application.manager;
 
 import gasChain.annotation.ManagerUser;
+import gasChain.annotation.MethodHelp;
 import gasChain.entity.*;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
 
 import java.sql.Date;
 import java.util.*;
+
+import static java.util.Collections.shuffle;
 
 public class ManagerHelper {
 
@@ -19,9 +22,7 @@ public class ManagerHelper {
     private static AvailabilityService _availabilityService = ServiceAutoWire.getBean(AvailabilityService.class);
     private static ItemService _itemService = ServiceAutoWire.getBean(ItemService.class);
 
-    /*
-    args should be ordered: username, password, name, wagesHourly, hoursWeekly
-     */
+    @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
     public static void addCashier(List<String> args, Manager manager) {
         Cashier model = new Cashier(
@@ -35,10 +36,8 @@ public class ManagerHelper {
         _cashierService.save(model);
     }
 
-    /*
-    args should be ordered: username, password, name, wagesHourly
-    NOTE: this method should NOT re-set the username
-     */
+    @MethodHelp("args should be ordered: username, password, name, wagesHourly\n" +
+            "NOTE: this method should NOT re-set the username")
     @ManagerUser(command = "UpdateCashier", parameterEquation = "p == 4")
     public static void updateCashier(List<String> args, Manager manager) {
 
@@ -51,9 +50,7 @@ public class ManagerHelper {
         _cashierService.save(model);
     }
 
-    /*
-    args should be given as '-'<username> (' -')-delimited list <startHour>'>'<endHour> or '0' for no available hours
-     */
+    @MethodHelp("args should be given as '-'<username> (' -')-delimited list <startHour>'>'<endHour> or '0' for no available hours")
     @ManagerUser(command = "UpdateCashierAvailability", parameterEquation = "p == 8")
     public static void updateCashierAvailability(List<String> args, Manager manager) {
 
@@ -80,9 +77,7 @@ public class ManagerHelper {
         _availabilityService.save(availability);
     }
 
-    /*
-    'username' only required arg
-     */
+    @MethodHelp("username' only required arg")
     @ManagerUser(command = "RemoveCashier", parameterEquation = "p == 1")
     public static void removeCashier(List<String> args, Manager manager) throws Exception {
         if (_cashierService.existsUser(args.get(0))) {
@@ -119,6 +114,7 @@ public class ManagerHelper {
         return storeCashiers;
     }
 
+
     @ManagerUser(command = "ListStoreCashiers")
     public static void listStoreCashiers(Manager manager) {
         List<Cashier> cashiers = getStoreCashiers(manager.getStore());
@@ -127,9 +123,7 @@ public class ManagerHelper {
         }
     }
 
-    /*
-    args should be given as -<username> -<startDate> -<endDate>
-     */
+    @MethodHelp("args should be given as -<username> -<startDate> -<endDate>")
     @ManagerUser(command = "GetCashierPayroll", parameterEquation = "p == 3")
     public static void getCashierPayroll(List<String> args, Manager manager) throws Exception {
         Cashier cashier = (Cashier) _cashierService.findByUsername(args.get(0));
@@ -166,6 +160,7 @@ public class ManagerHelper {
     /*
     args: -<startDate> -<endDate>
      */
+    @MethodHelp(" args: -<startDate> -<endDate>")
     @ManagerUser(command = "GetEmployeePayrolls", parameterEquation = "p == 2")
     public static void getEmployeePayrolls(List<String> args, Manager manager) throws Exception {
         List<Cashier> cashiers = getStoreCashiers(manager.getStore());
@@ -178,10 +173,8 @@ public class ManagerHelper {
         }
     }
 
-    /*
-    args: -<startDate> -<endDate>
-    NOTE: startDate must begin on a sunday
-     */
+    @MethodHelp("args: -<startDate> -<endDate>\n" +
+            "NOTE: startDate must begin on a sunday")
     @ManagerUser(command = "ScheduleEmployees", parameterEquation = "p == 2")
     public static void getEmployeeSchedule(List<String> args, Manager manager) {
         Date s = Date.valueOf(args.get(0));
@@ -237,23 +230,6 @@ public class ManagerHelper {
             }
         }
         return result;
-    }
-
-    // Generic function to randomize a list in Java using Fisher–Yates shuffle
-    private static <T> void shuffle(List<T> list) {
-        Random random = new Random();
-
-        // start from end of the list
-        for (int i = list.size() - 1; i >= 1; i--) {
-            // get a random index j such that 0 <= j <= i
-            int j = random.nextInt(i + 1);
-
-            // swap element at i'th position in the list with element at
-            // randomly generated index j
-            T obj = list.get(i);
-            list.set(i, list.get(j));
-            list.set(j, obj);
-        }
     }
 
     private static int getNextAvailabilityDiff(int day, int nextHour, Cashier nextAvailableCashier) {
@@ -377,19 +353,15 @@ public class ManagerHelper {
     public static void removeGasStationInventory(List<String> args, Manager manager) {
     }
 
-    /*
-     * This beast of a function takes a list of args but the format is such that you're just supposed to supply a location or manager name
-     * If the manager name exists then we find gasStation by manager else if location then by location else return false, ie bad input
-     * From gasStation we check all items to see if quantity is below a tolerance currently set at .5 of maximum amount
-     * Go through as many warehouseInventories we need until will fill that quantity
-     * Save to database accordingly
-     * (Could make this try to search the nearest warehouses first ie. by state / region but this doesn't seem necessary at this point)
-     * (There's a bunch of ways to go about the logic for that but this seems fine as a proof of concept)
-     *
-     * (non-Javadoc)
-     * @see gasChain.coreInterfaces.managers.IManagerHelper#restockGasStationInventory(java.util.List)
-     */
-
+    // (non-Javadoc)
+    // @see gasChain.coreInterfaces.managers.IManagerHelper#restockGasStationInventory(java.util.List)
+    @MethodHelp("This beast of a function takes a list of args but the format is such that you're just supposed to supply a location or manager name\n" +
+            "      If the manager name exists then we find gasStation by manager else if location then by location else return false, ie bad input\n" +
+            "      From gasStation we check all items to see if quantity is below a tolerance currently set at .5 of maximum amount\n" +
+            "      Go through as many warehouseInventories we need until will fill that quantity\n" +
+            "      Save to database accordingly\n" +
+            "      (Could make this try to search the nearest warehouses first ie. by state / region but this doesn't seem necessary at this point)\n" +
+            "      (There's a bunch of ways to go about the logic for that but this seems fine as a proof of concept)")
     @ManagerUser(command = "RestockInventory")
     public static boolean restockGasStationInventory(List<String> args, Manager manager) throws Exception {
 //		GasStation gasStation = null;

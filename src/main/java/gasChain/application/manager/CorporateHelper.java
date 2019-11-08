@@ -1,6 +1,7 @@
 package gasChain.application.manager;
 
 import gasChain.annotation.CorporateUser;
+import gasChain.annotation.MethodHelp;
 import gasChain.entity.*;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
@@ -125,15 +126,11 @@ public class CorporateHelper {
 
     @CorporateUser(command = "RemoveWarehouse", parameterEquation = "p == 1")
     public static void removeWarehouse(List<String> args, Corporate corporate) throws Exception {
-
         String location = args.get(0);
-
         Warehouse warehouse = warehouseService.findByLocation(location);
-
         if (warehouse == null) {
             throw new Exception("Warehouse at location '" + location + "' does not exist.");
         }
-
         warehouseService.delete(warehouse);
     }
 
@@ -188,17 +185,13 @@ public class CorporateHelper {
         warehouseInventoryService.delete(inventory);
     }
 
-    /*
-     * Takes name of warehouse as argument along with a list of items and quantities indexed at 0
-     * Iterates through current warehouse database to find matching item
-     * Adds the quantities and saves to database
-     * Returns total cost of the restock
-     * (in real world this would already be payed for, might change functionality in that regard later)
-     *
-     * (non-Javadoc)
-     * @see gasChain.coreInterfaces.corporate.ICorporateHelper#restockWarehouseInventory(java.lang.String, java.util.List, java.util.List)
-     */
+    //(non-Javadoc)
+    // @see gasChain.coreInterfaces.corporate.ICorporateHelper#restockWarehouseInventory(java.lang.String, java.util.List, java.util.List)
 
+    @MethodHelp("Takes name of warehouse as argument along with a list of items and quantities indexed at 0\n" +
+            "Iterates through current warehouse database to find matching item. Adds the quantities and saves to database\n" +
+            "Returns total cost of the restock(in real world this would already be payed for, might change functionality in that regard later)"
+    )
     @CorporateUser(command = "RestockInventory", parameterEquation = "p%2 == 1 && p>0")
     public static int restockWarehouseInventory(List<String> args, Corporate corporate) throws Exception {
         String location = args.get(0);

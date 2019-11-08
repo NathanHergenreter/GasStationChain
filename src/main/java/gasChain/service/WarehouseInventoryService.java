@@ -28,6 +28,6 @@ public class WarehouseInventoryService
     }
 
     public WarehouseInventory findWarehouseInventoriesByWarehouseAndAndItem(Warehouse warehouse, Item item) {
-        return getRepository().findWarehouseInventoriesByWarehouseAndAndItem(warehouse, item);
+        return getRepository().findWarehouseInventoriesByWarehouseAndItem(warehouse, item);
     }
 }

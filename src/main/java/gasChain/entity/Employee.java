@@ -11,6 +11,7 @@ public abstract class Employee {
     private Long id;
 
     private String username;
+
     private String password;
 
     Employee() {

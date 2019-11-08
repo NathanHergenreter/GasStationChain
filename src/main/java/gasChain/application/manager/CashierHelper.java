@@ -1,6 +1,8 @@
 package gasChain.application.manager;
 
 import gasChain.annotation.CashierUser;
+import gasChain.annotation.MethodHelp;
+import gasChain.application.UserApplication;
 import gasChain.entity.*;
 import gasChain.entity.Receipt.Payment;
 import gasChain.service.*;
@@ -10,7 +12,6 @@ import gasChain.util.ServiceAutoWire;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class CashierHelper {
 
@@ -21,11 +22,9 @@ public class CashierHelper {
     private static SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
     private static CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
 
-    /*
-    expected use case is every employee doesn't add a WorkPeriod until after their shift
-    NOTE: given hours should be on a 24 hour basis, also assumed shifts will not be greater than 24 hour period
-    args: -startHour -endHour
-     */
+    @MethodHelp("expected use case is every employee doesn't add a WorkPeriod until after their shift\n" +
+            "    NOTE: given hours should be on a 24 hour basis, also assumed shifts will not be greater than 24 hour period\n" +
+            "    args: -startHour -endHour")
     @CashierUser(command = "AddWorkPeriod")
     public static void addWorkPeriod(List<String> args, Cashier cashier) {
         WorkPeriod workPeriod = new WorkPeriod(
@@ -40,8 +39,8 @@ public class CashierHelper {
         cashierService.save(cashier);
     }
 
-    private static String getInput(Scanner in) throws Exception {
-        String input = in.nextLine();
+    private static String getInput() throws Exception {
+        String input = UserApplication.getInput();
         if (input.equals("/end")) {
             throw new Exception("/endCalled");
         } else {
@@ -50,17 +49,18 @@ public class CashierHelper {
     }
 
     @CashierUser(command = "NewSale")
+    @MethodHelp("NewSale is a one of a kind method will be sure to bring a fun experience to the whole family")
     public static void processSale(List<String> args, Cashier cashier) throws Exception {
-        Scanner in = new Scanner(System.in);
+
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
 
         GasStation gasStation = cashier.getWorkplace();
         Receipt receipt = receiptService.save(new Receipt());
 
-        ArrayList<GasStationInventory> inventoryItems = processSaleGetInventory(in, gasStation, receipt, df);
+        ArrayList<GasStationInventory> inventoryItems = processSaleGetInventory(gasStation, receipt, df);
 
-        Payment paymentType = processSaleGetPayment(in, df);
+        Payment paymentType = processSaleGetPayment(df);
         receipt.setPayment(paymentType);
 
         for (GasStationInventory inventoryItem : inventoryItems) {
@@ -72,8 +72,7 @@ public class CashierHelper {
         receiptService.save(receipt);
     }
 
-    private static ArrayList<GasStationInventory> processSaleGetInventory(Scanner in,
-                                                                          GasStation gasStation, Receipt receipt, DecimalFormat df) {
+    private static ArrayList<GasStationInventory> processSaleGetInventory(GasStation gasStation, Receipt receipt, DecimalFormat df) {
         ArrayList<GasStationInventory> inventoryItems = new ArrayList<>();
 
         System.out.println("New Order Started With ID: " + receipt.getId());
@@ -81,7 +80,7 @@ public class CashierHelper {
         System.out.println("To end transaction enter /end");
 
         int total = 0;
-        for (String itemType = in.nextLine(); !itemType.equals("/end"); itemType = in.nextLine()) {
+        for (String itemType = UserApplication.getInput(); !itemType.equals("/end"); itemType = UserApplication.getInput()) {
             Item item = itemService.findByName(itemType);
             GasStationInventory inventoryItem = gasStationInventoryService.findGasStationInventoryByGasStationAndItem(gasStation, item);
             inventoryItems.add(inventoryItem);
@@ -98,7 +97,7 @@ public class CashierHelper {
         return inventoryItems;
     }
 
-    private static Payment processSaleGetPayment(Scanner in, DecimalFormat df) throws Exception {
+    private static Payment processSaleGetPayment(DecimalFormat df) throws Exception {
         Payment paymentType = Receipt.Payment.INVALID;
 
         boolean invalid = true;
@@ -108,12 +107,12 @@ public class CashierHelper {
             System.out.println("2 - Debit Card");
             System.out.println("3 - Cash");
 
-            String input = getInput(in);
+            String input = getInput();
 
             if (!input.equals("/end")) {
                 paymentType = Receipt.Payment.values()[Integer.parseInt(input)];
 
-                invalid = processPayment(in, paymentType, df);
+                invalid = processPayment(paymentType, df);
 
                 if (invalid) {
                     System.out.println("Invalid payment method");
@@ -125,8 +124,7 @@ public class CashierHelper {
         return paymentType;
     }
 
-    private static boolean processPayment(Scanner in, Receipt.Payment paymentType, DecimalFormat df) throws Exception {
-        int modDenominator = 1000;    // Effectively 1 in modDenominator card numbers will be invalid
+    private static boolean processPayment(Receipt.Payment paymentType, DecimalFormat df) throws Exception {
 
         boolean continueProcessing = true;
         while (true) {
@@ -134,9 +132,9 @@ public class CashierHelper {
                 case CREDIT:
                 case DEBIT: {
                     System.out.println("Enter Card Number: ");
-                    String cardNumber = getInput(in);
+                    String cardNumber = getInput();
                     if (!Luhn.validate(cardNumber)) {
-                        continueProcessing = invalidCard(in, cardNumber);
+                        continueProcessing = invalidCard(cardNumber);
                         if (!continueProcessing) {
                             return false;
                         }
@@ -155,18 +153,14 @@ public class CashierHelper {
     }
 
     // Returns true if /end was not entered (i.e. cancel the processing, otherwise retry)
-    private static boolean invalidCard(Scanner in, String cardNumber) {
+    private static boolean invalidCard(String cardNumber) {
         System.out.println("Invalid Card Number " + cardNumber);
         System.out.println("Enter /end to exit, otherwise to retry");
-        return !in.nextLine().equals("/end");
+        return !UserApplication.getInput().equals("/end");
     }
 
     @CashierUser(command = "ReturnItems", parameterEquation = "p>2")
     public static void processReturn(List<String> args, Cashier cashier) throws Exception {
-        if (args == null || args.size() <= 2) {
-            throw new Exception("Invalid minimum number of args for 'ReturnItems' (2)");
-        }
-
         Long id = Long.valueOf(args.get(0));
         Receipt saleReceipt = receiptService.findById(id);
 
@@ -178,14 +172,11 @@ public class CashierHelper {
         for (int i = 1; i < args.size(); i++) {
             String itemType = args.get(i);
             Sale sale = saleReceipt.getSale(itemType);
-
             if (sale == null) {
                 throw new Exception("Item '" + itemType + "' is not on receipt.");
             }
-
             returnReceipt.addSale(returnItem(new Sale(sale, returnReceipt, -(sale.getPrice())), cashier));
         }
-
         System.out.print("Items Returned");
         receiptService.save(returnReceipt);
     }

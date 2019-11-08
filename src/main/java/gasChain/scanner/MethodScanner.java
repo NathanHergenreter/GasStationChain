@@ -3,6 +3,8 @@ package gasChain.scanner;
 import gasChain.annotation.CashierUser;
 import gasChain.annotation.CorporateUser;
 import gasChain.annotation.ManagerUser;
+import gasChain.annotation.MethodHelp;
+import gasChain.application.ActiveEmployeeWrapper;
 import gasChain.entity.Cashier;
 import gasChain.entity.Corporate;
 import gasChain.entity.Employee;
@@ -14,7 +16,6 @@ import org.reflections.util.ConfigurationBuilder;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -81,41 +82,28 @@ public class MethodScanner {
         }
     }
 
-    public static Object runEmployeeCommand(List<String> cmd, Employee employee) {
+    public static Object runEmployeeCommand(List<String> cmd) throws Exception {
+        Employee employee = ActiveEmployeeWrapper.get();
         Method m = null;
         String parameterEquation = "";
         List<String> params = cmd.subList(1, cmd.size());
         String command = cmd.get(0).toLowerCase();
-        try {
-            if (employee.getClass().equals(Cashier.class)) {
-                m = cashierCommands.get(command);
-                parameterEquation = m.getAnnotation(CashierUser.class).parameterEquation();
-            } else if (employee.getClass().equals(Manager.class)) {
-                m = managerCommands.get(command);
-                parameterEquation = m.getAnnotation(ManagerUser.class).parameterEquation();
-            } else if (employee.getClass().equals(Corporate.class)) {
-                m = corporateCommands.get(command);
-                parameterEquation = m.getAnnotation(CorporateUser.class).parameterEquation();
-            }
-        } catch (NullPointerException e) {
-            System.out.println("Invalid command. Type /help to see available commands");
-            return null;
+
+        if (employee.getClass().equals(Cashier.class)) {
+            m = cashierCommands.get(command);
+            parameterEquation = m.getAnnotation(CashierUser.class).parameterEquation();
+        } else if (employee.getClass().equals(Manager.class)) {
+            m = managerCommands.get(command);
+            parameterEquation = m.getAnnotation(ManagerUser.class).parameterEquation();
+        } else if (employee.getClass().equals(Corporate.class)) {
+            m = corporateCommands.get(command);
+            parameterEquation = m.getAnnotation(CorporateUser.class).parameterEquation();
         }
+
         if (!checkParams(params, parameterEquation)) {
             System.out.println("Invalid number of arguments given for the command " + command);
         }
-        try {
-            return m.invoke(null, params, employee);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            if (e.getCause() instanceof Exception) {
-                System.out.println("Runner: ITE: " + e.getMessage());
-            }
-        } catch (Exception e) {
-            System.out.println("Runner Exception E: " + e.getMessage() + " : " + e.toString());
-        }
-        return null;
+        return m != null ? m.invoke(null, params, employee) : null;
     }
 
     private static boolean checkParams(List<String> params, String parameterEquation) {
@@ -125,25 +113,40 @@ public class MethodScanner {
                 .replace("||", "|")
                 .replace("&&", "&")
                 .toLowerCase();
-
         ExpressionParser parser = new SpelExpressionParser();
         return (boolean) parser.parseExpression(equation).getValue();
     }
 
-    public static void printCommands(Employee employee) {
-        HashMap<String, Method> hm;
-        if (employee.getClass().equals(Cashier.class)) {
-            hm = getCashierMethods();
-        } else if (employee.getClass().equals(Corporate.class)) {
-            hm = getCorporateMethods();
-        } else if (employee.getClass().equals(Manager.class)) {
-            hm = getManagerMethods();
-        } else {
-            hm = null;
-        }
+    public static void printCommands() {
+        HashMap<String, Method> hm = getHashMap();
         for (String s : new TreeSet<>(hm.keySet())) {
             System.out.println(s);
         }
+    }
+
+    public static void printHelp(String command) {
+        HashMap<String, Method> commandHashMap = getHashMap();
+        Method m = commandHashMap.get(command);
+        MethodHelp annotation = m.getAnnotation(MethodHelp.class);
+        if (annotation == null) {
+            System.out.println("The " + command + " current doesn't have any help information");
+        } else {
+            System.out.println("Help for the " + command + " command");
+            System.out.println(annotation.value());
+        }
+    }
+
+    private static HashMap<String, Method> getHashMap() {
+        Employee employee = ActiveEmployeeWrapper.get();
+        Class ec = employee.getClass();
+        if (ec.equals(Cashier.class)) {
+            return getCashierMethods();
+        } else if (ec.equals(Corporate.class)) {
+            return getCorporateMethods();
+        } else if (ec.equals(Manager.class)) {
+            return getManagerMethods();
+        }
+        return null;
     }
 }
 
