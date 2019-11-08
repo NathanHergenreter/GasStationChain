@@ -125,6 +125,7 @@ public class MethodScanner {
     }
 
     public static void printHelp(String command) {
+        command = command.toLowerCase();
         HashMap<String, Method> commandHashMap = getHashMap();
         Method m = commandHashMap.get(command);
         MethodHelp annotation = m.getAnnotation(MethodHelp.class);

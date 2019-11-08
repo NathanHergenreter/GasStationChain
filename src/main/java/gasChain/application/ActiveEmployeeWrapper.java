@@ -7,7 +7,11 @@ import gasChain.entity.Cashier;
 import gasChain.entity.Corporate;
 import gasChain.entity.Employee;
 import gasChain.entity.Manager;
+import gasChain.service.CashierService;
+import gasChain.service.CorporateService;
 import gasChain.service.EmployeeService;
+import gasChain.service.ManagerService;
+import gasChain.util.ServiceAutoWire;
 
 import java.lang.annotation.Annotation;
 import java.text.SimpleDateFormat;
@@ -17,6 +21,9 @@ import java.util.HashMap;
 
 public class ActiveEmployeeWrapper {
 
+    private static CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
+    private static CorporateService corporateService = ServiceAutoWire.getBean(CorporateService.class);
+    private static ManagerService managerService = ServiceAutoWire.getBean(ManagerService.class);
     private static EmployeeService e;
     private static Employee activeEmployee;
     private static LocalDateTime loginTime;
@@ -37,7 +44,7 @@ public class ActiveEmployeeWrapper {
     public static void userLogout() {
         activeEmployee = null;
         Duration duration = Duration.between(LocalDateTime.now(), loginTime);
-        System.out.print("User Logged off. Total time logged in: " + duration.toMinutes() + " minutes");
+        System.out.println("User Logged off. Total time logged in: " + duration.toMinutes() + " minutes");
         get();
     }
 
@@ -58,12 +65,10 @@ public class ActiveEmployeeWrapper {
     }
 
     private static Employee validateUser(String username, String password) {
-        return e.findByUsername(username);
-
-//        Employee employee = cashierService.findByUsername(username);
-//        employee = employee != null ? employee: managerService.findByUsername(username) ;
-//        employee = employee != null ? employee: corporateService.findByUsername(username);
-//        return (employee != null && employee.getPassword().equals(password)) ? employee : null;
+        Employee employee = cashierService.findByUsername(username);
+        employee = employee != null ? employee : managerService.findByUsername(username);
+        employee = employee != null ? employee : corporateService.findByUsername(username);
+        return (employee != null && employee.getPassword().equals(password)) ? employee : null;
     }
 
     private static Employee userLogin(String... args) {
