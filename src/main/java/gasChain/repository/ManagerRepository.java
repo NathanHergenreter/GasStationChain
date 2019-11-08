@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ManagerRepository extends EmployeeRepository<Manager> {
 
-	Manager findByStore(GasStation store);
+    Manager findByStore(GasStation store);
 }

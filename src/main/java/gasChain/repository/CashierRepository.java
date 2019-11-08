@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface CashierRepository extends EmployeeRepository<Cashier> {
 
-	List<Cashier> findByWorkplace(GasStation workplace);
+    List<Cashier> findByWorkplace(GasStation workplace);
 }

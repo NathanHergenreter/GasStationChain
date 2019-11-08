@@ -10,6 +10,5 @@ import java.io.Serializable;
 @NoRepositoryBean
 public interface InventoryRepository<T extends Inventory, ID extends Serializable> extends JpaRepository<T, ID> {
 
-	T findByItem(Item item);
-
+    T findByItem(Item item);
 }

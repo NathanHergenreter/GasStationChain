@@ -1,37 +1,36 @@
 package gasChain.service;
 
-import javax.transaction.Transactional;
-
 import gasChain.entity.Employee;
 import gasChain.repository.EmployeeRepository;
 
 public abstract class EmployeeService<T extends Employee, R extends EmployeeRepository<T>>
-		extends GenericService<T, Long, R> {
+        extends GenericService<T, Long, R> {
 
-	public EmployeeService(R r) {
-		super(r);
-	}
+    public EmployeeService(R r) {
+        super(r);
+    }
 
-	public Employee findByUsername(String username) {
-		return getRepository().findByUsername(username);
-	}
+    public Employee findByUsername(String username) {
+        return getRepository().findByUsername(username);
+    }
 
-	public boolean existsUser(String username) {
-		return getRepository().findByUsername(username) != null;
-	}
+    public boolean existsUser(String username) {
+        return getRepository().findByUsername(username) != null;
+    }
 
-	public boolean hasCorrectAuth(Employee employee, String authority) {
-		return employee.isAuth(authority);
-	}
+    public boolean hasCorrectAuth(Employee employee, String authority) {
+        return employee.isAuth(authority);
+    }
 
-	public boolean hasCorrectAuth(String username, String authority) {
-		return hasCorrectAuth(findByUsername(username), authority);
-	}
-	
-	@Override
-	@Transactional
-	public void save(T entity) {
-		if(!existsUser(entity.getUsername())) getRepository().save(entity);
-	}
+    public boolean hasCorrectAuth(String username, String authority) {
+        return hasCorrectAuth(findByUsername(username), authority);
+    }
 
+    @Override
+    public T save(T entity) {
+        if (!existsUser(entity.getUsername())) {
+            return getRepository().save(entity);
+        }
+        return null;
+    }
 }

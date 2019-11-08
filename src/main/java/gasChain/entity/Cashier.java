@@ -1,6 +1,5 @@
 package gasChain.entity;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
@@ -31,7 +30,6 @@ public class Cashier extends Employee {
         super();
     }
 
-
     public Cashier(String username, String password,
                    String name, int wagesHourly, int hoursWeekly, GasStation workplace) {
         super(username, password);
@@ -56,31 +54,51 @@ public class Cashier extends Employee {
     public String getName() {
         return name;
     }
-    public void setName(String name) { this.name = name;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public int getWagesHourly() {
         return wagesHourly;
     }
-    public void setWagesHourly(int hourlyWage) { wagesHourly = hourlyWage; }
+
+    public void setWagesHourly(int hourlyWage) {
+        wagesHourly = hourlyWage;
+    }
 
     public int getHoursWeekly() {
         return hoursWeekly;
     }
-    public void setHoursWeekly(int weeklyHours) { hoursWeekly = weeklyHours; }
+
+    public void setHoursWeekly(int weeklyHours) {
+        hoursWeekly = weeklyHours;
+    }
 
     public GasStation getWorkplace() {
         return workplace;
     }
-    
-    public Availability getAvailability() { return availability; }
-    public void setAvailability(Availability availability) { this.availability = availability; }
-    
-    public List<WorkPeriod> getWorkPeriods() { return workPeriods; }
-    public Cashier addWorkPeriod(WorkPeriod workPeriod) { workPeriods.add(workPeriod); return this; }
-    public Cashier addWorkPeriods(ArrayList<WorkPeriod> workPeriods)
-    {
-    	this.workPeriods.addAll(workPeriods); 
-    	return this; 
+
+    public Availability getAvailability() {
+        return availability;
+    }
+
+    public void setAvailability(Availability availability) {
+        this.availability = availability;
+    }
+
+    public List<WorkPeriod> getWorkPeriods() {
+        return workPeriods;
+    }
+
+    public Cashier addWorkPeriod(WorkPeriod workPeriod) {
+        workPeriods.add(workPeriod);
+        return this;
+    }
+
+    public Cashier addWorkPeriods(ArrayList<WorkPeriod> workPeriods) {
+        this.workPeriods.addAll(workPeriods);
+        return this;
     }
 
     @Override

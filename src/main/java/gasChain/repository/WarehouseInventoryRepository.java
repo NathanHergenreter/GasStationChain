@@ -13,5 +13,4 @@ public interface WarehouseInventoryRepository extends InventoryRepository<Wareho
     Set<WarehouseInventory> findByWarehouse(Warehouse warehouse);
 
     WarehouseInventory findWarehouseInventoriesByWarehouseAndAndItem(Warehouse warehouse, Item item);
-
 }

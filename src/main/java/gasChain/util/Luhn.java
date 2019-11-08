@@ -22,14 +22,11 @@ public class Luhn {
             if ((length - 2 - i) % 2 == 0) {
                 int workingNum = 2 * cnArray[i];
                 total += workingNum > 9 ? workingNum % 10 + 1 : workingNum;
-
             } else {
                 total += cnArray[i];
             }
-
         }
         return (total + cnArray[length - 1]) % 10 == 0;
-
     }
 
     public static String generateLuhn(int num_digits) {
@@ -44,13 +41,10 @@ public class Luhn {
                 total += val;
             }
             sb.append(val);
-
-
         }
         sb.reverse();
         sb.append(total % 10 != 0 ? (10 - total % 10) : 0);
         return sb.toString();
     }
-
 }
 

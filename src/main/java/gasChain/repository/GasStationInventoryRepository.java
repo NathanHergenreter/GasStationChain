@@ -13,6 +13,4 @@ public interface GasStationInventoryRepository extends InventoryRepository<GasSt
     Set<GasStationInventory> findByGasStation(GasStation gasStation);
 
     GasStationInventory findGasStationInventoryByGasStationAndItem(GasStation gasStation, Item item);
-
-
 }

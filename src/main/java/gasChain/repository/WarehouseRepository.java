@@ -7,9 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
 
-	Warehouse findByName(String name);
-
-	Warehouse findByLocation(String location);
-	
-	Warehouse findByPhoneNumber(String phoneNumber);
+    Warehouse findByLocation(String location);
 }
