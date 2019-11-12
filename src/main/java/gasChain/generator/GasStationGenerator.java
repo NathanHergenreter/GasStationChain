@@ -3,6 +3,7 @@ package gasChain.generator;
 import gasChain.entity.*;
 import gasChain.util.ServiceMaster;
 
+import java.sql.Date;
 import java.util.ArrayList;
 
 public class GasStationGenerator {
@@ -33,6 +34,7 @@ public class GasStationGenerator {
             service.gasStation().save(gasStation);
 
             generateSales(maxSales, gasStation, repo.items());
+            generateExpenses(gasStation);
             generateCashiers(minEmployees, maxEmployees, gasStation, repo.firstNames(), repo.lastNames());
             service.gasStation().save(gasStation);
 
@@ -64,6 +66,23 @@ public class GasStationGenerator {
             service.receipt().save(receipt);
         }
     }
+    
+    private void generateExpenses(GasStation gasStation)
+    {
+    	// Note - costs are in cents
+    	int minCostUtility = 10000; int maxCostUtility = 60000; 
+    	int rangeUtility = maxCostUtility - minCostUtility;
+    	int minCostInsurance = 400000; int maxCostInsurance = 1000000;
+    	int rangeInsurance = maxCostInsurance - minCostInsurance;
+    	
+    	int electric = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
+        int water = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
+        int sewage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
+        int garbage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
+        int insurance = GenUtil.rng.nextInt(rangeInsurance) + minCostInsurance;
+        
+        gasStation.setExpenses(new Expenses(electric, water, sewage, garbage, insurance));
+    }
 
     private void generateCashiers(int minEmployees, int maxEmployees, GasStation gasStation,
                                   ArrayList<String> firstNames, ArrayList<String> lastNames) {
@@ -81,11 +100,28 @@ public class GasStationGenerator {
             Cashier cashier = new Cashier(name, (int) (wage * 100), hours, gasStation);
 
             if (!service.cashier().existsUser(cashier.getUsername())) {
+            	generateCashierWorkPeriods(cashier);
                 gasStation.addCashier(cashier);
                 service.cashier().save(cashier);
                 numEmployees--;
             }
         }
+    }
+    
+    private void generateCashierWorkPeriods(Cashier cashier)
+    {
+    	int numWorkPeriods = 50;
+    	int maxHours = 8; int maxStartHour = 24 - maxHours;
+    	
+    	while(numWorkPeriods > 0 )
+    	{
+    		int startHour = GenUtil.rng.nextInt(maxStartHour);
+    		int endHour = startHour + GenUtil.rng.nextInt(maxHours);
+    		Date date = GenUtil.genDate();
+    		cashier.addWorkPeriod(new WorkPeriod(cashier, startHour, endHour, 
+    											cashier.getWagesHourly(), date));
+    		numWorkPeriods--;
+    	}
     }
 
     private void generateManager(GasStation gasStation) {

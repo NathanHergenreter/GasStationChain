@@ -17,6 +17,9 @@ public class ServiceMaster {
     private CorporateService corporateService;
 
     @Autowired
+    private ExpensesService expensesService;
+    
+    @Autowired
     private GasStationInventoryService gasStationInventoryService;
 
     @Autowired
@@ -55,6 +58,10 @@ public class ServiceMaster {
         return corporateService;
     }
 
+    public ExpensesService expenses() {
+        return expensesService;
+    }
+    
     public ItemService item() {
         return itemService;
     }

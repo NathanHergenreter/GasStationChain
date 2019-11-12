@@ -13,7 +13,7 @@ public class GenUtil {
 
     // Produces a random date from the past x years
     public static Date genDate() {
-        int yearRange = 5;
+        int yearRange = 1;
         Random rng = new Random();
         String year = Integer.toString(2019 - rng.nextInt(yearRange));
         String month = Integer.toString((rng.nextInt(12) + 1));

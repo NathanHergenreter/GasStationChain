@@ -23,6 +23,11 @@ public class GasStation extends Store {
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
+    @Cascade({CascadeType.ALL})
+    @OneToOne
+    @JoinColumn(name = "expenses_id")
+    private Expenses expenses;
+
     @OneToMany(mappedBy = "workplace")
     @Cascade({CascadeType.SAVE_UPDATE})
     private List<Cashier> cashiers = new ArrayList<>();
@@ -74,5 +79,19 @@ public class GasStation extends Store {
     public GasStation addCashier(Cashier cashier) {
         cashiers.add(cashier);
         return this;
+    }
+    
+    public Expenses getExpenses() {
+    	return expenses;
+    }
+    
+    public GasStation setExpenses(Expenses expenses) {
+    	this.expenses = expenses;
+    	return this;
+    }
+    
+    public GasStation updateExpenses(Expenses expenses) {
+    	this.expenses.update(expenses);
+    	return this;
     }
 }
