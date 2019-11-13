@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 public class GasStation extends Store {
 
-    @Cascade({CascadeType.PERSIST, CascadeType.REMOVE})
+    @Cascade({CascadeType.ALL})
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
     private List<GasStationInventory> inventory = new ArrayList<>();
 
@@ -52,6 +52,15 @@ public class GasStation extends Store {
     public GasStation addInventory(GasStationInventory item) {
         inventory.add(item);
         return this;
+    }
+    
+    public boolean hasInventory(Item item)  {
+    	String type = item.getName();
+    	for(GasStationInventory inventoryItem : inventory)
+    	{
+    		if(inventoryItem.ofItem(type)) { return true; }
+    	}
+    	return false;
     }
 
     public List<Sale> getSales() {
