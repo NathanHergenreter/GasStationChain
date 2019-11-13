@@ -248,4 +248,54 @@ public class CorporateHelper {
         }
         return null;
     }
+
+    @MethodHelp("First enter a location, then an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
+    @CorporateUser(command = "UpdateExpenses", parameterEquation = "p % 2 == 1")
+    public static void updateExpenses(List<String> args, Corporate corporate) throws Exception
+    {
+    	String location = args.get(0);
+    	GasStation gasStation = gasStationService.findByLocation(location);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location does not exist");
+        }
+        
+        Expenses expenses = gasStation.getExpenses();
+        
+    	int electric = expenses.getElectric(); int water = expenses.getWater(); 
+    	int sewage = expenses.getSewage(); int garbage = expenses.getGarbage(); 
+    	int insurance = expenses.getSewage();
+    	
+    	// Loops through args past idx 0, in format TYPE;VALUE
+    	for(int idx = 1; idx < args.size() - 1; idx += 2)
+    	{
+    		String expense = args.get(idx);
+    		
+    		switch(expense)
+    		{
+    			case "electric":
+    				electric = new Integer(args.get(idx + 1));
+    				break;
+    			case "water":
+    				water = new Integer(args.get(idx + 1));
+    				break;
+    			case "sewage":
+    				sewage = new Integer(args.get(idx + 1));
+    				break;
+    			case "garbage":
+    				garbage = new Integer(args.get(idx + 1));
+    				break;
+    			case "insurance":
+    				insurance = new Integer(args.get(idx + 1));
+    				break;
+    			default:
+    	            throw new Exception("Expense of type '" + expense + "' is invalid.");
+    				
+    		}
+    	}
+    	
+    	Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
+    	expenses.update(updateExpenses);
+    	gasStationService.save(gasStation);
+    }
 }
