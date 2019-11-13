@@ -3,6 +3,7 @@ package gasChain.application.manager;
 import gasChain.annotation.CorporateUser;
 import gasChain.annotation.MethodHelp;
 import gasChain.entity.*;
+import gasChain.fileReader.FileReader;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
 
@@ -297,5 +298,12 @@ public class CorporateHelper {
     	Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
     	expenses.update(updateExpenses);
     	gasStationService.save(gasStation);
+    }
+
+    @MethodHelp("Enter the name of a file located in the resources/tables folder")
+    @CorporateUser(command = "UploadData")
+    public static void uploadData(List<String> args, Corporate corporate) throws Exception
+    {
+    	FileReader.readFile(args.get(0));
     }
 }

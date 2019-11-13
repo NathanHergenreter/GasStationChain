@@ -36,6 +36,7 @@ public class UserApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
         setScanner();
+        ActiveEmployeeWrapper.get();	// Need to log in first
         System.out.println("Enter 'exit' to close application or 'logout' to sign off");
         while (true) {
             System.out.println("Enter Command: ");

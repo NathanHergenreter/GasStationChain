@@ -1,0 +1,10 @@
+CashierTable
+Toronto_Cashier0,password,Toronto_Cashier,800,40,Toronto
+Toronto_Cashier1,password,Toronto_Cashier,800,40,Toronto
+Toronto_Cashier2,password,Toronto_Cashier,800,40,Toronto
+Toronto_Cashier3,password,Toronto_Cashier,800,40,Toronto
+EndTable
+
+ManagerTable
+Toronto_Manager,password,Toronto
+EndTable
