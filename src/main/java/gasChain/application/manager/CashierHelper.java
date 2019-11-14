@@ -1,6 +1,7 @@
 package gasChain.application.manager;
 
 import gasChain.annotation.CashierUser;
+import gasChain.annotation.ManagerUser;
 import gasChain.annotation.MethodHelp;
 import gasChain.application.UserApplication;
 import gasChain.entity.*;
@@ -21,6 +22,7 @@ public class CashierHelper {
     private static ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
     private static SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
     private static CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
+    private static RewardMembershipAccountService rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
 
     @MethodHelp("expected use case is every employee doesn't add a WorkPeriod until after their shift\n" +
             "    NOTE: given hours should be on a 24 hour basis, also assumed shifts will not be greater than 24 hour period\n" +
@@ -48,8 +50,62 @@ public class CashierHelper {
         }
     }
 
+    @CashierUser(command = "NewRewardsMembership")
+    @ManagerUser(command = "NewRewardsMembership")
+    @MethodHelp("Create a new rewards membership account. No arguments needed")
+    public static RewardMembershipAccount newRewardsMembership(List<String> args, Employee employee) throws Exception {
+        String name;
+        String email;
+        String phoneNumber;
+        System.out.println("Let's create a new membership account");
+        System.out.println("Please enter the customers name: ");
+        name = UserApplication.getInput();
+        System.out.println("Please enter the customers phone number: ");
+        phoneNumber = UserApplication.getInput();
+        System.out.println("Please enter the customers email: ");
+        email = UserApplication.getInput();
+        System.out.println("Please verify that the following information is correct: ");
+        System.out.println("Name: " + name);
+        System.out.println("Phone Number: " + phoneNumber);
+        System.out.println("Email: " + email);
+        System.out.println("Is everything correct?");
+        String input = UserApplication.getInput();
+        if (input.toLowerCase().equals("no")) {
+            boolean isError = true;
+            while (isError) {
+                System.out.println("What is incorrect? Name, Phone Number, or Email: ");
+                input = UserApplication.getInput().toLowerCase();
+                switch (input) {
+                    case "email":
+                        System.out.println("Please enter the customers email: ");
+                        email = UserApplication.getInput();
+                        break;
+                    case "phone number":
+                        System.out.println("Please enter the customers phone number: ");
+                        phoneNumber = UserApplication.getInput();
+                        break;
+                    case "name":
+                        System.out.println("Please enter the customers name: ");
+                        name = UserApplication.getInput();
+                        break;
+                    default:
+                        System.out.println("Invalid input. Please try again ");
+                        break;
+                }
+                System.out.println("Any other changes need to be made?");
+                input = UserApplication.getInput().toLowerCase();
+                if (input.equals("no")) {
+                    isError = false;
+                }
+            }
+        }
+
+        return rewardMembershipAccountService.save(new RewardMembershipAccount(email, name, phoneNumber, employee));
+
+    }
+
     @CashierUser(command = "NewSale")
-    @MethodHelp("NewSale is a one of a kind method will be sure to bring a fun experience to the whole family")
+    @MethodHelp("Begin a new sale. No arguments needed")
     public static void processSale(List<String> args, Cashier cashier) throws Exception {
 
         DecimalFormat df = new DecimalFormat();
@@ -57,6 +113,20 @@ public class CashierHelper {
 
         GasStation gasStation = cashier.getWorkplace();
         Receipt receipt = receiptService.save(new Receipt());
+
+        System.out.println("Does customer have a rewards account? ");
+        String input = UserApplication.getInput().toLowerCase();
+        if (input.equals("yes")) {
+            System.out.println("Enter rewards account id:");
+            input = UserApplication.getInput().toLowerCase();
+            receipt.setRewardMembershipAccount(rewardMembershipAccountService.findById(input));
+        } else {
+            System.out.println("Would the customer like to set up an account today?");
+            input = UserApplication.getInput().toLowerCase();
+            if (input.equals("yes")) {
+                receipt.setRewardMembershipAccount(newRewardsMembership(new ArrayList<String>(), cashier));
+            }
+        }
 
         ArrayList<GasStationInventory> inventoryItems = processSaleGetInventory(gasStation, receipt, df);
 
@@ -69,6 +139,9 @@ public class CashierHelper {
         }
 
         System.out.println("End of Sale");
+        for (Sale s : receipt.getSales()) {
+            saleService.save(s);
+        }
         receiptService.save(receipt);
     }
 
@@ -94,6 +167,10 @@ public class CashierHelper {
             System.out.println(item.getId() + " --- " + item.getName() + " ---  $" + df.format(price / 100.0) + " --- Total = " + df.format(total / 100.0));
         }
 
+        if (receipt.getRewardsMembershipAccount() != null) {
+            receipt.getRewardsMembershipAccount().addRewardBalance(total / 100);
+            rewardMembershipAccountService.save(receipt.getRewardsMembershipAccount());
+        }
         return inventoryItems;
     }
 
@@ -112,7 +189,7 @@ public class CashierHelper {
             if (!input.equals("/end")) {
                 paymentType = Receipt.Payment.values()[Integer.parseInt(input)];
 
-                invalid = processPayment(paymentType, df);
+                invalid = !processPayment(paymentType, df);
 
                 if (invalid) {
                     System.out.println("Invalid payment method");

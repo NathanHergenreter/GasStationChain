@@ -16,4 +16,8 @@ public class ItemService extends GenericService<Item, Long, ItemRepository> {
     public Item findByName(String name) {
         return getRepository().findByName(name);
     }
+    
+    public boolean existsItem(String name) {
+    	return findByName(name) != null;
+    }
 }

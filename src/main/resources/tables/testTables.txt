@@ -1,0 +1,55 @@
+ItemTable
+Icee,399
+Breakfast Pizza,499
+EndTable
+
+WarehouseTable
+Toronto,Ontario,Central Canada
+Ames,Iowa,Midwest
+EndTable
+
+WarehouseInventoryTable
+Toronto,Beer,400,100
+Toronto,Water,200,500
+Toronto,Soda,500,300
+Toronto,Icee,399,100
+EndTable
+
+CorporateTable
+HR0,password
+HR1,password
+Finances0,password
+Finances1,password
+EndTable
+
+GasStationTable
+Toronto,Ontario,Central Canada
+Roma,Lazio,Italy
+EndTable
+
+GasStationInventoryTable
+Toronto,Breakfast Pizza,499,5,10
+Toronto,Beer,400,15
+EndTable
+
+ExpensesTable
+Toronto,10000,20000,30000,40000,500000
+EndTable
+
+ManagerTable
+Toronto_Manager,password,Toronto
+EndTable
+
+CashierTable
+Toronto_Cashier0,password,Toronto_Cashier,800,40,Toronto
+Toronto_Cashier1,password,Toronto_Cashier,800,40,Toronto
+Toronto_Cashier2,password,Toronto_Cashier,800,40,Toronto
+Toronto_Cashier3,password,Toronto_Cashier,800,40,Toronto
+EndTable
+
+WorkPeriodTable
+Toronto_Cashier0,6,14,800,2019-11-10
+Toronto_Cashier0,6,14,800,2019-11-11
+Toronto_Cashier0,6,14,800,2019-11-12
+Toronto_Cashier1,14,20,800,2019-11-13
+EndTable

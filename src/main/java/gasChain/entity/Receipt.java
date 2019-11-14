@@ -21,6 +21,10 @@ public class Receipt {
     @Enumerated(EnumType.ORDINAL)
     private Payment payment;
 
+    @ManyToOne
+    @JoinColumn(name = "rewards")
+    private RewardMembershipAccount rewardMembershipAccount;
+
     public Receipt() {
     }
 
@@ -61,5 +65,13 @@ public class Receipt {
     // Note - do not change order - add new to end
     public enum Payment {
         INVALID, CREDIT, DEBIT, CASH
+    }
+
+    public void setRewardMembershipAccount(RewardMembershipAccount rewardMembershipAccount) {
+        this.rewardMembershipAccount = rewardMembershipAccount;
+    }
+
+    public RewardMembershipAccount getRewardsMembershipAccount() {
+        return rewardMembershipAccount;
     }
 }

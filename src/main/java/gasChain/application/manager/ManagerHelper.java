@@ -157,9 +157,6 @@ public class ManagerHelper {
         System.out.println("Employee: " + cashier.getName() + " -Payroll: $" + (totalHoursWorked * cashier.getWagesHourly()) + "\n");
     }
 
-    /*
-    args: -<startDate> -<endDate>
-     */
     @MethodHelp(" args: -<startDate> -<endDate>")
     @ManagerUser(command = "GetEmployeePayrolls", parameterEquation = "p == 2")
     public static void getEmployeePayrolls(List<String> args, Manager manager) throws Exception {
@@ -364,15 +361,6 @@ public class ManagerHelper {
             "      (There's a bunch of ways to go about the logic for that but this seems fine as a proof of concept)")
     @ManagerUser(command = "RestockInventory")
     public static boolean restockGasStationInventory(List<String> args, Manager manager) throws Exception {
-//		GasStation gasStation = null;
-//		if (_managerService.existsUser(args.get(0))) {
-//			gasStation = _gasStationService.findByManager((Manager) _managerService.findByUsername(args.get(0)));
-//		} else if (_gasStationService.existsLocation(args.get(0))) {
-//			gasStation = _gasStationService.findByLocation(args.get(0));
-//		} else {
-//			return false;
-//		}
-
         String location = manager.getStore().getLocation();
         GasStation gasStation = _gasStationService.findByLocation(location);
 
@@ -411,5 +399,55 @@ public class ManagerHelper {
             }
         }
         return true;
+    }
+    
+    @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
+    @ManagerUser(command = "UpdateExpenses", parameterEquation = "p % 2 == 0")
+    public static void updateExpenses(List<String> args, Manager manager) throws Exception
+    {
+    	String location = manager.getStore().getLocation();
+    	GasStation gasStation = _gasStationService.findByLocation(location);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location does not exist");
+        }
+        
+        Expenses expenses = gasStation.getExpenses();
+        
+    	int electric = expenses.getElectric(); int water = expenses.getWater(); 
+    	int sewage = expenses.getSewage(); int garbage = expenses.getGarbage(); 
+    	int insurance = expenses.getSewage();
+    	
+    	// Loops through args past idx 0, in format TYPE;VALUE
+    	for(int idx = 0; idx < args.size() - 1; idx += 2)
+    	{
+    		String expense = args.get(idx);
+    		
+    		switch(expense)
+    		{
+    			case "electric":
+    				electric = Integer.parseInt(args.get(idx + 1));
+    				break;
+    			case "water":
+    				water = Integer.parseInt(args.get(idx + 1));
+    				break;
+    			case "sewage":
+    				sewage = Integer.parseInt(args.get(idx + 1));
+    				break;
+    			case "garbage":
+    				garbage = Integer.parseInt(args.get(idx + 1));
+    				break;
+    			case "insurance":
+    				insurance = Integer.parseInt(args.get(idx + 1));
+    				break;
+    			default:
+    	            throw new Exception("Expense of type '" + expense + "' is invalid.");
+    				
+    		}
+    	}
+    	
+    	Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
+    	expenses.update(updateExpenses);
+    	_gasStationService.save(gasStation);
     }
 }
