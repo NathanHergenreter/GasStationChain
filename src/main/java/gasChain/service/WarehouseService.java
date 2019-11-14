@@ -1,6 +1,7 @@
 package gasChain.service;
 
 import gasChain.entity.Warehouse;
+import gasChain.entity.WarehouseInventory;
 import gasChain.repository.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,15 +12,19 @@ public class WarehouseService extends GenericService<Warehouse, Long, WarehouseR
         super(warehouseRepository);
     }
 
-    public Warehouse findByName(String name) {
-        return getRepository().findByName(name);
+    public Warehouse findByLocation(String location) {
+        return getRepository().findByLocation(location);
     }
 
-	public Warehouse findByLocation(String location) {
-		return getRepository().findByLocation(location);
-	}
+    public boolean existsLocation(String location) {
+        return getRepository().findByLocation(location) != null;
+    }
 
-	public boolean existsLocation(String location) {
-		return getRepository().findByLocation(location) != null;
-	}
+    public Warehouse removeInventory(Warehouse warehouse, WarehouseInventory item) {
+        Warehouse temp = getRepository().findByLocation(warehouse.getLocation());
+        temp.removeInventory(item);
+        getRepository().save(temp);
+
+        return temp;
+    }
 }

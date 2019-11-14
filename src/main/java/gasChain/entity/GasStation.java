@@ -3,78 +3,95 @@ package gasChain.entity;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 public class GasStation extends Store {
 
-	@Cascade({ CascadeType.MERGE })
-	@OneToMany(mappedBy = "gasStation")
-	private List<GasStationInventory> inventory = new ArrayList<>();
+    @Cascade({CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
+    private List<GasStationInventory> inventory = new ArrayList<>();
 
     @Cascade({CascadeType.PERSIST})
     @OneToMany(mappedBy = "sellLocation")
     private List<Sale> sales = new ArrayList<>();
 
+    @Cascade({CascadeType.PERSIST})
     @OneToOne
     @JoinColumn(name = "manager_id")
     private Manager manager;
 
-	@Cascade({ CascadeType.PERSIST })
-	@OneToMany(mappedBy = "workplace")
-	private List<Cashier> cashiers = new ArrayList<>();
+    @Cascade({CascadeType.ALL})
+    @OneToOne
+    @JoinColumn(name = "expenses_id")
+    private Expenses expenses;
 
-	protected GasStation() {
-		super();
-	}
+    @OneToMany(mappedBy = "workplace")
+    @Cascade({CascadeType.SAVE_UPDATE})
+    private List<Cashier> cashiers = new ArrayList<>();
 
-	public GasStation(String location, String state, String region) {
-		super(location, state, region);
-	}
+    protected GasStation() {
+        super();
+    }
 
-//    public GasStation(@NotNull double longitude, @NotNull double latitude, String name, GasStationInventory... inventoryItems) {
-//        super(longitude, latitude, name);
-//        for (GasStationInventory inventory : inventoryItems) inventory.setGasStation(this);
-//        this.inventory = Stream.of(inventoryItems).collect(Collectors.toSet());
-//    }
+    public GasStation(String location, String state, String region) {
+        super(location, state, region);
+    }
 
-	public List<GasStationInventory> getInventory() {
-		return inventory;
-	}
-	
-	public GasStation addInventory(GasStationInventory item) { inventory.add(item); return this; }
+    public List<GasStationInventory> getInventory() {
+        return inventory;
+    }
 
-	public List<Sale> getSales() {
-		return sales;
-	}
+    public GasStation setInventory(List<GasStationInventory> inventory) {
+        this.inventory = inventory;
+        return this;
+    }
 
-	public GasStation addSale(Sale sale) {
-		sales.add(sale);
-		return this;
-	}
+    public GasStation addInventory(GasStationInventory item) {
+        inventory.add(item);
+        return this;
+    }
 
-	public Manager getManager() {
-		return manager;
-	}
+    public List<Sale> getSales() {
+        return sales;
+    }
 
-	public GasStation setManager(Manager manager) {
-		this.manager = manager;
-		return this;
-	}
+    public GasStation addSale(Sale sale) {
+        sales.add(sale);
+        return this;
+    }
 
-	public List<Cashier> getCashiers() {
-		return cashiers;
-	}
+    public Manager getManager() {
+        return manager;
+    }
 
-	public GasStation addCashier(Cashier cashier) {
-		cashiers.add(cashier);
-		return this;
-	}
+    public GasStation setManager(Manager manager) {
+        this.manager = manager;
+        return this;
+    }
 
+    public List<Cashier> getCashiers() {
+        return cashiers;
+    }
+
+    public GasStation addCashier(Cashier cashier) {
+        cashiers.add(cashier);
+        return this;
+    }
+    
+    public Expenses getExpenses() {
+    	return expenses;
+    }
+    
+    public GasStation setExpenses(Expenses expenses) {
+    	this.expenses = expenses;
+    	return this;
+    }
+    
+    public GasStation updateExpenses(Expenses expenses) {
+    	this.expenses.update(expenses);
+    	return this;
+    }
 }
