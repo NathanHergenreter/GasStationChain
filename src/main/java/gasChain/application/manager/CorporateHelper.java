@@ -7,6 +7,7 @@ import gasChain.fileReader.FileReader;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -305,5 +306,157 @@ public class CorporateHelper {
     public static void uploadData(List<String> args, Corporate corporate) throws Exception
     {
     	FileReader.readFile(args.get(0));
+    }
+
+    @MethodHelp("Enter the <start date>;<end date> formatted as YYYY-MM-DD")
+    @CorporateUser(command = "GenerateFinancialReport")
+    public static void generateFinancialReport(List<String> args, Corporate corporateUser){
+        List<GasStation> gasStations = gasStationService.findAll();
+
+        Date s = Date.valueOf(args.get(0));
+        Date e = Date.valueOf(args.get(1));
+        int numDays = Math.abs(s.toLocalDate().getDayOfYear() - e.toLocalDate().getDayOfYear());
+        int multiplier = 1;
+        if (numDays >= 30)
+            multiplier = numDays / 30;
+
+        int electricTotal=0,waterTotal=0,sewageTotal=0,garbageTotal=0,insuranceTotal=0;
+        int electricMin=gasStations.get(0).getExpenses().getElectric();
+        int waterMin=gasStations.get(0).getExpenses().getWater();
+        int sewageMin=gasStations.get(0).getExpenses().getSewage();
+        int garbageMin=gasStations.get(0).getExpenses().getGarbage();
+        int insuranceMin=gasStations.get(0).getExpenses().getInsurance();
+        int electricMax=electricMin, waterMax=waterMin, sewageMax=sewageMin, garbageMax=garbageMin, insuranceMax=insuranceMin;
+        String itemizedExpenses = "";
+        String electricMinStoreName="",electricMaxStoreName="",waterMinStoreName="",waterMaxStoreName="",sewageMinStoreName="",sewageMaxStoreName="",garbageMinStoreName="",garbageMaxStoreName="",insuranceMinStoreName="",insuranceMaxStoreName="";
+
+        for(GasStation store: gasStations){
+            Expenses expenses = store.getExpenses();
+            electricTotal+=expenses.getElectric();waterTotal+=expenses.getWater();sewageTotal+=expenses.getSewage();garbageTotal+=expenses.getGarbage();insuranceTotal+=expenses.getInsurance();
+
+            if (expenses.getElectric() < electricMin){
+                electricMin = expenses.getElectric();
+                electricMinStoreName = store.getLocation();
+            }
+            if (expenses.getElectric() > electricMax){
+                electricMax = expenses.getElectric();
+                electricMaxStoreName = store.getLocation();
+            }
+
+            if (expenses.getWater() < waterMin){
+                waterMin = expenses.getWater();
+                waterMinStoreName = store.getLocation();
+            }
+            if (expenses.getWater() > waterMax){
+                waterMax = expenses.getWater();
+                waterMaxStoreName = store.getLocation();
+            }
+
+            if (expenses.getSewage() < sewageMin){
+                sewageMin = expenses.getSewage();
+                sewageMinStoreName = store.getLocation();
+            }
+            if (expenses.getSewage() > sewageMax){
+                sewageMax = expenses.getSewage();
+                sewageMaxStoreName = store.getLocation();
+            }
+
+            if (expenses.getGarbage() < garbageMin){
+                garbageMin = expenses.getGarbage();
+                garbageMinStoreName = store.getLocation();
+            }
+            if (expenses.getGarbage() > garbageMax){
+                garbageMax = expenses.getGarbage();
+                garbageMaxStoreName = store.getLocation();
+            }
+
+            if (expenses.getInsurance() < insuranceMin){
+                insuranceMin = expenses.getInsurance();
+                insuranceMinStoreName = store.getLocation();
+            }
+            if (expenses.getInsurance() > insuranceMax){
+                insuranceMax = expenses.getInsurance();
+                insuranceMaxStoreName = store.getLocation();
+            }
+
+            itemizedExpenses +=
+                    store.getLocation() + " Store Expenses: { Electric: $" + (multiplier * expenses.getElectric()) +
+                            ", Water: $" + (multiplier * expenses.getWater()) +
+                            ". Sewage: $" + (multiplier * expenses.getSewage()) +
+                            ", Garbage: $" + (multiplier * expenses.getGarbage()) +
+                            ", Insurance: $" + (multiplier * expenses.getInsurance()) + " }\n";
+        }
+
+        double meanElectric = ((double)electricTotal/(double) gasStations.size());
+        double meanWater = ((double)waterTotal/(double) gasStations.size());
+        double meanSewage = ((double)sewageTotal/(double) gasStations.size());
+        double meanGarbage = ((double)garbageTotal/(double) gasStations.size());
+        double meanInsurance = ((double)insuranceTotal/(double) gasStations.size());
+
+        System.out.println("GAS STATION CHAIN -EXPENSE REPORT from " + s + "to " + e + ":\n");
+        System.out.println("TOTAL EXPENSES BY CATEGORY:");
+        System.out.println("Electric: $" + (multiplier * electricTotal)
+                        + "\nWater: $" + (multiplier * waterTotal)
+                        + "\nSewage: $" + (multiplier * sewageTotal)
+                        + "\nGarbage: $" + (multiplier * garbageTotal)
+                        + "\nInsurance: $" + (multiplier * insuranceTotal) + "\n");
+        System.out.println("LARGEST EXPENSES BY STORE:");
+        System.out.println("Electric: $" + (multiplier * electricMax) + "->Store: " + electricMaxStoreName +
+                        "\nWater: $" + (multiplier * waterMax) + "->Store: " + waterMaxStoreName +
+                        "\nSewage: $" + (multiplier * sewageMax) + "->Store: " + sewageMaxStoreName +
+                        "\nGarbage: $" + (multiplier * garbageMax) + "->Store: " + garbageMaxStoreName +
+                        "\nInsurance: $" + (multiplier * insuranceMax) + "->Store: " + insuranceMaxStoreName + "\n");
+        System.out.println("SMALLEST EXPENSES BY STORE");
+        System.out.println("Electric: $" + (multiplier * electricMin) + "->Store: " + electricMinStoreName +
+                        "\nWater: $" + (multiplier * waterMin) + "->Store: " + waterMinStoreName +
+                        "\nSewage: $" + (multiplier * sewageMin) + "->Store: " + sewageMinStoreName +
+                        "\nGarbage: $" + (multiplier * garbageMin) + "->Store: " + garbageMinStoreName +
+                        "\nInsurance: $" + (multiplier * insuranceMin) + "->Store: " + insuranceMinStoreName + "\n");
+        System.out.println("MEAN EXPENSES BY CATEGORY:");
+        System.out.println("Electric: $" + (multiplier * meanElectric) +
+                "\nWater: $" + (multiplier * meanWater) +
+                "\nSewage: $" + (multiplier * meanSewage) +
+                "\nGarbage: $" + (multiplier * meanGarbage) +
+                "\nInsurance: $" + (multiplier * meanInsurance) + "\n");
+        System.out.println("STD. DEVIATEION OF EXPENSES BY CATEGORY:\n"+ getStandardDeviationExpenses(gasStations, meanElectric, meanWater, meanSewage, meanGarbage, meanInsurance, multiplier));
+        System.out.println("ITEMIZED EXPENSES BY STORE:\n"+itemizedExpenses);
+    }
+
+    private static String getStandardDeviationExpenses(List<GasStation> gasStations, double meanElectric, double meanWater, double meanSewage, double meanGarbage, double meanInsurance, int multiplier){
+        double totalElectric = 0.0,totalWater = 0.0,totalSewage = 0.0,totalGarbage = 0.0,totalInsurance = 0.0;
+        double stdvElectric, stdvWater, stdvSewage, stdvGarbage, stdvInsurance;
+        for(GasStation store: gasStations){
+            Expenses expenses = store.getExpenses();
+            totalElectric += Math.pow(((double)expenses.getElectric())-meanElectric, 2);
+            totalWater += Math.pow(((double)expenses.getWater())-meanWater, 2);
+            totalGarbage += Math.pow(((double)expenses.getGarbage())-meanGarbage, 2);
+            totalSewage += Math.pow(((double)expenses.getSewage())-meanSewage, 2);
+            totalInsurance += Math.pow(((double)expenses.getInsurance())-meanInsurance, 2);
+        }
+        stdvElectric = Math.sqrt(totalElectric)*multiplier;
+        stdvWater = Math.sqrt(totalWater)*multiplier;
+        stdvSewage = Math.sqrt(totalSewage)*multiplier;
+        stdvGarbage = Math.sqrt(totalGarbage)*multiplier;
+        stdvInsurance = Math.sqrt(totalInsurance)*multiplier;
+
+        return "Electric: " + stdvElectric +
+                "\nWater: " + stdvWater +
+                "\nSewage: " + stdvSewage +
+                "\nGarbage: " + stdvGarbage +
+                "\nInsurance: " + stdvInsurance + "\n";
+    }
+
+    @MethodHelp("Enter the <start date>;<end date> formatted as YYYY-MM-DD")
+    @CorporateUser(command = "GenerateSalesReport")
+    public static void generateSalesReport(List<String> args, Corporate corporateUser){
+        /*TODO: Print sales report: fetch all stores, then stores->sales
+                At top should highlight:
+                    total revenue per item_id,
+                Followed by per-Store summary of:
+                    largest revenue by item_id,
+                    smallest revenue by item_id,
+                    list of item_id of largest revenue-> smallest revenue
+
+         */
     }
 }

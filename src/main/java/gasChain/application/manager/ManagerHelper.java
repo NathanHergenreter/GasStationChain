@@ -157,9 +157,6 @@ public class ManagerHelper {
         System.out.println("Employee: " + cashier.getName() + " -Payroll: $" + (totalHoursWorked * cashier.getWagesHourly()) + "\n");
     }
 
-    /*
-    args: -<startDate> -<endDate>
-     */
     @MethodHelp(" args: -<startDate> -<endDate>")
     @ManagerUser(command = "GetEmployeePayrolls", parameterEquation = "p == 2")
     public static void getEmployeePayrolls(List<String> args, Manager manager) throws Exception {
@@ -429,19 +426,19 @@ public class ManagerHelper {
     		switch(expense)
     		{
     			case "electric":
-    				electric = new Integer(args.get(idx + 1));
+    				electric = Integer.parseInt(args.get(idx + 1));
     				break;
     			case "water":
-    				water = new Integer(args.get(idx + 1));
+    				water = Integer.parseInt(args.get(idx + 1));
     				break;
     			case "sewage":
-    				sewage = new Integer(args.get(idx + 1));
+    				sewage = Integer.parseInt(args.get(idx + 1));
     				break;
     			case "garbage":
-    				garbage = new Integer(args.get(idx + 1));
+    				garbage = Integer.parseInt(args.get(idx + 1));
     				break;
     			case "insurance":
-    				insurance = new Integer(args.get(idx + 1));
+    				insurance = Integer.parseInt(args.get(idx + 1));
     				break;
     			default:
     	            throw new Exception("Expense of type '" + expense + "' is invalid.");
