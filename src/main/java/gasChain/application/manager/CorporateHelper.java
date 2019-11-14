@@ -22,6 +22,7 @@ public class CorporateHelper {
     private static WarehouseInventoryService warehouseInventoryService = ServiceAutoWire.getBean(WarehouseInventoryService.class);
     private static WarehouseService warehouseService = ServiceAutoWire.getBean(WarehouseService.class);
     private static ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
+    private static SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
 
     @CorporateUser(command = "AddManager", parameterEquation = "p == 3")
     public static void addManager(List<String> args, Corporate corporate) throws Exception {
@@ -446,17 +447,118 @@ public class CorporateHelper {
                 "\nInsurance: " + stdvInsurance + "\n";
     }
 
-    @MethodHelp("Enter the <start date>;<end date> formatted as YYYY-MM-DD")
     @CorporateUser(command = "GenerateSalesReport")
     public static void generateSalesReport(List<String> args, Corporate corporateUser){
-        /*TODO: Print sales report: fetch all stores, then stores->sales
-                At top should highlight:
-                    total revenue per item_id,
-                Followed by per-Store summary of:
-                    largest revenue by item_id,
-                    smallest revenue by item_id,
-                    list of item_id of largest revenue-> smallest revenue
+        List<Item> sellableItems = itemService.findAll();
+        List<Sale> allSales = saleService.findAll();
+        List<Sale> firstItemSales = filterSalesByItemId(allSales, sellableItems.get(0).getId());
 
-         */
+        int totalRevenue = 0;
+        int mostPopularItemCount = firstItemSales.size();
+        int leastPopularItemCount = mostPopularItemCount;
+        Item mostPopularItem = sellableItems.get(0);
+        Item leastPopularItem = sellableItems.get(0);
+
+        int highestItemRevenue = firstItemSales.size()!=0? firstItemSales.size() * firstItemSales.get(0).getPrice(): 0;
+        int lowestItemRevenue = highestItemRevenue;
+        Item highestRevenueItem = sellableItems.get(0);
+        Item lowestRevenueItem = sellableItems.get(0);
+
+        String itemRevenues = "";
+        for(Item item: sellableItems){
+            List<Sale> itemSales = filterSalesByItemId(allSales, item.getId());
+            int totalItemRevenue = itemSales.size()!=0? itemSales.size() * itemSales.get(0).getPrice() : 0;
+
+            if (itemSales.size() > mostPopularItemCount){
+                mostPopularItem = item;
+                mostPopularItemCount = itemSales.size();
+            }
+            if (itemSales.size() < leastPopularItemCount){
+                leastPopularItem = item;
+                leastPopularItemCount = itemSales.size();
+            }
+            if (totalItemRevenue > highestItemRevenue){
+                highestRevenueItem = item;
+                highestItemRevenue = totalItemRevenue;
+            }
+            if (totalItemRevenue < lowestItemRevenue){
+                lowestRevenueItem = item;
+                lowestItemRevenue = totalItemRevenue;
+            }
+            itemRevenues += "Item: " + item.getName() + ", Total Revenue: $" + totalItemRevenue +"\n";
+            totalRevenue += totalItemRevenue;
+        }
+        System.out.println("GAS STATION CHAIN -SALES REPORT:\n");
+        System.out.println("TOTAL REVENUE: $" + totalRevenue);
+        System.out.println("LEAST & MOST POPULAR ITEMS: " + leastPopularItem.getName() + " & " + mostPopularItem.getName());
+        System.out.println("LOWEST REVENUE ITEM: " + lowestRevenueItem.getName() + "Generated: $" + lowestItemRevenue);
+        System.out.println("HIGHEST REVENUE ITEM: " + highestRevenueItem.getName() + "Generated: $" + highestItemRevenue + "\n");
+
+        String storeResults = "";
+        for(GasStation store: gasStationService.findAll()){
+            List<Sale> storeSales = filterSalesByStoreId(allSales, store.getId());
+            List<Sale> firstStoreItemSales = filterSalesByItemId(storeSales, sellableItems.get(0).getId());
+            int totalStoreRevenue = 0;
+
+            int highestStoreItemRevenue = firstStoreItemSales.size() !=0? firstStoreItemSales.size() * firstStoreItemSales.get(0).getPrice(): 0;
+            int lowestStoreItemRevenue = highestStoreItemRevenue;
+            Sale highestRevenueStoreSale = storeSales.get(0);
+            Sale lowestRevenueStoreSale = storeSales.get(0);
+
+            int mostPopularStoreItemCount = firstStoreItemSales.size();
+            int leastPopularStoreItemCount = mostPopularStoreItemCount;
+            Sale mostPopularStoreSale = storeSales.get(0);
+            Sale leastPopularStoreSale = storeSales.get(0);
+
+            for(Item item: sellableItems){
+                List<Sale> storeItemSales = filterSalesByItemId(storeSales, item.getId());
+                int totalStoreItemRevenue = storeItemSales.size()!=0? storeItemSales.size() * storeItemSales.get(0).getPrice(): 0;
+                if (storeItemSales.size() > mostPopularStoreItemCount){
+                    mostPopularStoreItemCount = storeItemSales.size();
+                    mostPopularStoreSale = storeItemSales.get(0);
+                }
+                if (storeItemSales.size() < leastPopularStoreItemCount){
+                    leastPopularStoreItemCount = storeItemSales.size();
+                    leastPopularStoreSale = storeItemSales.get(0);
+                }
+                if (totalStoreItemRevenue > highestStoreItemRevenue){
+                    highestStoreItemRevenue = totalStoreItemRevenue;
+                    highestRevenueStoreSale = storeItemSales.get(0);
+                }
+                if (totalStoreItemRevenue < lowestStoreItemRevenue){
+                    lowestStoreItemRevenue = totalStoreItemRevenue;
+                    lowestRevenueStoreSale = storeItemSales.get(0);
+                }
+                totalStoreRevenue += totalStoreItemRevenue;
+            }
+            storeResults += "STORE STATISTICS:\n";
+            storeResults += "Store: " + store.getLocation() + "Total Revenue: $" + totalStoreRevenue + "\n";
+            storeResults += "Lowest Item Revenue: " + lowestRevenueStoreSale.getItem().getName() + " Generated: $" + lowestStoreItemRevenue + " At $" + lowestRevenueStoreSale.getPrice() + "/unit\n";
+            storeResults += "Highest Item Revenue: " + highestRevenueStoreSale.getItem().getName() + " Generated: $" + highestStoreItemRevenue + " At $" + highestRevenueStoreSale.getPrice() + "/unit\n";
+            storeResults += "Most Popular Item: " + mostPopularStoreSale.getItem().getName() + " Sold: " + mostPopularStoreItemCount + " units At $" + mostPopularStoreSale.getPrice() + "/unit\n";
+            storeResults += "Least Popular Item: " + leastPopularStoreSale.getItem().getName() + " Sold: " + leastPopularStoreItemCount + " units At $" + leastPopularStoreSale.getPrice() + "/unit\n";
+        }
+        System.out.println(storeResults);
+    }
+
+    private static List<Sale> filterSalesByStoreId(List<Sale> sales, long id){
+        List<Sale> result = new ArrayList<>();
+        for(Sale sale: sales){
+            GasStation store = sale.getSellLocation();
+            if (store.getId() == id){
+                result.add(sale);
+            }
+        }
+        return result;
+    }
+
+    private static List<Sale> filterSalesByItemId(List<Sale> sales, long id){
+        List<Sale> result = new ArrayList<>();
+        for(Sale sale: sales){
+            Item item = sale.getItem();
+            if(item.getId() == id)
+                result.add(sale);
+        }
+        return result;
     }
 }
