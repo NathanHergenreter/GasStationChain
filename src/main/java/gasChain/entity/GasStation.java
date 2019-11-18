@@ -28,13 +28,17 @@ public class GasStation extends Store {
     @JoinColumn(name = "expenses_id")
     private Expenses expenses;
 
-    @OneToMany(mappedBy = "workplace")
     @Cascade({CascadeType.SAVE_UPDATE})
+    @OneToMany(mappedBy = "workplace")
     private List<Cashier> cashiers = new ArrayList<>();
 
     @Cascade({CascadeType.ALL})
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
+    @OneToMany(mappedBy = "gasStation")
     private List<Promotion> promotions = new ArrayList<>();
+
+    @Cascade({CascadeType.ALL})
+    @OneToMany(mappedBy = "gasStation")
+    private List<GasTankInventory> gasTanks = new ArrayList<>();
 
     protected GasStation() {
         super();
@@ -42,6 +46,7 @@ public class GasStation extends Store {
 
     public GasStation(String location, String state, String region) {
         super(location, state, region);
+        this.expenses = new Expenses(0, 0, 0, 0, 0);
     }
 
     public List<GasStationInventory> getInventory() {
@@ -62,9 +67,7 @@ public class GasStation extends Store {
         return this;
     }
 
-    public Promotion hasPromotion(Item item) { //TODO
-
-
+    public Promotion hasPromotion(Item item) { 
         return new Promotion();
     }
 

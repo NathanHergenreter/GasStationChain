@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "gas_tanks")
+@Table(name = "gas_tank")
 @IdClass(GasTankInventoryCompositeId.class)
 public class GasTankInventory extends Inventory {
 
