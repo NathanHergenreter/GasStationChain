@@ -32,6 +32,10 @@ public class GasStation extends Store {
     @Cascade({CascadeType.SAVE_UPDATE})
     private List<Cashier> cashiers = new ArrayList<>();
 
+    @Cascade({CascadeType.ALL})
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
+    private List<Promotion> promotions = new ArrayList<>();
+
     protected GasStation() {
         super();
     }
@@ -42,6 +46,26 @@ public class GasStation extends Store {
 
     public List<GasStationInventory> getInventory() {
         return inventory;
+    }
+
+    public List<Promotion> getPromotions() {
+        return promotions;
+    }
+
+    public GasStation setPromotions(List<Promotion> promotions) {
+        this.promotions = promotions;
+        return this;
+    }
+
+    public GasStation addPromotion(Promotion promotion) {
+        promotions.add(promotion);
+        return this;
+    }
+
+    public Promotion hasPromotion(Item item) { //TODO
+
+
+        return new Promotion();
     }
 
     public GasStation setInventory(List<GasStationInventory> inventory) {

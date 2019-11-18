@@ -1,4 +1,36 @@
 package gasChain.service;
 
-public class PromotionService {
+import gasChain.entity.GasStation;
+import gasChain.entity.Promotion;
+import gasChain.repository.PromotionRepository;
+import gasChain.entity.Item;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Set;
+
+@Service
+public class PromotionService extends GenericService<Promotion, Long, PromotionRepository> {
+
+    @Autowired
+    PromotionService(PromotionRepository promotionRepository) {
+        super(promotionRepository);
+    }
+
+    @Override
+    public PromotionRepository getRepository() {
+        return super.getRepository();
+    }
+
+    public Promotion findByItem(Item item) {
+        return getRepository().findByItem(item);
+    }
+
+    public Set<Promotion> findByGasStation(GasStation gasStation) {
+        return getRepository().findByGasStation(gasStation);
+    }
+
+    public boolean existsPromotion(Item item) {
+        return findByItem(item) != null;
+    }
 }

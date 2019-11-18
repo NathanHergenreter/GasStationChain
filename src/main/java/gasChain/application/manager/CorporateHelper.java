@@ -23,6 +23,7 @@ public class CorporateHelper {
     private static WarehouseService warehouseService = ServiceAutoWire.getBean(WarehouseService.class);
     private static ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
     private static SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
+    private static PromotionService promotionService = ServiceAutoWire.getBean(PromotionService.class);
 
     @CorporateUser(command = "AddManager", parameterEquation = "p == 3")
     public static void addManager(List<String> args, Corporate corporate) throws Exception {

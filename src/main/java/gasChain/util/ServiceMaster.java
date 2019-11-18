@@ -46,6 +46,9 @@ public class ServiceMaster {
     @Autowired
     private WorkPeriodService workPeriodService;
 
+    @Autowired
+    private PromotionService promotionService;
+
     public AvailabilityService availability() {
         return availabilityService;
     }
@@ -97,4 +100,6 @@ public class ServiceMaster {
     public WorkPeriodService workPeriod() {
         return workPeriodService;
     }
+
+    public PromotionService promotion() { return promotionService; }
 }
