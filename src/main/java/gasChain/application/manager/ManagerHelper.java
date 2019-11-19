@@ -406,11 +406,6 @@ public class ManagerHelper {
             throw new Exception("Item of type '" + type + "' does not exist.");
         }
 
-
-        /*
-        * this probably doesn't work, promotion more than likely needs to have an ID attached to it
-        * and I couldn't get the damn thing to work with one so yeah
-        */
         if (promotion != null) {
             _promotionService.delete(promotion);
         } else {
