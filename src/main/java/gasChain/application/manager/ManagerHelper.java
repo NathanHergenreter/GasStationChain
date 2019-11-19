@@ -2,6 +2,7 @@ package gasChain.application.manager;
 
 import gasChain.annotation.ManagerUser;
 import gasChain.annotation.MethodHelp;
+import gasChain.application.UserApplication;
 import gasChain.entity.*;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
@@ -21,6 +22,8 @@ public class ManagerHelper {
     private static WorkPeriodService _workPeriodService = ServiceAutoWire.getBean(WorkPeriodService.class);
     private static AvailabilityService _availabilityService = ServiceAutoWire.getBean(AvailabilityService.class);
     private static ItemService _itemService = ServiceAutoWire.getBean(ItemService.class);
+    private static RewardMembershipAccountService _rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
+    private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
 
     @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
@@ -450,4 +453,70 @@ public class ManagerHelper {
     	expenses.update(updateExpenses);
     	_gasStationService.save(gasStation);
     }
+
+    @ManagerUser(command = "GenerateMemershipRewardsReport", parameterEquation = "p<2")
+    public static void generateMemershipRewardsReport(List<String> args, Manager manager) {
+        GasStation gasStation = manager.getStore();
+        boolean isNewSignup;
+        boolean isAmountPerItem;
+        System.out.println("Reward Membership Report");
+        System.out.println("Would you like to include new sign-ups by employee?");
+        String input = UserApplication.getInput();
+        isNewSignup = input.equalsIgnoreCase("yes");
+        System.out.println(isNewSignup);
+        System.out.println("Would you like to include amount spent per item by rewards members?");
+        input = UserApplication.getInput();
+        isAmountPerItem = input.equalsIgnoreCase("yes");
+        if (isNewSignup) {
+            List<Cashier> cashiers = _cashierService.findAllByWorkplace(gasStation);
+            String header = "| Account Created By        | #of | date     | Accounts Email                      | Accounts Name        |";
+            System.out.println("New Sign Ups by Cashier\n----------------\n" + header);
+            for (Cashier c : cashiers) {
+                Set<RewardMembershipAccount> rewardMembershipAccounts =
+                        _rewardMembershipAccountService.findAllByCreateByAndCreatedOnAfter(c, getFirstDateOfCurrentMonth());
+                for (RewardMembershipAccount r : rewardMembershipAccounts) {
+                    String out = String.format("| %-25s | %3d | %tD | %-35s | %-20s |", r.getCreateBy().getUsername(), rewardMembershipAccounts.size(), r.getCreatedOn(), r.getEmail(), r.getName());
+                    System.out.println(out);
+                }
+            }
+        }
+        if (isAmountPerItem) {
+            HashMap<Item, Integer> itemTotalSpent = new HashMap<>();
+            List<Receipt> receipts = _receiptService.findAllByRewardMembershipAccountIsNotNull();
+            for (Receipt r : receipts) {
+                for (Sale s : r.getSales()) {
+                    if (itemTotalSpent.containsKey(s.getItem())) {
+                        itemTotalSpent.replace(s.getItem(), itemTotalSpent.get(s.getItem()) + s.getPrice());
+                    } else {
+                        itemTotalSpent.put(s.getItem(), s.getPrice());
+                    }
+                }
+            }
+            String header = "| Item                 | Total Spent By Members |";
+            System.out.println("Total spent per item\n----------------\n" + header);
+            for (Item i : itemTotalSpent.keySet()) {
+                String out = String.format("| %-20s | $%7f |", i.getName(), itemTotalSpent.get(i) / 100.0);
+            }
+        }
+    }
+
+    private static java.util.Date getFirstDateOfCurrentMonth() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        return cal.getTime();
+    }
+    /**1.Manger enters in the command GenerateMemershipRewardsReport
+     2. System asks if report should include all new sign-up by employee
+     3. Manager enters yes
+     4. System fetches all employees at gas station
+     5. System searches for all rewards membership accounts created this month by each employee
+     6. System asks if report should include amount spent per item by rewards members
+     7. Manager enters yes
+     8. System fetches all sales at gas station
+     9. System calculates total spent per item
+     10. System calculates total spent all together by rewards members
+     11. System calculates total rewards redeemed
+     12. System calculates total unredeemed rewards
+     13. System prints out report
+     **/
 }

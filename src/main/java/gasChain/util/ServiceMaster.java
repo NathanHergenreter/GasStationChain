@@ -46,6 +46,9 @@ public class ServiceMaster {
     @Autowired
     private WorkPeriodService workPeriodService;
 
+    @Autowired
+    private RewardMembershipAccountService rewardMembershipAccountService;
+
     public AvailabilityService availability() {
         return availabilityService;
     }
@@ -96,5 +99,9 @@ public class ServiceMaster {
 
     public WorkPeriodService workPeriod() {
         return workPeriodService;
+    }
+
+    public RewardMembershipAccountService rewardMembershipAccount() {
+        return rewardMembershipAccountService;
     }
 }
