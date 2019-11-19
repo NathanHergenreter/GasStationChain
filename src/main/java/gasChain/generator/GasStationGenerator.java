@@ -81,7 +81,7 @@ public class GasStationGenerator {
         int garbage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
         int insurance = GenUtil.rng.nextInt(rangeInsurance) + minCostInsurance;
         
-        gasStation.setExpenses(new Expenses(electric, water, sewage, garbage, insurance));
+        gasStation.updateExpenses(new Expenses(electric, water, sewage, garbage, insurance));
     }
 
     private void generateCashiers(int minEmployees, int maxEmployees, GasStation gasStation,

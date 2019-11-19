@@ -11,9 +11,16 @@ import java.util.Objects;
 public class Promotion {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
+    
     @ManyToOne
     @JoinColumn
     private Item item;
+    
+    @ManyToOne
+    @JoinColumn(name = "gas_station_id")
+    private GasStation gasStation;
 
     @Id
     @ManyToOne
