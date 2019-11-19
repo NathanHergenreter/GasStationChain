@@ -47,6 +47,9 @@ public class ServiceMaster {
     private WorkPeriodService workPeriodService;
 
     @Autowired
+    private RewardMembershipAccountService rewardMembershipAccountService;
+
+    @Autowired
     private PromotionService promotionService;
 
     @Autowired
@@ -104,7 +107,15 @@ public class ServiceMaster {
         return workPeriodService;
     }
 
-    public PromotionService promotion() { return promotionService; }
+    public PromotionService promotion() {
+        return promotionService;
+    }
 
-    public GasTankInventoryService gasTank() { return gasTankInventoryService; }
+    public GasTankInventoryService gasTank() {
+        return gasTankInventoryService;
+    }
+
+    public RewardMembershipAccountService rewardMembershipAccount() {
+        return rewardMembershipAccountService;
+    }
 }

@@ -5,9 +5,10 @@ import gasChain.util.ServiceMaster;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GasStationGenerator {
-
+    private int counter = 0;
     private ServiceMaster service;
     private GenDataRepository repo;
 
@@ -114,7 +115,7 @@ public class GasStationGenerator {
         int sewage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
         int garbage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
         int insurance = GenUtil.rng.nextInt(rangeInsurance) + minCostInsurance;
-        
+
         gasStation.updateExpenses(new Expenses(electric, water, sewage, garbage, insurance));
     }
 
@@ -138,10 +139,34 @@ public class GasStationGenerator {
                 gasStation.addCashier(cashier);
                 service.cashier().save(cashier);
                 numEmployees--;
+                generateRewardMembershipAccounts(cashier, firstNames, lastNames);
             }
         }
     }
-    
+
+    private void generateRewardMembershipAccounts(Cashier cashier, ArrayList<String> firstNames, ArrayList<String> lastNames) {
+        int numAccounts = GenUtil.rng.nextInt(100) + 2;
+        List<Receipt> receipts = service.receipt().findAllByRewardMembershipAccountIsNull();
+        System.out.println("Percent complete (Very rough): " + (counter++ / 450.00) + "%");
+        for (int i = 0; i < numAccounts; i++) {
+            String email = GenUtil.genRandomEmail();
+            String name = GenUtil.genRandomName(firstNames, lastNames);
+            String phoneNumber = GenUtil.genRandonPhoneNumber();
+
+            RewardMembershipAccount rewardMembershipAccount = new RewardMembershipAccount(email, name, phoneNumber, cashier);
+            rewardMembershipAccount.setCreatedOn(GenUtil.genDate());
+            service.rewardMembershipAccount().save(rewardMembershipAccount);
+
+            int numReceipt = receipts.size() / (numAccounts - i) > 0 ? GenUtil.rng.nextInt(receipts.size() / (numAccounts - i)) : 0;
+            for (int j = 0; j < numReceipt; j++) {
+                int index = GenUtil.rng.nextInt(receipts.size() - 1);
+                Receipt r = receipts.get(index);
+                r.setRewardMembershipAccount(rewardMembershipAccount);
+                service.receipt().save(r);
+                receipts.remove(index);
+            }
+        }
+    }
     private void generateCashierWorkPeriods(Cashier cashier)
     {
     	int numWorkPeriods = 50;

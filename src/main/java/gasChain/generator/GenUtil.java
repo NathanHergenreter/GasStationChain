@@ -27,4 +27,22 @@ public class GenUtil {
     public static String genRandomName(ArrayList<String> firstNames, ArrayList<String> lastNames) {
         return firstNames.get(rng.nextInt(firstNames.size())) + " " + lastNames.get(rng.nextInt(lastNames.size()));
     }
+
+    public static String genRandonPhoneNumber() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 9; i++) {
+            sb.append(rng.nextInt(10));
+        }
+        return sb.toString();
+    }
+
+    public static String genRandomEmail() {
+        StringBuilder sb = new StringBuilder();
+        int numChar = rng.nextInt(19) + 6;
+        for (int i = 0; i < numChar; i++) {
+            sb.append((char) (rng.nextInt(26) + 97));
+        }
+        sb.append("@gmail.com");
+        return sb.toString();
+    }
 }

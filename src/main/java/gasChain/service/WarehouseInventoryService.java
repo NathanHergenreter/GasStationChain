@@ -4,7 +4,6 @@ import gasChain.entity.Item;
 import gasChain.entity.Warehouse;
 import gasChain.entity.WarehouseInventory;
 import gasChain.repository.WarehouseInventoryRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

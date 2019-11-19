@@ -1,6 +1,7 @@
 package gasChain.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Table(name = "items")
@@ -27,6 +28,25 @@ public class Item {
 
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getSuggestRetailPrice());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Item item = (Item) o;
+        return getSuggestRetailPrice() == item.getSuggestRetailPrice() &&
+                getId().equals(item.getId()) &&
+                getName().equals(item.getName());
     }
 
     public void setId(Long id) {

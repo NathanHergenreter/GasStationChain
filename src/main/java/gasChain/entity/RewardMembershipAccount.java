@@ -37,14 +37,15 @@ public class RewardMembershipAccount {
         this.rewardsBalance = 0;
         this.createdOn = new Date();
         this.Id = Luhn.generateLuhn(15);
-        System.out.println(Id);
     }
 
     public String getId() {
         return Id;
     }
 
-
+    public void setCreatedOn(Date date) {
+        this.createdOn = date;
+    }
     public String getEmail() {
         return email;
     }
