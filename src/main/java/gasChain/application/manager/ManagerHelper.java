@@ -674,8 +674,6 @@ public class ManagerHelper {
             printWriter.println(totalSalesRewardsString);
             printWriter.close();
         }
-
-
     }
 
     private static java.util.Date getFirstDateOfCurrentMonth() {

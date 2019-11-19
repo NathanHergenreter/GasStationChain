@@ -28,7 +28,7 @@ public class GenUtil {
         return firstNames.get(rng.nextInt(firstNames.size())) + " " + lastNames.get(rng.nextInt(lastNames.size()));
     }
 
-    public static String genRandonPhoneNumber() {
+    public static String genRandomPhoneNumber() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 9; i++) {
             sb.append(rng.nextInt(10));

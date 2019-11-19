@@ -147,11 +147,11 @@ public class GasStationGenerator {
     private void generateRewardMembershipAccounts(Cashier cashier, ArrayList<String> firstNames, ArrayList<String> lastNames) {
         int numAccounts = GenUtil.rng.nextInt(100) + 2;
         List<Receipt> receipts = service.receipt().findAllByRewardMembershipAccountIsNull();
-        System.out.println("Percent complete (Very rough): " + (counter++ / 450.00) + "%");
+        System.out.println(String.format("Percent complete (Very rough): %.2f", (counter++ / 450.00) * 100) + "%");
         for (int i = 0; i < numAccounts; i++) {
             String email = GenUtil.genRandomEmail();
             String name = GenUtil.genRandomName(firstNames, lastNames);
-            String phoneNumber = GenUtil.genRandonPhoneNumber();
+            String phoneNumber = GenUtil.genRandomPhoneNumber();
 
             RewardMembershipAccount rewardMembershipAccount = new RewardMembershipAccount(email, name, phoneNumber, cashier);
             rewardMembershipAccount.setCreatedOn(GenUtil.genDate());
