@@ -11,9 +11,6 @@ import java.util.Objects;
 public class Promotion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-
     @ManyToOne
     @JoinColumn
     private Item item;
@@ -63,25 +60,17 @@ public class Promotion {
         this.priceMultiplier = priceMultiplier;
     }
 
-    public Date getStartDate() {
-        return startDate;
-    }
+    public Date getStartDate() { return startDate; }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
+    public void setStartDate(Date startDate) { this.startDate = startDate; }
 
-    public Date getEndDate() {
-        return endDate;
-    }
+    public Date getEndDate() { return endDate; }
 
-    public void setEndDate(Date startDate) {
-        this.endDate = endDate;
-    }
+    public void setEndDate(Date startDate) { this.endDate = endDate; }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGasStation(), getItem());
+        return Objects.hash(getItem(), getGasStation(), getStartDate(), getEndDate(), getPriceMultiplier());
     }
 
     @Override
@@ -93,7 +82,7 @@ public class Promotion {
             return false;
         }
         Promotion that = (Promotion) o;
-        return getGasStation().equals(that.getGasStation()) && getItem().equals(that.getItem());
+        return getGasStation().equals(that.getGasStation()) && getItem().equals(that.getItem()) && getStartDate().equals(that.getStartDate()) && getEndDate().equals(that.getEndDate());
     }
 }
 

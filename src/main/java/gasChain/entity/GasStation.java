@@ -2,6 +2,8 @@ package gasChain.entity;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ public class GasStation extends Store {
     @OneToMany(mappedBy = "workplace")
     private List<Cashier> cashiers = new ArrayList<>();
 
-    @Cascade({CascadeType.ALL})
+    @Cascade({CascadeType.SAVE_UPDATE, CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.REMOVE})
     @OneToMany(mappedBy = "gasStation")
     private List<Promotion> promotions = new ArrayList<>();
 
