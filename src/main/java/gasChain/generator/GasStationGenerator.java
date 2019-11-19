@@ -151,7 +151,7 @@ public class GasStationGenerator {
         for (int i = 0; i < numAccounts; i++) {
             String email = GenUtil.genRandomEmail();
             String name = GenUtil.genRandomName(firstNames, lastNames);
-            String phoneNumber = GenUtil.genRandonPhoneNumber();
+            String phoneNumber = GenUtil.genRandomPhoneNumber();
 
             RewardMembershipAccount rewardMembershipAccount = new RewardMembershipAccount(email, name, phoneNumber, cashier);
             rewardMembershipAccount.setCreatedOn(GenUtil.genDate());
