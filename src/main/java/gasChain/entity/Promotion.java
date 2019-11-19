@@ -11,9 +11,6 @@ import java.util.Objects;
 public class Promotion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
-    
     @ManyToOne
     @JoinColumn
     private Item item;
@@ -73,7 +70,7 @@ public class Promotion {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGasStation(), getItem());
+        return Objects.hash(getItem(), getGasStation(), getStartDate(), getEndDate(), getPriceMultiplier());
     }
 
     @Override
@@ -85,7 +82,7 @@ public class Promotion {
             return false;
         }
         Promotion that = (Promotion) o;
-        return getGasStation().equals(that.getGasStation()) && getItem().equals(that.getItem());
+        return getGasStation().equals(that.getGasStation()) && getItem().equals(that.getItem()) && getStartDate().equals(that.getStartDate()) && getEndDate().equals(that.getEndDate());
     }
 }
 

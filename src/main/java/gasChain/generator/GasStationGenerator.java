@@ -33,6 +33,9 @@ public class GasStationGenerator {
         for (GasStation gasStation : gasStations) {
             service.gasStation().save(gasStation);
 
+
+            generatePromotions(repo.items().size(), gasStation, repo.items());
+
             generateSales(maxSales, gasStation, repo.items());
             generateExpenses(gasStation);
             generateCashiers(minEmployees, maxEmployees, gasStation, repo.firstNames(), repo.lastNames());
@@ -40,9 +43,29 @@ public class GasStationGenerator {
 
             generateManager(gasStation);
 
+
             service.gasStation().save(gasStation);
 
             generateGasStationInventory(gasStation);
+        }
+    }
+
+    private void generatePromotions(int maxPromotions, GasStation gasStation, ArrayList<Item> items) {
+        int numPromotions = GenUtil.rng.nextInt(maxPromotions);
+
+        for (int i = numPromotions; numPromotions > 0; numPromotions--) {
+            Item item = service.item().findAll().get(GenUtil.rng.nextInt(items.size()));
+            float multiplier = (float) (GenUtil.rng.nextFloat() * (1.0 - .5) + .5);
+            Date startDate = GenUtil.genDate();
+            Date endDate = GenUtil.genDate();
+            while (startDate.after(endDate)) {
+                startDate = GenUtil.genDate();
+                endDate = GenUtil.genDate();
+            }
+            Promotion promotion = new Promotion(item, multiplier, startDate, endDate);
+            promotion.setGasStation(gasStation);
+            service.promotion().save(promotion);
+            gasStation.addPromotion(promotion);
         }
     }
 
