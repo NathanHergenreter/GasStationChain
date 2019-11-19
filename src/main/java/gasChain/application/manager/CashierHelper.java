@@ -12,6 +12,7 @@ import gasChain.util.ServiceAutoWire;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CashierHelper {
@@ -23,6 +24,7 @@ public class CashierHelper {
     private static SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
     private static CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
     private static RewardMembershipAccountService rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
+    private static PromotionService promotionService = ServiceAutoWire.getBean(PromotionService.class);
 
     @MethodHelp("expected use case is every employee doesn't add a WorkPeriod until after their shift\n" +
             "    NOTE: given hours should be on a 24 hour basis, also assumed shifts will not be greater than 24 hour period\n" +
@@ -128,6 +130,7 @@ public class CashierHelper {
             }
         }
 
+
         ArrayList<GasStationInventory> inventoryItems = processSaleGetInventory(gasStation, receipt, df);
 
         Payment paymentType = processSaleGetPayment(df);
@@ -158,7 +161,24 @@ public class CashierHelper {
             GasStationInventory inventoryItem = gasStationInventoryService.findGasStationInventoryByGasStationAndItem(gasStation, item);
             inventoryItems.add(inventoryItem);
 
+            /*
+            New with promotions
+            Check if promotion on item exists
+            Check if the promotion exists at given gasStation
+            If promotion exists, check within date range of promotion
+            Update price accordingly
+             */
             int price = inventoryItem.getPrice();
+            if (promotionService.existsPromotion(inventoryItem.getItem())) {
+                if (promotionService.findByGasStation(gasStation) != null) {
+                    Date date = new Date();
+                    Promotion promotion = promotionService.findByItem(inventoryItem.getItem());
+                    if (!date.before(promotion.getStartDate()) || !date.after(promotion.getEndDate())) {
+                        price = (int) (price * promotion.getPriceMultiplier());
+                    }
+                }
+            }
+
             total += price;
 
             Sale s = new Sale(item, gasStation, receipt, price);

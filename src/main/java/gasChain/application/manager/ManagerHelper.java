@@ -22,6 +22,7 @@ public class ManagerHelper {
     private static WorkPeriodService _workPeriodService = ServiceAutoWire.getBean(WorkPeriodService.class);
     private static AvailabilityService _availabilityService = ServiceAutoWire.getBean(AvailabilityService.class);
     private static ItemService _itemService = ServiceAutoWire.getBean(ItemService.class);
+    private static PromotionService _promotionService = ServiceAutoWire.getBean(PromotionService.class);
     private static RewardMembershipAccountService _rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
     private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
 
@@ -318,9 +319,111 @@ public class ManagerHelper {
         return endOfShift;
     }
 
-    @ManagerUser(command = "TODO")
-    public static void addItem(List<String> args, Manager manager) {
+    // TODO - check if promotion already exists
+    @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
+    @ManagerUser(command = "AddPromotion", parameterEquation = "p == 4")
+    public static void addPromotion(List<String> args, Manager manager) throws Exception {
+        String location = manager.getStore().getLocation();
+        String type = args.get(0);
+        Float priceMultiplier = Float.parseFloat(args.get(1));
+        Date startDate = Date.valueOf(args.get(2));
+        Date endDate = Date.valueOf(args.get(3));
 
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        }
+
+        if (item == null) {
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        }
+
+        if (_promotionService.existsPromotion(item)) {
+            throw new Exception("Promotion already exists for " + type + ". Use UpdatePromotion instead.");
+        }
+
+        Promotion promotion = new Promotion(item, priceMultiplier, startDate, endDate);
+        gasStation.addPromotion(promotion);
+
+        _promotionService.save(promotion);
+
+        System.out.println("Promotion for " + type + " has been added to gas station" + location);
+    }
+
+    @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
+    @ManagerUser(command = "UpdatePromotion", parameterEquation = "p == 4")
+    public static void updatePromotion(List<String> args, Manager manager) throws Exception {
+        String location = manager.getStore().getLocation();
+        String type = args.get(0);
+        Float priceMultiplier = Float.parseFloat(args.get(1));
+        Date startDate = Date.valueOf(args.get(2));
+        Date endDate = Date.valueOf(args.get(3));
+
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        }
+
+        if (item == null) {
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        }
+
+        if (!_promotionService.existsPromotion(item)) {
+            throw new Exception("No promotion exists for " + type);
+        }
+
+        Promotion promotion = _promotionService.findByItem(item);
+
+        promotion.setItem(item);
+        promotion.setStartDate(startDate);
+        promotion.setEndDate(endDate);
+        promotion.setPriceMultiplier(priceMultiplier);
+
+        _promotionService.save(promotion);
+
+        System.out.println("Promotion for " + type + " has been updated");
+    }
+
+    @MethodHelp("args: -<item> \n")
+    @ManagerUser(command = "DeletePromotion", parameterEquation = "p == 1")
+    public static void deletePromotion(List<String> args, Manager manager) throws Exception {
+
+        String location = manager.getStore().getLocation();
+        String type = args.get(0);
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        }
+
+        if (item == null) {
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        }
+
+        if (_promotionService.existsPromotion(item)) {
+            _promotionService.deleteById(item.getId());
+        } else {
+            throw new Exception("Promotion on " + type + " does not exist");
+        }
+    }
+
+    // TODO - check if item already exists
+    @MethodHelp("args: -<item> -<suggestRetailPrice> \n")
+    @ManagerUser(command = "AddItem", parameterEquation = "p == 2")
+    public static void addItem(List<String> args, Manager manager) throws Exception {
+        String name = args.get(0);
+        int suggestRetailPrice = Integer.parseInt(args.get(1));
+        if (!_itemService.existsItem(name)) {
+            Item item = new Item(name, suggestRetailPrice);
+            _itemService.save(item);
+        } else {
+            throw new Exception("Item already exists");
+        }
     }
 
     // TODO - check if inventory already contains item
@@ -505,18 +608,4 @@ public class ManagerHelper {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         return cal.getTime();
     }
-    /**1.Manger enters in the command GenerateMemershipRewardsReport
-     2. System asks if report should include all new sign-up by employee
-     3. Manager enters yes
-     4. System fetches all employees at gas station
-     5. System searches for all rewards membership accounts created this month by each employee
-     6. System asks if report should include amount spent per item by rewards members
-     7. Manager enters yes
-     8. System fetches all sales at gas station
-     9. System calculates total spent per item
-     10. System calculates total spent all together by rewards members
-     11. System calculates total rewards redeemed
-     12. System calculates total unredeemed rewards
-     13. System prints out report
-     **/
 }

@@ -28,9 +28,17 @@ public class GasStation extends Store {
     @JoinColumn(name = "expenses_id")
     private Expenses expenses;
 
-    @OneToMany(mappedBy = "workplace")
     @Cascade({CascadeType.SAVE_UPDATE})
+    @OneToMany(mappedBy = "workplace")
     private List<Cashier> cashiers = new ArrayList<>();
+
+    @Cascade({CascadeType.ALL})
+    @OneToMany(mappedBy = "gasStation")
+    private List<Promotion> promotions = new ArrayList<>();
+
+    @Cascade({CascadeType.ALL})
+    @OneToMany(mappedBy = "gasStation")
+    private List<GasTankInventory> gasTanks = new ArrayList<>();
 
     protected GasStation() {
         super();
@@ -38,10 +46,35 @@ public class GasStation extends Store {
 
     public GasStation(String location, String state, String region) {
         super(location, state, region);
+        this.expenses = new Expenses(0, 0, 0, 0, 0);
     }
 
     public List<GasStationInventory> getInventory() {
         return inventory;
+    }
+
+    public List<Promotion> getPromotions() {
+        return promotions;
+    }
+
+    public GasStation setPromotions(List<Promotion> promotions) {
+        this.promotions = promotions;
+        return this;
+    }
+
+    public GasStation addPromotion(Promotion promotion) {
+        promotions.add(promotion);
+        return this;
+    }
+
+    public boolean hasPromotion(Item item) {
+        String type = item.getName();
+        for (Promotion promotion : promotions) {
+            if (promotion.getItem().getName() == item.getName()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public GasStation setInventory(List<GasStationInventory> inventory) {
