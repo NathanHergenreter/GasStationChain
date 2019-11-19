@@ -1,6 +1,7 @@
 package gasChain.entity;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Inheritance
@@ -49,5 +50,22 @@ public abstract class Store {
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Store store = (Store) o;
+        return getId().equals(store.getId());
     }
 }

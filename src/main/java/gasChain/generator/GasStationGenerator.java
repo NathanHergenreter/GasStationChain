@@ -5,9 +5,10 @@ import gasChain.util.ServiceMaster;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
 
 public class GasStationGenerator {
-
+    private int counter = 0;
     private ServiceMaster service;
     private GenDataRepository repo;
 
@@ -33,6 +34,9 @@ public class GasStationGenerator {
         for (GasStation gasStation : gasStations) {
             service.gasStation().save(gasStation);
 
+
+            generatePromotions(repo.items().size(), gasStation, repo.items());
+
             generateSales(maxSales, gasStation, repo.items());
             generateExpenses(gasStation);
             generateCashiers(minEmployees, maxEmployees, gasStation, repo.firstNames(), repo.lastNames());
@@ -40,9 +44,29 @@ public class GasStationGenerator {
 
             generateManager(gasStation);
 
+
             service.gasStation().save(gasStation);
 
             generateGasStationInventory(gasStation);
+        }
+    }
+
+    private void generatePromotions(int maxPromotions, GasStation gasStation, ArrayList<Item> items) {
+        int numPromotions = GenUtil.rng.nextInt(maxPromotions);
+
+        for (int i = numPromotions; numPromotions > 0; numPromotions--) {
+            Item item = service.item().findAll().get(GenUtil.rng.nextInt(items.size()));
+            float multiplier = (float) (GenUtil.rng.nextFloat() * (1.0 - .5) + .5);
+            Date startDate = GenUtil.genDate();
+            Date endDate = GenUtil.genDate();
+            while (startDate.after(endDate)) {
+                startDate = GenUtil.genDate();
+                endDate = GenUtil.genDate();
+            }
+            Promotion promotion = new Promotion(item, multiplier, startDate, endDate);
+            promotion.setGasStation(gasStation);
+            service.promotion().save(promotion);
+            gasStation.addPromotion(promotion);
         }
     }
 
@@ -54,7 +78,18 @@ public class GasStationGenerator {
             Item item = service.item().findAll().get(GenUtil.rng.nextInt(items.size()));
 
             for (int numReceipt = GenUtil.rng.nextInt(8); numReceipt > 0; numReceipt--) {
-                Sale sale = new Sale(item, gasStation, receipt, item.getSuggestRetailPrice(), GenUtil.genDate());
+                Date date = GenUtil.genDate();
+                int price = item.getSuggestRetailPrice();
+                Promotion promotion = service.promotion().findPromotionByGasStationAndItem(gasStation, item);
+                if (promotion != null) {
+                    if (!date.before(promotion.getStartDate()) || !date.after(promotion.getEndDate())) {
+                        price = (int) (price * promotion.getPriceMultiplier());
+                    }
+                }
+
+                Sale sale = new Sale(item, gasStation, receipt, price, date);
+
+
                 gasStation.addSale(sale);
                 receipt.addSale(sale);
                 numSales--;
@@ -80,8 +115,8 @@ public class GasStationGenerator {
         int sewage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
         int garbage = GenUtil.rng.nextInt(rangeUtility) + minCostUtility;
         int insurance = GenUtil.rng.nextInt(rangeInsurance) + minCostInsurance;
-        
-        gasStation.setExpenses(new Expenses(electric, water, sewage, garbage, insurance));
+
+        gasStation.updateExpenses(new Expenses(electric, water, sewage, garbage, insurance));
     }
 
     private void generateCashiers(int minEmployees, int maxEmployees, GasStation gasStation,
@@ -104,10 +139,34 @@ public class GasStationGenerator {
                 gasStation.addCashier(cashier);
                 service.cashier().save(cashier);
                 numEmployees--;
+                generateRewardMembershipAccounts(cashier, firstNames, lastNames);
             }
         }
     }
-    
+
+    private void generateRewardMembershipAccounts(Cashier cashier, ArrayList<String> firstNames, ArrayList<String> lastNames) {
+        int numAccounts = GenUtil.rng.nextInt(100) + 2;
+        List<Receipt> receipts = service.receipt().findAllByRewardMembershipAccountIsNull();
+        System.out.println("Percent complete (Very rough): " + (counter++ / 450.00) + "%");
+        for (int i = 0; i < numAccounts; i++) {
+            String email = GenUtil.genRandomEmail();
+            String name = GenUtil.genRandomName(firstNames, lastNames);
+            String phoneNumber = GenUtil.genRandonPhoneNumber();
+
+            RewardMembershipAccount rewardMembershipAccount = new RewardMembershipAccount(email, name, phoneNumber, cashier);
+            rewardMembershipAccount.setCreatedOn(GenUtil.genDate());
+            service.rewardMembershipAccount().save(rewardMembershipAccount);
+
+            int numReceipt = receipts.size() / (numAccounts - i) > 0 ? GenUtil.rng.nextInt(receipts.size() / (numAccounts - i)) : 0;
+            for (int j = 0; j < numReceipt; j++) {
+                int index = GenUtil.rng.nextInt(receipts.size() - 1);
+                Receipt r = receipts.get(index);
+                r.setRewardMembershipAccount(rewardMembershipAccount);
+                service.receipt().save(r);
+                receipts.remove(index);
+            }
+        }
+    }
     private void generateCashierWorkPeriods(Cashier cashier)
     {
     	int numWorkPeriods = 50;

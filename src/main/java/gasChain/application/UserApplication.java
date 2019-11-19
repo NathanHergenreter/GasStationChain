@@ -45,6 +45,7 @@ public class UserApplication implements CommandLineRunner {
                 List<String> result = Arrays.asList(input.split(";"));
                 MethodScanner.runEmployeeCommand(result);
             } catch (Exception e) {
+                System.out.println(e.getCause());
                 System.out.println(e.getMessage());
             }
         }

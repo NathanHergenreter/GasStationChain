@@ -15,11 +15,11 @@ public class SaleService extends GenericService<Sale, Long, SaleRepository> {
         super(saleRepository);
     }
 
-    List<Sale> findBySellLocation(GasStation sellLocation) {
+    public List<Sale> findBySellLocation(GasStation sellLocation) {
         return getRepository().findBySellLocation(sellLocation);
     }
 
-    List<Sale> findByReceipt(Receipt receipt) {
+    public List<Sale> findByReceipt(Receipt receipt) {
         return getRepository().findByReceipt(receipt);
     }
 }

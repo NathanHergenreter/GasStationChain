@@ -2,10 +2,14 @@ package gasChain.application.manager;
 
 import gasChain.annotation.ManagerUser;
 import gasChain.annotation.MethodHelp;
+import gasChain.application.UserApplication;
 import gasChain.entity.*;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.*;
 
@@ -21,6 +25,10 @@ public class ManagerHelper {
     private static WorkPeriodService _workPeriodService = ServiceAutoWire.getBean(WorkPeriodService.class);
     private static AvailabilityService _availabilityService = ServiceAutoWire.getBean(AvailabilityService.class);
     private static ItemService _itemService = ServiceAutoWire.getBean(ItemService.class);
+    private static PromotionService _promotionService = ServiceAutoWire.getBean(PromotionService.class);
+    private static RewardMembershipAccountService _rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
+    private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
+    private static SaleService _saleService = ServiceAutoWire.getBean(SaleService.class);
 
     @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
@@ -113,7 +121,6 @@ public class ManagerHelper {
         }
         return storeCashiers;
     }
-
 
     @ManagerUser(command = "ListStoreCashiers")
     public static void listStoreCashiers(Manager manager) {
@@ -315,9 +322,114 @@ public class ManagerHelper {
         return endOfShift;
     }
 
-    @ManagerUser(command = "TODO")
-    public static void addItem(List<String> args, Manager manager) {
+    @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
+    @ManagerUser(command = "AddPromotion", parameterEquation = "p == 4")
+    public static void addPromotion(List<String> args, Manager manager) throws Exception {
+        String location = manager.getStore().getLocation();
+        String type = args.get(0);
+        Float priceMultiplier = Float.parseFloat(args.get(1));
+        Date startDate = Date.valueOf(args.get(2));
+        Date endDate = Date.valueOf(args.get(3));
 
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+        Promotion promotion = _promotionService.findPromotionByGasStationAndItem(gasStation, item);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        }
+
+        if (item == null) {
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        }
+
+        if (promotion != null) {
+            throw new Exception("Promotion already exists for " + type + ". Use UpdatePromotion instead.");
+        }
+
+        promotion = new Promotion(item, priceMultiplier, startDate, endDate);
+        _gasStationService.addPromotion(location, promotion);
+
+        System.out.println("Promotion for " + type + " has been added to gas station" + location);
+    }
+
+    @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
+    @ManagerUser(command = "UpdatePromotion", parameterEquation = "p == 4")
+    public static void updatePromotion(List<String> args, Manager manager) throws Exception {
+        String location = manager.getStore().getLocation();
+        String type = args.get(0);
+        Float priceMultiplier = Float.parseFloat(args.get(1));
+        Date startDate = Date.valueOf(args.get(2));
+        Date endDate = Date.valueOf(args.get(3));
+
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+        Promotion promotion = _promotionService.findPromotionByGasStationAndItem(gasStation, item);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        }
+
+        if (item == null) {
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        }
+
+        if (promotion == null) {
+            throw new Exception("No promotion exists for " + type);
+        }
+
+        promotion.setItem(item);
+        promotion.setStartDate(startDate);
+        promotion.setEndDate(endDate);
+        promotion.setPriceMultiplier(priceMultiplier);
+
+        _promotionService.save(promotion);
+
+        System.out.println("Promotion for " + type + " has been updated");
+    }
+
+    @MethodHelp("args: -<item> \n")
+    @ManagerUser(command = "DeletePromotion", parameterEquation = "p == 1")
+    public static void deletePromotion(List<String> args, Manager manager) throws Exception {
+
+        String location = manager.getStore().getLocation();
+        String type = args.get(0);
+        GasStation gasStation = _gasStationService.findByLocation(location);
+        Item item = _itemService.findByName(type);
+        Promotion promotion = _promotionService.findPromotionByGasStationAndItem(gasStation, item);
+
+        if (gasStation == null) {
+            throw new Exception("Gas station at location '" + location + "' does not exist.");
+        }
+
+        if (item == null) {
+            throw new Exception("Item of type '" + type + "' does not exist.");
+        }
+
+
+        /*
+        * this probably doesn't work, promotion more than likely needs to have an ID attached to it
+        * and I couldn't get the damn thing to work with one so yeah
+        */
+        if (promotion != null) {
+            _promotionService.delete(promotion);
+        } else {
+            throw new Exception("Promotion on " + type + " does not exist");
+        }
+    }
+
+    // TODO - check if item already exists
+    @MethodHelp("args: -<item> -<suggestRetailPrice> \n")
+    @ManagerUser(command = "AddItem", parameterEquation = "p == 2")
+    public static void addItem(List<String> args, Manager manager) throws Exception {
+        String name = args.get(0);
+        int suggestRetailPrice = Integer.parseInt(args.get(1));
+        if (!_itemService.existsItem(name)) {
+            Item item = new Item(name, suggestRetailPrice);
+            _itemService.save(item);
+        } else {
+            throw new Exception("Item already exists");
+        }
     }
 
     // TODO - check if inventory already contains item
@@ -400,54 +512,180 @@ public class ManagerHelper {
         }
         return true;
     }
-    
+
     @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
     @ManagerUser(command = "UpdateExpenses", parameterEquation = "p % 2 == 0")
-    public static void updateExpenses(List<String> args, Manager manager) throws Exception
-    {
-    	String location = manager.getStore().getLocation();
-    	GasStation gasStation = _gasStationService.findByLocation(location);
+    public static void updateExpenses(List<String> args, Manager manager) throws Exception {
+        String location = manager.getStore().getLocation();
+        GasStation gasStation = _gasStationService.findByLocation(location);
 
         if (gasStation == null) {
             throw new Exception("Gas station at location does not exist");
         }
-        
+
         Expenses expenses = gasStation.getExpenses();
-        
-    	int electric = expenses.getElectric(); int water = expenses.getWater(); 
-    	int sewage = expenses.getSewage(); int garbage = expenses.getGarbage(); 
-    	int insurance = expenses.getSewage();
-    	
-    	// Loops through args past idx 0, in format TYPE;VALUE
-    	for(int idx = 0; idx < args.size() - 1; idx += 2)
-    	{
-    		String expense = args.get(idx);
-    		
-    		switch(expense)
-    		{
-    			case "electric":
-    				electric = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "water":
-    				water = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "sewage":
-    				sewage = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "garbage":
-    				garbage = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "insurance":
-    				insurance = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			default:
-    	            throw new Exception("Expense of type '" + expense + "' is invalid.");
-    				
-    		}
-    	}
-    	
-    	Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
-    	expenses.update(updateExpenses);
-    	_gasStationService.save(gasStation);
+
+        int electric = expenses.getElectric();
+        int water = expenses.getWater();
+        int sewage = expenses.getSewage();
+        int garbage = expenses.getGarbage();
+        int insurance = expenses.getSewage();
+
+        // Loops through args past idx 0, in format TYPE;VALUE
+        for (int idx = 0; idx < args.size() - 1; idx += 2) {
+            String expense = args.get(idx);
+
+            switch (expense) {
+                case "electric":
+                    electric = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "water":
+                    water = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "sewage":
+                    sewage = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "garbage":
+                    garbage = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "insurance":
+                    insurance = Integer.parseInt(args.get(idx + 1));
+                    break;
+                default:
+                    throw new Exception("Expense of type '" + expense + "' is invalid.");
+            }
+        }
+
+        Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
+        expenses.update(updateExpenses);
+        _gasStationService.save(gasStation);
+    }
+
+    @ManagerUser(command = "GenerateMemershipRewardsReport", parameterEquation = "p <= 2")
+    public static void generateMemershipRewardsReport(List<String> args, Manager manager) {
+        GasStation gasStation = manager.getStore();
+        FileWriter fileWriter = null;
+        PrintWriter printWriter = null;
+        boolean isNewSignup = false;
+        boolean isAmountPerItem = false;
+        boolean userPrompts = true;
+        if (args.size() > 0) {
+            try {
+                fileWriter = new FileWriter(args.get(0));
+                printWriter = new PrintWriter(fileWriter);
+            } catch (IOException e) {
+                System.out.println("File Error: " + e.getMessage());
+            }
+        }
+        if (args.size() == 2) {
+            switch (Integer.parseInt(args.get(1))) {
+                case 0:
+                    isNewSignup = false;
+                    isAmountPerItem = false;
+                    userPrompts = false;
+                    break;
+                case 1:
+                    isNewSignup = true;
+                    isAmountPerItem = false;
+                    userPrompts = false;
+                    break;
+                case 2:
+                    isNewSignup = false;
+                    isAmountPerItem = true;
+                    userPrompts = false;
+                    break;
+                case 3:
+                    isNewSignup = true;
+                    isAmountPerItem = true;
+                    userPrompts = false;
+                    break;
+                default:
+                    System.out.println("Invalid input");
+                    break;
+            }
+        }
+
+        int totalSalesRewards = 0;
+        if (userPrompts) {
+            System.out.println("Reward Membership Report");
+            System.out.println("Would you like to include new sign-ups by employee?");
+            String input = UserApplication.getInput();
+            isNewSignup = input.equalsIgnoreCase("yes");
+            System.out.println("Would you like to include amount spent per item by rewards members?");
+            input = UserApplication.getInput();
+            isAmountPerItem = input.equalsIgnoreCase("yes");
+        }
+        if (isNewSignup) {
+            List<Cashier> cashiers = _cashierService.findAllByWorkplace(gasStation);
+            String header = "\nNew Sign Ups by Cashier\n--------------------------------\n| Account Created By        | #of | date     | Accounts Email                      | Accounts Name        |";
+            System.out.println(header);
+            if (printWriter != null) {
+                printWriter.println(header);
+            }
+            for (Cashier c : cashiers) {
+                Set<RewardMembershipAccount> rewardMembershipAccounts =
+                        _rewardMembershipAccountService.findAllByCreateByAndCreatedOnAfter(c, getFirstDateOfCurrentMonth());
+                for (RewardMembershipAccount r : rewardMembershipAccounts) {
+                    String out = String.format("| %-25s | %3d | %tD | %-35s | %-20s |", r.getCreateBy().getUsername(), rewardMembershipAccounts.size(), r.getCreatedOn(), r.getEmail(), r.getName());
+                    System.out.println(out);
+                    if (printWriter != null) {
+                        printWriter.println(out);
+                    }
+                }
+            }
+
+        }
+
+        HashMap<Item, Integer> itemTotalSpent = new HashMap<>();
+        List<Receipt> receipts = _receiptService.findAllByRewardMembershipAccountIsNotNull();
+        for (Receipt r : receipts) {
+            List<Sale> sales = _saleService.findByReceipt(r);
+            for (Sale s : sales) {
+                if (s.getSellLocation().getId() == manager.getStore().getId()) {
+                    if (itemTotalSpent.containsKey(s.getItem())) {
+                        itemTotalSpent.replace(s.getItem(), itemTotalSpent.get(s.getItem()) + s.getPrice());
+                    } else {
+                        itemTotalSpent.put(s.getItem(), s.getPrice());
+                    }
+                }
+            }
+        }
+        String header = "\nTotal spent per item\n--------------------------------\n| Item                 | Total Spent By Members |";
+        if (isAmountPerItem) {
+            System.out.println(header);
+            if (printWriter != null) {
+                printWriter.println(header);
+            }
+        }
+        for (Item i : itemTotalSpent.keySet()) {
+            if (isAmountPerItem) {
+                String out = String.format("| %-20s | $%05.2f              |", i.getName(), itemTotalSpent.get(i) / 100.0);
+                System.out.println(out);
+                if (printWriter != null) {
+                    printWriter.println(out);
+                }
+                totalSalesRewards += itemTotalSpent.get(i);
+            }
+        }
+        String totalUnredeemed = String.format("Total Unredeemed: $%07.2f ", _rewardMembershipAccountService.findTotalUnredeemed());
+        String totalSalesRewardsString = String.format("Total Sales Rewards: $%07.2f", totalSalesRewards / 100.0);
+        String totalRedeemed = String.format("Total redeemed: $%07.2f ", ((totalSalesRewards / 100.0) - _rewardMembershipAccountService.findTotalUnredeemed()));
+        System.out.println(totalRedeemed);
+        System.out.println(totalUnredeemed);
+        System.out.println(totalSalesRewardsString);
+        if (printWriter != null) {
+            printWriter.println(totalRedeemed);
+            printWriter.println(totalUnredeemed);
+            printWriter.println(totalSalesRewardsString);
+            printWriter.close();
+        }
+
+
+    }
+
+    private static java.util.Date getFirstDateOfCurrentMonth() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
+        return cal.getTime();
     }
 }
