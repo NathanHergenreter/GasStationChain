@@ -163,19 +163,16 @@ public class CashierHelper {
 
             /*
             New with promotions
-            Check if promotion on item exists
-            Check if the promotion exists at given gasStation
+            Check if the promotion for given item at given gasStation exists
             If promotion exists, check within date range of promotion
             Update price accordingly
              */
             int price = inventoryItem.getPrice();
-            if (promotionService.existsPromotion(inventoryItem.getItem())) {
-                if (promotionService.findByGasStation(gasStation) != null) {
-                    Date date = new Date();
-                    Promotion promotion = promotionService.findByItem(inventoryItem.getItem());
-                    if (!date.before(promotion.getStartDate()) || !date.after(promotion.getEndDate())) {
-                        price = (int) (price * promotion.getPriceMultiplier());
-                    }
+            Promotion promotion = promotionService.findPromotionByGasStationAndItem(gasStation, item);
+            if (promotion != null) {
+                Date date = new Date();
+                if (!date.before(promotion.getStartDate()) || !date.after(promotion.getEndDate())) {
+                    price = (int) (price * promotion.getPriceMultiplier());
                 }
             }
 

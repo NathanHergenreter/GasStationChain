@@ -30,6 +30,10 @@ public class PromotionService extends GenericService<Promotion, Long, PromotionR
         return getRepository().findByGasStation(gasStation);
     }
 
+    public Promotion findPromotionByGasStationAndItem(GasStation gasStation, Item item) {
+        return getRepository().findPromotionByGasStationAndItem(gasStation, item);
+    }
+
     public boolean existsPromotion(Item item) {
         return findByItem(item) != null;
     }
