@@ -49,6 +49,9 @@ public class ServiceMaster {
     @Autowired
     private PromotionService promotionService;
 
+    @Autowired
+    private GasTankInventoryService gasTankInventoryService;
+
     public AvailabilityService availability() {
         return availabilityService;
     }
@@ -102,4 +105,6 @@ public class ServiceMaster {
     }
 
     public PromotionService promotion() { return promotionService; }
+
+    public GasTankInventoryService gasTank() { return gasTankInventoryService; }
 }

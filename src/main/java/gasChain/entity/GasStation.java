@@ -2,6 +2,8 @@ package gasChain.entity;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -33,7 +35,8 @@ public class GasStation extends Store {
     private List<Cashier> cashiers = new ArrayList<>();
 
     @Cascade({CascadeType.ALL})
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "gasStation")
+    @OneToMany(mappedBy = "gasStation")
+    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Promotion> promotions = new ArrayList<>();
 
     protected GasStation() {
@@ -62,10 +65,14 @@ public class GasStation extends Store {
         return this;
     }
 
-    public Promotion hasPromotion(Item item) { //TODO
-
-
-        return new Promotion();
+    public boolean hasPromotion(Item item) {
+        String type = item.getName();
+        for (Promotion promotion : promotions) {
+            if (promotion.getItem().getName() == item.getName()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public GasStation setInventory(List<GasStationInventory> inventory) {
