@@ -322,7 +322,6 @@ public class ManagerHelper {
         return endOfShift;
     }
 
-    // TODO - check if promotion already exists
     @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
     @ManagerUser(command = "AddPromotion", parameterEquation = "p == 4")
     public static void addPromotion(List<String> args, Manager manager) throws Exception {
@@ -349,9 +348,7 @@ public class ManagerHelper {
         }
 
         promotion = new Promotion(item, priceMultiplier, startDate, endDate);
-        gasStation.addPromotion(promotion);
-
-        _promotionService.save(promotion);
+        _gasStationService.addPromotion(location, promotion);
 
         System.out.println("Promotion for " + type + " has been added to gas station" + location);
     }
@@ -415,7 +412,7 @@ public class ManagerHelper {
         * and I couldn't get the damn thing to work with one so yeah
         */
         if (promotion != null) {
-            _promotionService.deleteById(item.getId());
+            _promotionService.delete(promotion);
         } else {
             throw new Exception("Promotion on " + type + " does not exist");
         }
