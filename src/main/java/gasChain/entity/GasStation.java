@@ -2,8 +2,6 @@ package gasChain.entity;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ public class GasStation extends Store {
 
     @Cascade({CascadeType.ALL})
     @OneToMany(mappedBy = "gasStation")
-    @LazyCollection(LazyCollectionOption.FALSE)
     private List<Promotion> promotions = new ArrayList<>();
 
     @Cascade({CascadeType.ALL})

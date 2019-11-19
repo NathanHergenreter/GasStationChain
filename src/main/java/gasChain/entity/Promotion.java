@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity
-@Table(name = "promotions")
+@Table(name = "promotion")
 @IdClass(PromotionCompositeId.class)
 public class Promotion {
 
@@ -17,14 +17,10 @@ public class Promotion {
     @ManyToOne
     @JoinColumn
     private Item item;
-    
-    @ManyToOne
-    @JoinColumn(name = "gas_station_id")
-    private GasStation gasStation;
 
     @Id
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "gas_station_id")
     private GasStation gasStation;
 
     private Date startDate;
