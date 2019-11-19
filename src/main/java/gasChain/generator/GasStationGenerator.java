@@ -78,7 +78,18 @@ public class GasStationGenerator {
             Item item = service.item().findAll().get(GenUtil.rng.nextInt(items.size()));
 
             for (int numReceipt = GenUtil.rng.nextInt(8); numReceipt > 0; numReceipt--) {
-                Sale sale = new Sale(item, gasStation, receipt, item.getSuggestRetailPrice(), GenUtil.genDate());
+                Date date = GenUtil.genDate();
+                int price = item.getSuggestRetailPrice();
+                Promotion promotion = service.promotion().findPromotionByGasStationAndItem(gasStation, item);
+                if (promotion != null) {
+                    if (!date.before(promotion.getStartDate()) || !date.after(promotion.getEndDate())) {
+                        price = (int) (price * promotion.getPriceMultiplier());
+                    }
+                }
+
+                Sale sale = new Sale(item, gasStation, receipt, price, date);
+
+
                 gasStation.addSale(sale);
                 receipt.addSale(sale);
                 numSales--;

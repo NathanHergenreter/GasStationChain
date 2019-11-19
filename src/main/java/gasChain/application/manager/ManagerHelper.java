@@ -334,6 +334,7 @@ public class ManagerHelper {
 
         GasStation gasStation = _gasStationService.findByLocation(location);
         Item item = _itemService.findByName(type);
+        Promotion promotion = _promotionService.findPromotionByGasStationAndItem(gasStation, item);
 
         if (gasStation == null) {
             throw new Exception("Gas station at location '" + location + "' does not exist.");
@@ -343,11 +344,11 @@ public class ManagerHelper {
             throw new Exception("Item of type '" + type + "' does not exist.");
         }
 
-        if (_promotionService.existsPromotion(item)) {
+        if (promotion != null) {
             throw new Exception("Promotion already exists for " + type + ". Use UpdatePromotion instead.");
         }
 
-        Promotion promotion = new Promotion(item, priceMultiplier, startDate, endDate);
+        promotion = new Promotion(item, priceMultiplier, startDate, endDate);
         gasStation.addPromotion(promotion);
 
         _promotionService.save(promotion);
@@ -366,6 +367,7 @@ public class ManagerHelper {
 
         GasStation gasStation = _gasStationService.findByLocation(location);
         Item item = _itemService.findByName(type);
+        Promotion promotion = _promotionService.findPromotionByGasStationAndItem(gasStation, item);
 
         if (gasStation == null) {
             throw new Exception("Gas station at location '" + location + "' does not exist.");
@@ -375,11 +377,9 @@ public class ManagerHelper {
             throw new Exception("Item of type '" + type + "' does not exist.");
         }
 
-        if (!_promotionService.existsPromotion(item)) {
+        if (promotion == null) {
             throw new Exception("No promotion exists for " + type);
         }
-
-        Promotion promotion = _promotionService.findByItem(item);
 
         promotion.setItem(item);
         promotion.setStartDate(startDate);
@@ -399,6 +399,7 @@ public class ManagerHelper {
         String type = args.get(0);
         GasStation gasStation = _gasStationService.findByLocation(location);
         Item item = _itemService.findByName(type);
+        Promotion promotion = _promotionService.findPromotionByGasStationAndItem(gasStation, item);
 
         if (gasStation == null) {
             throw new Exception("Gas station at location '" + location + "' does not exist.");
@@ -408,7 +409,12 @@ public class ManagerHelper {
             throw new Exception("Item of type '" + type + "' does not exist.");
         }
 
-        if (_promotionService.existsPromotion(item)) {
+
+        /*
+        * this probably doesn't work, promotion more than likely needs to have an ID attached to it
+        * and I couldn't get the damn thing to work with one so yeah
+        */
+        if (promotion != null) {
             _promotionService.deleteById(item.getId());
         } else {
             throw new Exception("Promotion on " + type + " does not exist");
