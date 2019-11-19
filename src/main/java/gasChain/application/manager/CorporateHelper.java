@@ -494,7 +494,6 @@ public class CorporateHelper {
         System.out.println("LOWEST REVENUE ITEM: " + lowestRevenueItem.getName() + "Generated: $" + lowestItemRevenue);
         System.out.println("HIGHEST REVENUE ITEM: " + highestRevenueItem.getName() + "Generated: $" + highestItemRevenue + "\n");
 
-        String storeResults = "";
         for(GasStation store: gasStationService.findAll()){
             List<Sale> storeSales = filterSalesByStoreId(allSales, store.getId());
             List<Sale> firstStoreItemSales = filterSalesByItemId(storeSales, sellableItems.get(0).getId());
@@ -517,7 +516,7 @@ public class CorporateHelper {
                     mostPopularStoreItemCount = storeItemSales.size();
                     mostPopularStoreSale = storeItemSales.get(0);
                 }
-                if (storeItemSales.size() < leastPopularStoreItemCount){
+                if (storeItemSales.size() < leastPopularStoreItemCount && storeItemSales.size()!=0){
                     leastPopularStoreItemCount = storeItemSales.size();
                     leastPopularStoreSale = storeItemSales.get(0);
                 }
@@ -525,20 +524,19 @@ public class CorporateHelper {
                     highestStoreItemRevenue = totalStoreItemRevenue;
                     highestRevenueStoreSale = storeItemSales.get(0);
                 }
-                if (totalStoreItemRevenue < lowestStoreItemRevenue){
+                if (totalStoreItemRevenue < lowestStoreItemRevenue && storeItemSales.size()!=0){
                     lowestStoreItemRevenue = totalStoreItemRevenue;
                     lowestRevenueStoreSale = storeItemSales.get(0);
                 }
                 totalStoreRevenue += totalStoreItemRevenue;
             }
-            storeResults += "STORE STATISTICS:\n";
-            storeResults += "Store: " + store.getLocation() + "Total Revenue: $" + totalStoreRevenue + "\n";
-            storeResults += "Lowest Item Revenue: " + lowestRevenueStoreSale.getItem().getName() + " Generated: $" + lowestStoreItemRevenue + " At $" + lowestRevenueStoreSale.getPrice() + "/unit\n";
-            storeResults += "Highest Item Revenue: " + highestRevenueStoreSale.getItem().getName() + " Generated: $" + highestStoreItemRevenue + " At $" + highestRevenueStoreSale.getPrice() + "/unit\n";
-            storeResults += "Most Popular Item: " + mostPopularStoreSale.getItem().getName() + " Sold: " + mostPopularStoreItemCount + " units At $" + mostPopularStoreSale.getPrice() + "/unit\n";
-            storeResults += "Least Popular Item: " + leastPopularStoreSale.getItem().getName() + " Sold: " + leastPopularStoreItemCount + " units At $" + leastPopularStoreSale.getPrice() + "/unit\n";
+            System.out.println("STORE STATISTICS:\n");
+            System.out.println("Store: " + store.getLocation() + "Total Revenue: $" + totalStoreRevenue);
+            System.out.println("Lowest Item Revenue: " + lowestRevenueStoreSale.getItem().getName() + " Generated: $" + lowestStoreItemRevenue + " At $" + lowestRevenueStoreSale.getPrice() + "/unit");
+            System.out.println("Highest Item Revenue: " + highestRevenueStoreSale.getItem().getName() + " Generated: $" + highestStoreItemRevenue + " At $" + highestRevenueStoreSale.getPrice() + "/unit");
+            System.out.println("Most Popular Item: " + mostPopularStoreSale.getItem().getName() + " Sold: " + mostPopularStoreItemCount + " units At $" + mostPopularStoreSale.getPrice() + "/units");
+            System.out.println("Least Popular Item: " + leastPopularStoreSale.getItem().getName() + " Sold: " + leastPopularStoreItemCount + " units At $" + leastPopularStoreSale.getPrice() + "/unit\n");
         }
-        System.out.println(storeResults);
     }
 
     private static List<Sale> filterSalesByStoreId(List<Sale> sales, long id){
