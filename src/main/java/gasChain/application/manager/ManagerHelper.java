@@ -7,6 +7,9 @@ import gasChain.entity.*;
 import gasChain.service.*;
 import gasChain.util.ServiceAutoWire;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Date;
 import java.util.*;
 
@@ -25,6 +28,7 @@ public class ManagerHelper {
     private static PromotionService _promotionService = ServiceAutoWire.getBean(PromotionService.class);
     private static RewardMembershipAccountService _rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
     private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
+    private static SaleService _saleService = ServiceAutoWire.getBean(SaleService.class);
 
     @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
@@ -117,7 +121,6 @@ public class ManagerHelper {
         }
         return storeCashiers;
     }
-
 
     @ManagerUser(command = "ListStoreCashiers")
     public static void listStoreCashiers(Manager manager) {
@@ -509,88 +512,136 @@ public class ManagerHelper {
         }
         return true;
     }
-    
+
     @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
     @ManagerUser(command = "UpdateExpenses", parameterEquation = "p % 2 == 0")
-    public static void updateExpenses(List<String> args, Manager manager) throws Exception
-    {
-    	String location = manager.getStore().getLocation();
-    	GasStation gasStation = _gasStationService.findByLocation(location);
+    public static void updateExpenses(List<String> args, Manager manager) throws Exception {
+        String location = manager.getStore().getLocation();
+        GasStation gasStation = _gasStationService.findByLocation(location);
 
         if (gasStation == null) {
             throw new Exception("Gas station at location does not exist");
         }
-        
+
         Expenses expenses = gasStation.getExpenses();
-        
-    	int electric = expenses.getElectric(); int water = expenses.getWater(); 
-    	int sewage = expenses.getSewage(); int garbage = expenses.getGarbage(); 
-    	int insurance = expenses.getSewage();
-    	
-    	// Loops through args past idx 0, in format TYPE;VALUE
-    	for(int idx = 0; idx < args.size() - 1; idx += 2)
-    	{
-    		String expense = args.get(idx);
-    		
-    		switch(expense)
-    		{
-    			case "electric":
-    				electric = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "water":
-    				water = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "sewage":
-    				sewage = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "garbage":
-    				garbage = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			case "insurance":
-    				insurance = Integer.parseInt(args.get(idx + 1));
-    				break;
-    			default:
-    	            throw new Exception("Expense of type '" + expense + "' is invalid.");
-    				
-    		}
-    	}
-    	
-    	Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
-    	expenses.update(updateExpenses);
-    	_gasStationService.save(gasStation);
+
+        int electric = expenses.getElectric();
+        int water = expenses.getWater();
+        int sewage = expenses.getSewage();
+        int garbage = expenses.getGarbage();
+        int insurance = expenses.getSewage();
+
+        // Loops through args past idx 0, in format TYPE;VALUE
+        for (int idx = 0; idx < args.size() - 1; idx += 2) {
+            String expense = args.get(idx);
+
+            switch (expense) {
+                case "electric":
+                    electric = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "water":
+                    water = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "sewage":
+                    sewage = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "garbage":
+                    garbage = Integer.parseInt(args.get(idx + 1));
+                    break;
+                case "insurance":
+                    insurance = Integer.parseInt(args.get(idx + 1));
+                    break;
+                default:
+                    throw new Exception("Expense of type '" + expense + "' is invalid.");
+            }
+        }
+
+        Expenses updateExpenses = new Expenses(electric, water, sewage, garbage, insurance);
+        expenses.update(updateExpenses);
+        _gasStationService.save(gasStation);
     }
 
-    @ManagerUser(command = "GenerateMemershipRewardsReport", parameterEquation = "p<2")
+    @ManagerUser(command = "GenerateMemershipRewardsReport", parameterEquation = "p <= 2")
     public static void generateMemershipRewardsReport(List<String> args, Manager manager) {
         GasStation gasStation = manager.getStore();
-        boolean isNewSignup;
-        boolean isAmountPerItem;
-        System.out.println("Reward Membership Report");
-        System.out.println("Would you like to include new sign-ups by employee?");
-        String input = UserApplication.getInput();
-        isNewSignup = input.equalsIgnoreCase("yes");
-        System.out.println(isNewSignup);
-        System.out.println("Would you like to include amount spent per item by rewards members?");
-        input = UserApplication.getInput();
-        isAmountPerItem = input.equalsIgnoreCase("yes");
+        FileWriter fileWriter = null;
+        PrintWriter printWriter = null;
+        boolean isNewSignup = false;
+        boolean isAmountPerItem = false;
+        boolean userPrompts = true;
+        if (args.size() > 0) {
+            try {
+                fileWriter = new FileWriter(args.get(0));
+                printWriter = new PrintWriter(fileWriter);
+            } catch (IOException e) {
+                System.out.println("File Error: " + e.getMessage());
+            }
+        }
+        if (args.size() == 2) {
+            switch (Integer.parseInt(args.get(1))) {
+                case 0:
+                    isNewSignup = false;
+                    isAmountPerItem = false;
+                    userPrompts = false;
+                    break;
+                case 1:
+                    isNewSignup = true;
+                    isAmountPerItem = false;
+                    userPrompts = false;
+                    break;
+                case 2:
+                    isNewSignup = false;
+                    isAmountPerItem = true;
+                    userPrompts = false;
+                    break;
+                case 3:
+                    isNewSignup = true;
+                    isAmountPerItem = true;
+                    userPrompts = false;
+                    break;
+                default:
+                    System.out.println("Invalid input");
+                    break;
+            }
+        }
+
+        int totalSalesRewards = 0;
+        if (userPrompts) {
+            System.out.println("Reward Membership Report");
+            System.out.println("Would you like to include new sign-ups by employee?");
+            String input = UserApplication.getInput();
+            isNewSignup = input.equalsIgnoreCase("yes");
+            System.out.println("Would you like to include amount spent per item by rewards members?");
+            input = UserApplication.getInput();
+            isAmountPerItem = input.equalsIgnoreCase("yes");
+        }
         if (isNewSignup) {
             List<Cashier> cashiers = _cashierService.findAllByWorkplace(gasStation);
-            String header = "| Account Created By        | #of | date     | Accounts Email                      | Accounts Name        |";
-            System.out.println("New Sign Ups by Cashier\n----------------\n" + header);
+            String header = "\nNew Sign Ups by Cashier\n--------------------------------\n| Account Created By        | #of | date     | Accounts Email                      | Accounts Name        |";
+            System.out.println(header);
+            if (printWriter != null) {
+                printWriter.println(header);
+            }
             for (Cashier c : cashiers) {
                 Set<RewardMembershipAccount> rewardMembershipAccounts =
                         _rewardMembershipAccountService.findAllByCreateByAndCreatedOnAfter(c, getFirstDateOfCurrentMonth());
                 for (RewardMembershipAccount r : rewardMembershipAccounts) {
                     String out = String.format("| %-25s | %3d | %tD | %-35s | %-20s |", r.getCreateBy().getUsername(), rewardMembershipAccounts.size(), r.getCreatedOn(), r.getEmail(), r.getName());
                     System.out.println(out);
+                    if (printWriter != null) {
+                        printWriter.println(out);
+                    }
                 }
             }
+
         }
-        if (isAmountPerItem) {
-            HashMap<Item, Integer> itemTotalSpent = new HashMap<>();
-            List<Receipt> receipts = _receiptService.findAllByRewardMembershipAccountIsNotNull();
-            for (Receipt r : receipts) {
-                for (Sale s : r.getSales()) {
+
+        HashMap<Item, Integer> itemTotalSpent = new HashMap<>();
+        List<Receipt> receipts = _receiptService.findAllByRewardMembershipAccountIsNotNull();
+        for (Receipt r : receipts) {
+            List<Sale> sales = _saleService.findByReceipt(r);
+            for (Sale s : sales) {
+                if (s.getSellLocation().getId() == manager.getStore().getId()) {
                     if (itemTotalSpent.containsKey(s.getItem())) {
                         itemTotalSpent.replace(s.getItem(), itemTotalSpent.get(s.getItem()) + s.getPrice());
                     } else {
@@ -598,12 +649,38 @@ public class ManagerHelper {
                     }
                 }
             }
-            String header = "| Item                 | Total Spent By Members |";
-            System.out.println("Total spent per item\n----------------\n" + header);
-            for (Item i : itemTotalSpent.keySet()) {
-                String out = String.format("| %-20s | $%7f |", i.getName(), itemTotalSpent.get(i) / 100.0);
+        }
+        String header = "\nTotal spent per item\n--------------------------------\n| Item                 | Total Spent By Members |";
+        if (isAmountPerItem) {
+            System.out.println(header);
+            if (printWriter != null) {
+                printWriter.println(header);
             }
         }
+        for (Item i : itemTotalSpent.keySet()) {
+            if (isAmountPerItem) {
+                String out = String.format("| %-20s | $%05.2f              |", i.getName(), itemTotalSpent.get(i) / 100.0);
+                System.out.println(out);
+                if (printWriter != null) {
+                    printWriter.println(out);
+                }
+                totalSalesRewards += itemTotalSpent.get(i);
+            }
+        }
+        String totalUnredeemed = String.format("Total Unredeemed: $%07.2f ", _rewardMembershipAccountService.findTotalUnredeemed());
+        String totalSalesRewardsString = String.format("Total Sales Rewards: $%07.2f", totalSalesRewards / 100.0);
+        String totalRedeemed = String.format("Total redeemed: $%07.2f ", ((totalSalesRewards / 100.0) - _rewardMembershipAccountService.findTotalUnredeemed()));
+        System.out.println(totalRedeemed);
+        System.out.println(totalUnredeemed);
+        System.out.println(totalSalesRewardsString);
+        if (printWriter != null) {
+            printWriter.println(totalRedeemed);
+            printWriter.println(totalUnredeemed);
+            printWriter.println(totalSalesRewardsString);
+            printWriter.close();
+        }
+
+
     }
 
     private static java.util.Date getFirstDateOfCurrentMonth() {
