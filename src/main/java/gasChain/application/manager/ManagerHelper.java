@@ -659,8 +659,8 @@ public class ManagerHelper {
                 if (printWriter != null) {
                     printWriter.println(out);
                 }
-                totalSalesRewards += itemTotalSpent.get(i);
             }
+            totalSalesRewards += itemTotalSpent.get(i);
         }
         String totalUnredeemed = String.format("Total Unredeemed: $%07.2f ", _rewardMembershipAccountService.findTotalUnredeemed());
         String totalSalesRewardsString = String.format("Total Sales Rewards: $%07.2f", totalSalesRewards / 100.0);
