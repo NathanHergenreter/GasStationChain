@@ -681,4 +681,19 @@ public class ManagerHelper {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         return cal.getTime();
     }
+    
+
+    @ManagerUser(command = "ResupplyGasTank", parameterEquation = "p % 2 == 0")
+    public static void resupplyGasTank(List<String> args, Manager manager) {
+    	ArrayList<String> types = new ArrayList<String>();
+    	ArrayList<Integer> amounts = new ArrayList<Integer>();
+    	
+    	for(int idx = 0; idx < args.size() - 2; idx += 2)
+    	{
+    		types.add(args.get(idx));
+    		amounts.add(new Integer(args.get(idx + 1)));
+    	}
+
+        GasStation gasStation = manager.getStore();
+    }
 }

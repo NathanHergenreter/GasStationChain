@@ -284,6 +284,15 @@ public class CashierHelper {
 
         return sale;
     }
+    
+
+    @CashierUser(command = "ProcessGasSale", parameterEquation = "p == 2")
+    public static void processGasSale(List<String> args, Cashier cashier) throws Exception {
+    	String type = args.get(0);
+    	int amount = new Integer(args.get(1));
+    	
+        GasStation gasStation = cashier.getWorkplace();
+    }
 }
 
 

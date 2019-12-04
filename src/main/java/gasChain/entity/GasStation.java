@@ -30,6 +30,11 @@ public class GasStation extends Store {
     @JoinColumn(name = "expenses_id")
     private Expenses expenses;
 
+    @Cascade({CascadeType.ALL})
+    @OneToOne
+    @JoinColumn(name = "gas_tank_id")
+    private GasTank gasTank;
+    
     @Cascade({CascadeType.SAVE_UPDATE})
     @OneToMany(mappedBy = "workplace")
     private List<Cashier> cashiers = new ArrayList<>();
@@ -38,9 +43,9 @@ public class GasStation extends Store {
     @OneToMany(mappedBy = "gasStation")
     private List<Promotion> promotions = new ArrayList<>();
 
-    @Cascade({CascadeType.ALL})
-    @OneToMany(mappedBy = "gasStation")
-    private List<GasTankInventory> gasTanks = new ArrayList<>();
+//    @Cascade({CascadeType.ALL})
+//    @OneToMany(mappedBy = "gasStation")
+//    private List<GasTankInventory> gasTanks = new ArrayList<>();
 
     protected GasStation() {
         super();
@@ -136,6 +141,15 @@ public class GasStation extends Store {
     
     public GasStation updateExpenses(Expenses expenses) {
     	this.expenses.update(expenses);
+    	return this;
+    }
+    
+    public GasTank getGasTank() {
+    	return gasTank;
+    }
+    
+    public GasStation setGasTank(GasTank gasTank) {
+    	this.gasTank = gasTank;
     	return this;
     }
 }
