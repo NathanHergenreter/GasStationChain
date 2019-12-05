@@ -44,9 +44,9 @@ public class GasTank {
     	this.ethanolMax = ethanol;
     }
     
-    public void pumpGas(String type, int amount)
+    public boolean pumpGas(String type, int amount)
     {
-    	if(!validPump(type, amount)) return;
+    	if(!validPump(type, amount)) return false;
     	
     	switch(type)
     	{
@@ -66,13 +66,15 @@ public class GasTank {
 	    		ethanolAmount -= amount;
 	    		break;
     		default:
-    			break;
+    			return false;
     	}
+    	
+    	return true;
     }
 
-    public void fillGas(String type, int amount)
+    public boolean fillGas(String type, int amount)
     {
-    	if(!validFill(type, amount)) return;
+    	if(!validFill(type, amount)) return false;
     	
     	switch(type)
     	{
@@ -92,8 +94,10 @@ public class GasTank {
 	    		ethanolAmount += amount;
 	    		break;
     		default:
-    			break;
+    			return false;
     	}
+    	
+    	return true;
     }
     
     private boolean validPump(String type, int amount)
@@ -133,4 +137,28 @@ public class GasTank {
     			return false;
     	}
     }
+    
+    public int costGas(String type) { 
+    	switch(type)
+    	{
+	    	case "regular":
+	    		return costRegular();
+	    	case "midGrade":
+	    		return costMidGrade();
+	    	case "premium":
+	    		return costPremium();
+	    	case "bioDiesel":
+	    		return costBioDiesel();
+	    	case "ethanol":
+	    		return costEthanol();
+    		default:
+    			return -1;
+    	}
+    }
+    
+    private int costRegular() { return 238; }
+    private int costMidGrade() { return 258; }
+    private int costPremium() { return 290; }
+    private int costBioDiesel() { return 285; }
+    private int costEthanol() { return 202; }
 }

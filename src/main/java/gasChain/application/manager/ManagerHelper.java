@@ -31,6 +31,7 @@ public class ManagerHelper {
     private static RewardMembershipAccountService _rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
     private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
     private static SaleService _saleService = ServiceAutoWire.getBean(SaleService.class);
+    private static GasTankService gasTankService = ServiceAutoWire.getBean(GasTankService.class);
 
     @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
@@ -415,7 +416,6 @@ public class ManagerHelper {
         }
     }
 
-    // TODO - check if item already exists
     @MethodHelp("args: -<item> -<suggestRetailPrice> \n")
     @ManagerUser(command = "AddItem", parameterEquation = "p == 2")
     public static void addItem(List<String> args, Manager manager) throws Exception {
@@ -429,7 +429,6 @@ public class ManagerHelper {
         }
     }
 
-    // TODO - check if inventory already contains item
     @ManagerUser(command = "AddGasStationInventory", parameterEquation = "p == 3")
     public static void addGasStationInventory(List<String> args, Manager manager) throws Exception {
 
@@ -483,8 +482,7 @@ public class ManagerHelper {
             GasStationInventory inventory = iter.next();
             if (((float) inventory.getQuantity() / (float) inventory.getMaxQuantity()) <= .5) {
                 int desiredQuantity = inventory.getMaxQuantity() - inventory.getQuantity();
-                //TODO
-//				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+
                 Set<WarehouseInventory> warehouseInventory = null;
                 Iterator<WarehouseInventory> warehouseIterator = warehouseInventory.iterator();
                 while (warehouseIterator.hasNext() && desiredQuantity > 0) {
@@ -686,7 +684,7 @@ public class ManagerHelper {
     
 
     @ManagerUser(command = "ResupplyGasTank", parameterEquation = "p % 2 == 0")
-    public static void resupplyGasTank(List<String> args, Manager manager) {
+    public static void resupplyGasTank(List<String> args, Manager manager) throws Exception {
     	ArrayList<String> types = new ArrayList<String>();
     	ArrayList<Integer> amounts = new ArrayList<Integer>();
     	
@@ -697,6 +695,20 @@ public class ManagerHelper {
     	}
 
         GasStation gasStation = manager.getStore();
+        GasTank gasTank = gasStation.getGasTank();
+        
+        for(int idx = 0; idx < types.size(); idx++)
+        {
+        	String type = types.get(idx);
+        	int amount = amounts.get(idx);
+        	boolean validFill = gasTank.fillGas(type, amount);
+
+            if(!validFill)
+                throw new Exception("Invalid gas type (" + type + ") or amount (" + amount + ")\n"
+                				  + "No fills were performed.");
+        }
+        
+        gasTankService.save(gasTank);
     }
 
     @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")

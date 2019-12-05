@@ -26,6 +26,7 @@ public class CashierHelper {
     private static CashierService cashierService = ServiceAutoWire.getBean(CashierService.class);
     private static RewardMembershipAccountService rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
     private static PromotionService promotionService = ServiceAutoWire.getBean(PromotionService.class);
+    private static GasTankService gasTankService = ServiceAutoWire.getBean(GasTankService.class);
 
     @MethodHelp("expected use case is every employee doesn't add a WorkPeriod until after their shift\n" +
             "    NOTE: given hours should be on a 24 hour basis, also assumed shifts will not be greater than 24 hour period\n" +
@@ -137,8 +138,6 @@ public class CashierHelper {
 
 
         ArrayList<GasStationInventory> inventoryItems = processSaleGetInventory(gasStation, receipt, df);
-
-
 
         for (GasStationInventory inventoryItem : inventoryItems) {
             gasStationInventoryService.RemoveItemFromInventory(inventoryItem.getGasStation(), inventoryItem.getItem());
@@ -314,6 +313,41 @@ public class CashierHelper {
     	int amount = new Integer(args.get(1));
     	
         GasStation gasStation = cashier.getWorkplace();
+        GasTank gasTank = gasStation.getGasTank();
+        
+        boolean validPump = gasTank.pumpGas(type, amount);
+        
+        if(!validPump)
+            throw new Exception("Invalid gas type (" + type + ") or amount (" + amount + ")\n"
+            				  + "No pump was performed.");
+
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        
+        Payment paymentType = Receipt.Payment.INVALID;
+        boolean invalid = true;
+        while (invalid) {
+	        System.out.println("Sale comes to a total of " + df.format(gasTank.costGas(type) * amount * 0.01));
+	        System.out.println("Select a payment method (enter /end to end processing)");
+	        System.out.println("1 - Credit Card");
+	        System.out.println("2 - Debit Card");
+	        System.out.println("3 - Cash");
+	
+	        String input = getInput();
+	
+	        if (!input.equals("/end")) {
+	            paymentType = Receipt.Payment.values()[Integer.parseInt(input)];
+	
+	            invalid = !processPayment(paymentType, df);
+	
+	            if(invalid) {
+	                System.out.println("Invalid payment method");
+	                paymentType = Receipt.Payment.INVALID;
+	            }
+	        }
+        }
+        
+        gasTankService.save(gasTank);
     }
 
     @MethodHelp("Manage Rewards Account. Parameter needs to include account id. Enter -1 to find account by other means")
