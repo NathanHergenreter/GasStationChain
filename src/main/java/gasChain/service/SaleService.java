@@ -1,6 +1,7 @@
 package gasChain.service;
 
 import gasChain.entity.GasStation;
+import gasChain.entity.Item;
 import gasChain.entity.Receipt;
 import gasChain.entity.Sale;
 import gasChain.repository.SaleRepository;
@@ -19,6 +20,9 @@ public class SaleService extends GenericService<Sale, Long, SaleRepository> {
         return getRepository().findBySellLocation(sellLocation);
     }
 
+    public List<Sale> findAllBySellLocationAndAndItem(GasStation sellLocation, Item item) {
+        return getRepository().findAllBySellLocationAndAndItem(sellLocation, item);
+    }
     public List<Sale> findByReceipt(Receipt receipt) {
         return getRepository().findByReceipt(receipt);
     }

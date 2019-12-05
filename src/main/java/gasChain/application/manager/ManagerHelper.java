@@ -731,7 +731,58 @@ public class ManagerHelper {
                 endDate = null;
             }
         }
-        System.out.println("Valid dates entered");
+        Set<Promotion> promotions = _promotionService.findAllPromotionsInTimePeriod(startDate, endDate, manager.getStore());
+        StringBuilder sb = new StringBuilder();
+        int numOfWeeksInReport = weeksBetweenDates(startDate, endDate);
+        for (Promotion p : promotions) {
+            List<Sale> sales = _saleService.findAllBySellLocationAndAndItem(manager.getStore(), p.getItem());
+            int totalNumSalesAllTime = 0;
+            int totalDollarsSalesAllTime = 0;
+            int totalNumSalesDuringPeriod = 0;
+            int totalDollarsSalesDuringPeriod = 0;
+            java.util.Date firstSaleDate = formatter.parse("01-01-2100");
+            java.util.Date lastSaleDate = formatter.parse("01-01-1970");
+            for (Sale s : sales) {
+                if (dateAfterOrSame(s.getSellDate(), startDate) && dateAfterOrSame(endDate, s.getSellDate())) {
+                    totalNumSalesDuringPeriod++;
+                    totalDollarsSalesDuringPeriod += s.getPrice();
+                } else {
+                    totalNumSalesAllTime++;
+                    totalDollarsSalesAllTime += s.getPrice();
+                    if (s.getSellDate().before(firstSaleDate)) {
+                        firstSaleDate = s.getSellDate();
+                    }
+                    if (s.getSellDate().after(lastSaleDate)) {
+                        lastSaleDate = s.getSellDate();
+                    }
+                }
+            }
+            int numberOfWeeksAllSales = weeksBetweenDates(firstSaleDate, lastSaleDate);
+            double averagePerWeekPromoDollar = (double) totalDollarsSalesDuringPeriod / numOfWeeksInReport / 100.0;
+            double averagePerWeekPromoUnits = (double) totalNumSalesDuringPeriod / numOfWeeksInReport;
+            double averagePerWeekAllTimeDollar = (double) totalDollarsSalesAllTime / numberOfWeeksAllSales / 100.0;
+            double averagePerWeekAllTimeUnits = (double) totalNumSalesAllTime / numberOfWeeksAllSales;
+            double percentIncreaseInUnitSales = averagePerWeekPromoUnits / averagePerWeekAllTimeUnits;
+            double totalIncreaseRevenue = totalDollarsSalesDuringPeriod / 100.0 - (totalNumSalesAllTime * p.getItem().getSuggestRetailPrice() / 150.0) - (averagePerWeekAllTimeDollar * numOfWeeksInReport - (averagePerWeekAllTimeUnits * p.getItem().getSuggestRetailPrice() / 150.0));
+            sb.append(String.format("| %tD | %tD | %15s | %,6d | $%7.2f | %4.1f | %6.2f | $%4.1f | $%6.2f | %3.2f%% | $%6.2f |\n", p.getStartDate(), p.getEndDate(), p.getItem().getName(), totalNumSalesDuringPeriod, totalDollarsSalesDuringPeriod / 100.0, averagePerWeekPromoUnits, averagePerWeekPromoDollar, averagePerWeekAllTimeDollar, averagePerWeekPromoUnits, percentIncreaseInUnitSales, totalIncreaseRevenue));
+        }
+        System.out.println(sb.toString());
+    }
+
+    private static boolean dateAfterOrSame(java.util.Date date1, java.util.Date date2) {
+        return date1.after(date2) || date1.equals(date2);
+    }
+
+    private static int weeksBetweenDates(java.util.Date start, java.util.Date end) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(start);
+
+        int weeks = 0;
+        while (cal.getTime().before(end)) {
+            cal.add(Calendar.WEEK_OF_YEAR, 1);
+            weeks++;
+        }
+        return weeks;
     }
 
 }
