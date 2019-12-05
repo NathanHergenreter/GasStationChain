@@ -9,6 +9,7 @@ import gasChain.entity.Receipt.Payment;
 import gasChain.service.*;
 import gasChain.util.Luhn;
 import gasChain.util.ServiceAutoWire;
+import org.hibernate.service.spi.ServiceException;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -120,8 +121,12 @@ public class CashierHelper {
         String input = UserApplication.getInput().toLowerCase();
         if (input.equals("yes")) {
             System.out.println("Enter rewards account id:");
-            input = UserApplication.getInput().toLowerCase();
-            receipt.setRewardMembershipAccount(rewardMembershipAccountService.findById(input));
+            String accountId = UserApplication.getInput().toLowerCase();
+            try {
+                receipt.setRewardMembershipAccount(rewardMembershipAccountService.findById(input));
+            } catch (ServiceException e) {
+                receipt.setRewardMembershipAccount(findRewardsAccount(accountId));
+            }
         } else {
             System.out.println("Would the customer like to set up an account today?");
             input = UserApplication.getInput().toLowerCase();
@@ -133,8 +138,7 @@ public class CashierHelper {
 
         ArrayList<GasStationInventory> inventoryItems = processSaleGetInventory(gasStation, receipt, df);
 
-        Payment paymentType = processSaleGetPayment(df);
-        receipt.setPayment(paymentType);
+
 
         for (GasStationInventory inventoryItem : inventoryItems) {
             gasStationInventoryService.RemoveItemFromInventory(inventoryItem.getGasStation(), inventoryItem.getItem());
@@ -148,7 +152,7 @@ public class CashierHelper {
         receiptService.save(receipt);
     }
 
-    private static ArrayList<GasStationInventory> processSaleGetInventory(GasStation gasStation, Receipt receipt, DecimalFormat df) {
+    private static ArrayList<GasStationInventory> processSaleGetInventory(GasStation gasStation, Receipt receipt, DecimalFormat df) throws Exception {
         ArrayList<GasStationInventory> inventoryItems = new ArrayList<>();
 
         System.out.println("New Order Started With ID: " + receipt.getId());
@@ -184,6 +188,7 @@ public class CashierHelper {
             System.out.println(item.getId() + " --- " + item.getName() + " ---  $" + df.format(price / 100.0) + " --- Total = " + df.format(total / 100.0));
         }
 
+        processSaleGetPayment(receipt, total, df);
         if (receipt.getRewardsMembershipAccount() != null) {
             receipt.getRewardsMembershipAccount().addRewardBalance(total / 100);
             rewardMembershipAccountService.save(receipt.getRewardsMembershipAccount());
@@ -191,11 +196,29 @@ public class CashierHelper {
         return inventoryItems;
     }
 
-    private static Payment processSaleGetPayment(DecimalFormat df) throws Exception {
+    private static void processSaleGetPayment(Receipt receipt, int total, DecimalFormat df) throws Exception {
         Payment paymentType = Receipt.Payment.INVALID;
 
         boolean invalid = true;
         while (invalid) {
+            if (receipt.getRewardsMembershipAccount() != null) {
+                if (receipt.getRewardsMembershipAccount().getRewardsBalance() > 0) {
+                    System.out.println("Would the customer like to use rewards account balance?");
+                    if (getInput().toLowerCase().equals("yes")) {
+                        System.out.println("How much would the customer like to apply (Enter whole number $1 = 100): ");
+                        System.out.println("Total balance = $" + df.format(receipt.getRewardsMembershipAccount().getRewardsBalance() / 100.0));
+                        int amount = Integer.parseInt(getInput());
+                        receipt.getRewardsMembershipAccount().addRewardBalance(amount * -1);
+                        if (amount >= total) {
+                            receipt.setPayment(Payment.REWARDS);
+                            invalid = false;
+                            break;
+                        }
+                    }
+
+                }
+
+            }
             System.out.println("How will the customer be paying today? (enter /end to end processing)");
             System.out.println("1 - Credit Card");
             System.out.println("2 - Debit Card");
@@ -214,8 +237,7 @@ public class CashierHelper {
                 }
             }
         }
-
-        return paymentType;
+        receipt.setPayment(paymentType);
     }
 
     private static boolean processPayment(Receipt.Payment paymentType, DecimalFormat df) throws Exception {
@@ -292,6 +314,115 @@ public class CashierHelper {
     	int amount = new Integer(args.get(1));
     	
         GasStation gasStation = cashier.getWorkplace();
+    }
+
+    @MethodHelp("Manage Rewards Account. Parameter needs to include account id. Enter -1 to find account by other means")
+    @CashierUser(command = "ManageRMA", parameterEquation = "p == 1")
+    public static void manageRMA(List<String> args, Cashier cashier) throws Exception {
+        String accountId = args.get(0);
+        String confirmation = "Information updated";
+        RewardMembershipAccount rma = null;
+        boolean isAccountIDValid = false;
+        try {
+            rma = rewardMembershipAccountService.findById(accountId);
+        } catch (ServiceException e) {
+            rma = findRewardsAccount(accountId);
+        }
+
+
+        String accountInfo = String.format("Rewards Account: %s \n1. Name: %s\n2. Email: %s\n3. Phone Number: %s\n4. Redeem account balance of: $%f\n5. Delete Account", rma.getId(), rma.getName(), rma.getEmail(), rma.getPhoneNumber(), rma.getRewardsBalance() / 100.0);
+        System.out.println(accountInfo);
+        boolean isStillUpdating = true;
+        boolean informationIsValid = false;
+        while (!informationIsValid) {
+            while (isStillUpdating) {
+                System.out.println("Please enter a number for which item you would like to update: ");
+                String input = UserApplication.getInput();
+                switch (Integer.parseInt(input)) {
+                    case 1:
+                        System.out.println("Enter updated account name: ");
+                        rma.setName(UserApplication.getInput());
+                        break;
+                    case 2:
+                        System.out.println("Enter updated account email: ");
+                        rma.setEmail(UserApplication.getInput());
+                        break;
+                    case 3:
+                        System.out.println("Enter updated account phone number: ");
+                        rma.setPhoneNumber(UserApplication.getInput());
+                        break;
+                    case 4:
+                        System.out.println("How much would the customer like to redeem? (enter amount without decimal $1 = 100): ");
+                        int amount = Integer.parseInt(UserApplication.getInput());
+                        while (amount > rma.getRewardsBalance()) {
+                            System.out.println("Invalid amount given. Must be less then current rewards balance");
+                            System.out.println("How much would the customer like to redeem? (enter amount without decimal $1 = 100): ");
+                            amount = Integer.parseInt(UserApplication.getInput());
+                        }
+                        rma.addRewardBalance(amount * -1);
+                        break;
+                    case 5:
+                        System.out.println("Are you sure you wish to delete the account. This is NOT reversible. Enter YES in all caps to continue or no to exit");
+                        if (UserApplication.getInput().equals("YES")) {
+                            rewardMembershipAccountService.delete(rma);
+                            isStillUpdating = false;
+                            informationIsValid = true;
+                            confirmation = "Account Deleted";
+                        }
+                        break;
+                    default:
+                        System.out.println("Invalid number given. No information will be updated");
+                        break;
+                }
+                System.out.println("Updated info: ");
+                accountInfo = String.format("Rewards Account: %s \n1. Name: %s\n2. Email: %s\n3. Phone Number: %s\n4. Redeem account balance of: $%f", rma.getId(), rma.getName(), rma.getEmail(), rma.getPhoneNumber(), rma.getRewardsBalance() / 100.0);
+                System.out.println(accountInfo);
+                System.out.println("Would you like to update any other information? Enter yes to enter more information");
+                String finished = UserApplication.getInput();
+                isStillUpdating = finished.toLowerCase().equals("yes");
+            }
+            try {
+                rewardMembershipAccountService.save(rma);
+                informationIsValid = true;
+            } catch (Exception e) {
+                System.out.println("Unable to save new account. The following error is given: ");
+                System.out.println(e);
+                System.out.println("Please update account information to fix the above errors: ");
+            }
+        }
+        System.out.println(confirmation);
+    }
+
+    private static RewardMembershipAccount findRewardsAccount(String accountId) {
+        System.out.println("Invalid rewards account: " + accountId + " Would you like to find account by 1. id 2. Email 3. Phone-Number: ");
+        String input = UserApplication.getInput();
+        RewardMembershipAccount rma = null;
+        while (true) {
+            try {
+                switch (Integer.parseInt(input)) {
+                    case 1:
+                        System.out.println("Enter account Id: ");
+                        String id = UserApplication.getInput();
+                        rma = rewardMembershipAccountService.findById(id);
+                        return rma;
+                    case 2:
+                        System.out.println("Enter account email: ");
+                        String email = UserApplication.getInput();
+                        rma = rewardMembershipAccountService.findByEmail(email);
+                        return rma;
+                    case 3:
+                        System.out.println("Enter account phone number: ");
+                        String phoneNumber = UserApplication.getInput();
+                        rma = rewardMembershipAccountService.findByPhoneNumber(phoneNumber);
+                        return rma;
+                    default:
+                        System.out.println("Invalid number given. Please select 1. id 2. Email  or 3. Phone-Number:");
+                        break;
+                }
+            } catch (ServiceException se) {
+                System.out.println("No such account found with given information");
+            }
+        }
     }
 }
 

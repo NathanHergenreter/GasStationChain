@@ -2,10 +2,7 @@ package gasChain.entity;
 
 import gasChain.util.Luhn;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -13,8 +10,12 @@ public class RewardMembershipAccount {
 
     @Id
     private String Id;
+
+    @Column(unique = true)
     private String email;
     private String name;
+
+    @Column(unique = true)
     private String phoneNumber;
     private int rewardsBalance;
     private Date createdOn;

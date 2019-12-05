@@ -64,7 +64,7 @@ public class Receipt {
 
     // Note - do not change order - add new to end
     public enum Payment {
-        INVALID, CREDIT, DEBIT, CASH
+        INVALID, CREDIT, DEBIT, CASH, REWARDS
     }
 
     public void setRewardMembershipAccount(RewardMembershipAccount rewardMembershipAccount) {

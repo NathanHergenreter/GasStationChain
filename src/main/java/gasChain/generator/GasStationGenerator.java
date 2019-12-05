@@ -155,7 +155,16 @@ public class GasStationGenerator {
 
             RewardMembershipAccount rewardMembershipAccount = new RewardMembershipAccount(email, name, phoneNumber, cashier);
             rewardMembershipAccount.setCreatedOn(GenUtil.genDate());
-            service.rewardMembershipAccount().save(rewardMembershipAccount);
+            boolean invalid = true;
+            while (invalid) {
+                try {
+                    service.rewardMembershipAccount().save(rewardMembershipAccount);
+                    invalid = false;
+                } catch (Exception e) {
+                    email = GenUtil.genRandomEmail();
+                    phoneNumber = GenUtil.genRandomPhoneNumber();
+                }
+            }
 
             int numReceipt = receipts.size() / (numAccounts - i) > 0 ? GenUtil.rng.nextInt(receipts.size() / (numAccounts - i)) : 0;
             for (int j = 0; j < numReceipt; j++) {

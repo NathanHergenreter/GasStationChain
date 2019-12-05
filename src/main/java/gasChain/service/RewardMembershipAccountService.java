@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -22,6 +23,15 @@ public class RewardMembershipAccountService extends GenericService<RewardMembers
         return getRepository().findAllByCreateByAndCreatedOnAfter(employee, after);
     }
 
+    public RewardMembershipAccount findByPhoneNumber(String phoneNumber) {
+        Optional<RewardMembershipAccount> rma = getRepository().findByPhoneNumber(phoneNumber);
+        return nullCheck(rma, "No Such Phone Number Found");
+    }
+
+    public RewardMembershipAccount findByEmail(String email) {
+        Optional<RewardMembershipAccount> rma = getRepository().findByEmail(email);
+        return nullCheck(rma, "No Such Email Found");
+    }
     public float findTotalUnredeemed() {
         List<RewardMembershipAccount> rewardMembershipAccounts = getRepository().findAll();
         float total = 0;

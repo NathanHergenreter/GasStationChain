@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.util.Collections.shuffle;
@@ -696,4 +698,40 @@ public class ManagerHelper {
 
         GasStation gasStation = manager.getStore();
     }
+
+    @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
+    @ManagerUser(command = "generatePromotionalDataReport", parameterEquation = "p == 0")
+    public static void generatePromotionalDataReport(List<String> args, Manager manager) throws Exception {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
+        java.util.Date startDate = null;
+        java.util.Date endDate = null;
+        boolean isStartBeforeEnd = false;
+        while (!isStartBeforeEnd) {
+            while (startDate == null) {
+                try {
+                    System.out.println("Enter start date of report (Format MM-dd-yyyy): ");
+                    startDate = formatter.parse(UserApplication.getInput());
+                } catch (ParseException e) {
+                    System.out.println("Invalid date entered. Please use format MM-dd-yyyy");
+                }
+            }
+            while (endDate == null) {
+                try {
+                    System.out.println("Enter end date of report (Format MM-dd-yyyy): ");
+                    endDate = formatter.parse(UserApplication.getInput());
+                } catch (ParseException e) {
+                    System.out.println("Invalid date entered. Please use format MM-dd-yyyy");
+                }
+            }
+
+            isStartBeforeEnd = startDate.before(endDate);
+            if (!isStartBeforeEnd) {
+                System.out.println("Start date must be before end date. Please re-enter valid dates");
+                startDate = null;
+                endDate = null;
+            }
+        }
+        System.out.println("Valid dates entered");
+    }
+
 }
