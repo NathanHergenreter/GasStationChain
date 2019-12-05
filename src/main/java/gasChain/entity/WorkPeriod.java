@@ -43,4 +43,6 @@ public class WorkPeriod {
     public Cashier getCashier() {
         return cashier;
     }
+
+    public int getWages() { return wages; }
 }
