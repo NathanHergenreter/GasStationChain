@@ -639,6 +639,7 @@ public class CorporateHelper {
         return result;
     }
 
+    @CorporateUser(command = "GenerateWorkHourReport")
     public static void generateWorkHourReport(List<String> args, Corporate user){
         List<WorkPeriod> workPeriods = workPeriodService.findAll();
         int numWorkPeriods = workPeriods.size();
@@ -655,7 +656,8 @@ public class CorporateHelper {
             if (workPeriod.getDate().compareTo(newestWorkPeriod) > 0)
                 newestWorkPeriod = workPeriod.getDate();
         }
-        int totalPayPeriodHours = Math.abs(newestWorkPeriod.toLocalDate().getDayOfYear() - oldestWorkPeriod.toLocalDate().getDayOfYear()) * 24;
+		int numDays = newestWorkPeriod.toLocalDate().getDayOfYear() - oldestWorkPeriod.toLocalDate().getDayOfYear();
+        int totalPayPeriodHours = Math.abs(numDays) * 24;
         System.out.println("WORK HOUR REPORT:\n\n");
         System.out.println("Average Daily Shift: " + (float)totalHoursWorked/(float)numWorkPeriods);
         System.out.println("Scheduling Efficiency: " + (float)totalHoursWorked/(float)totalPayPeriodHours);
