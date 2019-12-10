@@ -618,6 +618,18 @@ public class CorporateHelper {
         System.out.println("Least Popular Item: " + leastPopularStoreSale.getItem().getName() + " Sold: " + leastPopularStoreItemCount + " units At $" + leastPopularStoreSale.getPrice() + "/unit\n");
     }
 
+
+    @CorporateUser(command = "GenerateTaxReport")
+    public static void generateTaxReport(List<String> args, Corporate corporateUser) {
+        Store store;
+        try{
+            store = gasStationService.findByLocation(args.get(0));
+        }catch(Exception e){
+            System.out.println("Unable to find given store location");
+            return;
+        }
+    }
+
     private static List<Sale> filterSalesByStoreId(List<Sale> sales, long id){
         List<Sale> result = new ArrayList<>();
         for(Sale sale: sales){

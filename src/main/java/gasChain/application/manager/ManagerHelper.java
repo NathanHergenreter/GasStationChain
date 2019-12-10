@@ -32,6 +32,7 @@ public class ManagerHelper {
     private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
     private static SaleService _saleService = ServiceAutoWire.getBean(SaleService.class);
     private static GasTankService gasTankService = ServiceAutoWire.getBean(GasTankService.class);
+    private static TaxService _taxService = ServiceAutoWire.getBean(TaxService.class);
 
     @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
@@ -323,6 +324,85 @@ public class ManagerHelper {
                 break;
         }
         return endOfShift;
+    }
+
+    @MethodHelp("args: -<type> -<item>\n")
+    @ManagerUser(command = "ApplyItemTax", parameterEquation = "p == 2")
+    public static void applyItemTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        String name = args.get(1);
+
+        if (_taxService.findByType(type) != null) {
+            if (_itemService.findByName(name) != null) {
+                _itemService.findByName(name).setTax(_taxService.findByType(type));
+            }
+            else {
+                throw new Exception("Employee " + name + " does not exist");
+            }
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type> -<employee>\n")
+    @ManagerUser(command = "ApplyEmployeeTax", parameterEquation = "p == 2")
+    public static void applyEmployeeTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        String name = args.get(1);
+        if (_taxService.findByType(type) != null) {
+            if (_cashierService.findByUsername(name) != null) {
+                _cashierService.findByUsername(name).setTax(_taxService.findByType(type));
+            }
+            else {
+                throw new Exception("Employee " + name + " does not exist");
+            }
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type> -<multiplier>\n")
+    @ManagerUser(command = "AddTax", parameterEquation = "p == 2")
+    public static void addTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        Float multiplier = Float.parseFloat(args.get(1));
+
+        if (_taxService.findByType(type) == null) {
+            Tax tax = new Tax(type, multiplier);
+            _taxService.save(tax);
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type> -<multiplier>\n")
+    @ManagerUser(command = "UpdateTax", parameterEquation = "p == 2")
+    public static void updateTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        Float multiplier = Float.parseFloat(args.get(1));
+
+        if (_taxService.findByType(type) != null) {
+            _taxService.findByType(type).setMultiplier(multiplier);
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type>\n")
+    @ManagerUser(command = "DeleteTax", parameterEquation = "p == 1")
+    public static void deleteTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+
+        if (_taxService.findByType(type) != null) {
+            _taxService.delete(_taxService.findByType(type));
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
     }
 
     @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
