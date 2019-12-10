@@ -791,13 +791,24 @@ public class ManagerHelper {
         gasTankService.save(gasTank);
     }
 
-    @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
-    @ManagerUser(command = "generatePromotionalDataReport", parameterEquation = "p == 0")
+    @MethodHelp("Generate Promotional Data Report. Include a parameter file name to save to file\n" +
+            "Start Date, End date, Item Name, # of Sales item sold, $ sales sold, average # of items sold per week,  average $ of items sold per week average, total $, average Per Week Promo Units, Percent Increase In Unit Sales, total Increase Revenue")
+    @ManagerUser(command = "generatePromotionalDataReport", parameterEquation = "p <= 1")
     public static void generatePromotionalDataReport(List<String> args, Manager manager) throws Exception {
         SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
         java.util.Date startDate = null;
         java.util.Date endDate = null;
         boolean isStartBeforeEnd = false;
+        FileWriter fileWriter = null;
+        PrintWriter printWriter = null;
+        if (args.size() > 0) {
+            try {
+                fileWriter = new FileWriter(args.get(0));
+                printWriter = new PrintWriter(fileWriter);
+            } catch (IOException e) {
+                System.out.println("File Error: " + e.getMessage());
+            }
+        }
         while (!isStartBeforeEnd) {
             while (startDate == null) {
                 try {
@@ -859,6 +870,11 @@ public class ManagerHelper {
             sb.append(String.format("| %tD | %tD | %15s | %,6d | $%7.2f | %4.1f | %6.2f | $%4.1f | $%6.2f | %3.2f%% | $%6.2f |\n", p.getStartDate(), p.getEndDate(), p.getItem().getName(), totalNumSalesDuringPeriod, totalDollarsSalesDuringPeriod / 100.0, averagePerWeekPromoUnits, averagePerWeekPromoDollar, averagePerWeekAllTimeDollar, averagePerWeekPromoUnits, percentIncreaseInUnitSales, totalIncreaseRevenue));
         }
         System.out.println(sb.toString());
+        if (printWriter != null) {
+            printWriter.println(sb.toString());
+            printWriter.close();
+        }
+
     }
 
     private static boolean dateAfterOrSame(java.util.Date date1, java.util.Date date2) {
