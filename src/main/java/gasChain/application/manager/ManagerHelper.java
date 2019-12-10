@@ -892,5 +892,29 @@ public class ManagerHelper {
         }
         return weeks;
     }
+    
+    @MethodHelp("args: -<startDate> -<endDate> \n")
+    @ManagerUser(command = "generateTaxReport", parameterEquation = "p <= 2")
+    private static void generateTaxReport(List<String> args, Manager manager) throws Exception {
+    	Date startDate = Date.valueOf(args.get(0));
+    	Date endDate = Date.valueOf(args.get(1));
+    	WorkPeriod work;
+    	Sale sale;
+    	int total = 0;
+    	for (int i = 0; i < _workPeriodService.findAll().size(); i++) {
+    		work = _workPeriodService.findAll().get(i);
+    		if (work.getDate().after(startDate) && work.getDate().before(endDate))
+    			total += (int) (work.getWages() * work.getCashier().getTax().getMultiplier());
+    	}
+    	System.out.println("Total Cashier Taxes For Period: " + total);
+    	
+    	total = 0;
+    	for (int i = 0; i < _saleService.findAll().size(); i++) {
+    		sale = _saleService.findAll().get(i);
+    		if (sale.getSellDate().after(startDate) && sale.getSellDate().before(endDate)) 
+    			total += (int) (sale.getItem().getTax().getMultiplier() * sale.getPrice());
+    	}
+    	System.out.println("Total Sale Taxes For Period: " + total);
+    }
 
 }
