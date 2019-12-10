@@ -11,6 +11,10 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn
+    private Tax tax;
+
     private String name;
     private int suggestRetailPrice;
 
@@ -20,6 +24,7 @@ public class Item {
     public Item(String name, int suggestRetailPrice) {
         this.name = name;
         this.suggestRetailPrice = suggestRetailPrice;
+        this.tax = null;
     }
 
     public Item(String name, float suggestRetailPrice) {
@@ -28,6 +33,14 @@ public class Item {
 
     public Long getId() {
         return id;
+    }
+
+    public Tax getTax() {
+        return tax;
+    }
+
+    public void setTax(Tax tax) {
+        this.tax = tax;
     }
 
     @Override

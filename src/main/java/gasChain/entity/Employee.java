@@ -10,6 +10,10 @@ public abstract class Employee {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn
+    private Tax tax;
+
     private String username;
 
     private String password;
@@ -20,6 +24,15 @@ public abstract class Employee {
     public Employee(String username, String password) {
         this.username = username;
         this.password = password;
+        this.tax = null;
+    }
+
+    public Tax getTax() {
+        return tax;
+    }
+
+    public void setTax(Tax tax) {
+        this.tax = tax;
     }
 
     public Long getId() {

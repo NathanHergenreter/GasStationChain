@@ -55,6 +55,9 @@ public class ServiceMaster {
     @Autowired
     private GasTankService gasTankService;
 
+    @Autowired
+    private TaxService taxService;
+
     public AvailabilityService availability() {
         return availabilityService;
     }
@@ -118,4 +121,7 @@ public class ServiceMaster {
     public RewardMembershipAccountService rewardMembershipAccount() {
         return rewardMembershipAccountService;
     }
+
+    public TaxService tax() { return taxService; }
+
 }
