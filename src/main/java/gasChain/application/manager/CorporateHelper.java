@@ -23,6 +23,7 @@ public class CorporateHelper {
     private static WarehouseService warehouseService = ServiceAutoWire.getBean(WarehouseService.class);
     private static ItemService itemService = ServiceAutoWire.getBean(ItemService.class);
     private static SaleService saleService = ServiceAutoWire.getBean(SaleService.class);
+    private static WorkPeriodService workPeriodService = ServiceAutoWire.getBean(WorkPeriodService.class);
 
     @CorporateUser(command = "AddManager", parameterEquation = "p == 3")
     public static void addManager(List<String> args, Corporate corporate) throws Exception {
@@ -423,6 +424,30 @@ public class CorporateHelper {
         System.out.println("ITEMIZED EXPENSES BY STORE:\n"+itemizedExpenses);
     }
 
+    @MethodHelp("Enter the <store_location>;<start date>;<end date> formatted as YYYY-MM-DD")
+    @CorporateUser(command = "GenerateFinancialReportByLocation")
+    public static void generateFinancialReportByLocation(List<String> args, Corporate corporateUser){
+        GasStation store;
+        try{
+            store = gasStationService.findByLocation(args.get(0));
+        }catch(Exception e){
+            System.out.println("Unable to find given store location");
+            return;
+        }
+        Date s = Date.valueOf(args.get(1));
+        Date e = Date.valueOf(args.get(2));
+        int numDays = Math.abs(s.toLocalDate().getDayOfYear() - e.toLocalDate().getDayOfYear());
+        int multiplier = 1;
+        if (numDays >= 30)
+            multiplier = numDays / 30;
+        Expenses expenses = store.getExpenses();
+        System.out.println(store.getLocation() + " Store Expenses: { Electric: $" + (multiplier * expenses.getElectric()) +
+                ", Water: $" + (multiplier * expenses.getWater()) +
+                ". Sewage: $" + (multiplier * expenses.getSewage()) +
+                ", Garbage: $" + (multiplier * expenses.getGarbage()) +
+                ", Insurance: $" + (multiplier * expenses.getInsurance()) + " }\n");
+    }
+
     private static String getStandardDeviationExpenses(List<GasStation> gasStations, double meanElectric, double meanWater, double meanSewage, double meanGarbage, double meanInsurance, int multiplier){
         double totalElectric = 0.0,totalWater = 0.0,totalSewage = 0.0,totalGarbage = 0.0,totalInsurance = 0.0;
         double stdvElectric, stdvWater, stdvSewage, stdvGarbage, stdvInsurance;
@@ -539,6 +564,72 @@ public class CorporateHelper {
         }
     }
 
+    @CorporateUser(command = "GenerateSalesReportByLocation")
+    public static void GenerateSalesReportByLocation(List<String> args, Corporate corporateUser){
+        Store store;
+        try{
+            store = gasStationService.findByLocation(args.get(0));
+        }catch(Exception e){
+            System.out.println("Unable to find given store location");
+            return;
+        }
+        List<Item> sellableItems = itemService.findAll();
+        List<Sale> allSales = saleService.findAll();
+        List<Sale> storeSales = filterSalesByStoreId(allSales, store.getId());
+        List<Sale> firstStoreItemSales = filterSalesByItemId(storeSales, sellableItems.get(0).getId());
+        int totalStoreRevenue = 0;
+
+        int highestStoreItemRevenue = firstStoreItemSales.size() !=0? firstStoreItemSales.size() * firstStoreItemSales.get(0).getPrice(): 0;
+        int lowestStoreItemRevenue = highestStoreItemRevenue;
+        Sale highestRevenueStoreSale = storeSales.get(0);
+        Sale lowestRevenueStoreSale = storeSales.get(0);
+
+        int mostPopularStoreItemCount = firstStoreItemSales.size();
+        int leastPopularStoreItemCount = mostPopularStoreItemCount;
+        Sale mostPopularStoreSale = storeSales.get(0);
+        Sale leastPopularStoreSale = storeSales.get(0);
+
+        for(Item item: sellableItems){
+            List<Sale> storeItemSales = filterSalesByItemId(storeSales, item.getId());
+            int totalStoreItemRevenue = storeItemSales.size()!=0? storeItemSales.size() * storeItemSales.get(0).getPrice(): 0;
+            if (storeItemSales.size() > mostPopularStoreItemCount){
+                mostPopularStoreItemCount = storeItemSales.size();
+                mostPopularStoreSale = storeItemSales.get(0);
+            }
+            if (storeItemSales.size() < leastPopularStoreItemCount && storeItemSales.size()!=0){
+                leastPopularStoreItemCount = storeItemSales.size();
+                leastPopularStoreSale = storeItemSales.get(0);
+            }
+            if (totalStoreItemRevenue > highestStoreItemRevenue){
+                highestStoreItemRevenue = totalStoreItemRevenue;
+                highestRevenueStoreSale = storeItemSales.get(0);
+            }
+            if (totalStoreItemRevenue < lowestStoreItemRevenue && storeItemSales.size()!=0){
+                lowestStoreItemRevenue = totalStoreItemRevenue;
+                lowestRevenueStoreSale = storeItemSales.get(0);
+            }
+            totalStoreRevenue += totalStoreItemRevenue;
+        }
+        System.out.println("STORE STATISTICS:\n");
+        System.out.println("Store: " + store.getLocation() + "Total Revenue: $" + totalStoreRevenue);
+        System.out.println("Lowest Item Revenue: " + lowestRevenueStoreSale.getItem().getName() + " Generated: $" + lowestStoreItemRevenue + " At $" + lowestRevenueStoreSale.getPrice() + "/unit");
+        System.out.println("Highest Item Revenue: " + highestRevenueStoreSale.getItem().getName() + " Generated: $" + highestStoreItemRevenue + " At $" + highestRevenueStoreSale.getPrice() + "/unit");
+        System.out.println("Most Popular Item: " + mostPopularStoreSale.getItem().getName() + " Sold: " + mostPopularStoreItemCount + " units At $" + mostPopularStoreSale.getPrice() + "/units");
+        System.out.println("Least Popular Item: " + leastPopularStoreSale.getItem().getName() + " Sold: " + leastPopularStoreItemCount + " units At $" + leastPopularStoreSale.getPrice() + "/unit\n");
+    }
+
+
+    @CorporateUser(command = "GenerateTaxReport")
+    public static void generateTaxReport(List<String> args, Corporate corporateUser) {
+        Store store;
+        try{
+            store = gasStationService.findByLocation(args.get(0));
+        }catch(Exception e){
+            System.out.println("Unable to find given store location");
+            return;
+        }
+    }
+
     private static List<Sale> filterSalesByStoreId(List<Sale> sales, long id){
         List<Sale> result = new ArrayList<>();
         for(Sale sale: sales){
@@ -558,5 +649,31 @@ public class CorporateHelper {
                 result.add(sale);
         }
         return result;
+    }
+
+    @CorporateUser(command = "GenerateWorkHourReport")
+    public static void generateWorkHourReport(List<String> args, Corporate user){
+        List<WorkPeriod> workPeriods = workPeriodService.findAll();
+        int numWorkPeriods = workPeriods.size();
+        int totalHoursWorked = 0;
+        int totalWagesPaid = 0;
+        Date oldestWorkPeriod = workPeriods.get(0).getDate();
+        Date newestWorkPeriod = oldestWorkPeriod;
+        for(WorkPeriod workPeriod: workPeriods){
+            int shiftHours = workPeriod.getEndHour() - workPeriod.getStartHour();
+            totalHoursWorked += shiftHours;
+            totalWagesPaid += shiftHours * workPeriod.getWages();
+            if (workPeriod.getDate().compareTo(oldestWorkPeriod) < 0)
+                oldestWorkPeriod = workPeriod.getDate();
+            if (workPeriod.getDate().compareTo(newestWorkPeriod) > 0)
+                newestWorkPeriod = workPeriod.getDate();
+        }
+		int numDays = newestWorkPeriod.toLocalDate().getDayOfYear() - oldestWorkPeriod.toLocalDate().getDayOfYear();
+        int totalPayPeriodHours = Math.abs(numDays) * 24;
+        System.out.println("WORK HOUR REPORT:\n\n");
+        System.out.println("Average Daily Shift: " + (float)totalHoursWorked/(float)numWorkPeriods);
+        System.out.println("Scheduling Efficiency: " + (float)totalHoursWorked/(float)totalPayPeriodHours);
+        System.out.println("Average Wages Paid: " + (float)totalWagesPaid/(float)numWorkPeriods);
+        System.out.println("Total Wages Paid: " + totalWagesPaid);
     }
 }

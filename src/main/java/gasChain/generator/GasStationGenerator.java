@@ -23,7 +23,22 @@ public class GasStationGenerator {
         int minEmployees = 3;
         int maxEmployees = 8;
 
+        Tax t = new Tax("Sales", (float) .08);
+        service.tax().save(t);
+        t = new Tax("Tobacco", (float) .10);
+        service.tax().save(t);
+        t = new Tax("Liquor", (float) .12);
+        service.tax().save(t);
+        t = new Tax("Lottery", (float) .12);
+        service.tax().save(t);
+        t = new Tax("Income", (float) .24);
+        service.tax().save(t);
+
+        generateItemTaxes(repo.items());
+
         generateGasStations(maxSales, minEmployees, maxEmployees);
+
+        //generateItemTaxes(repo.items());
     }
 
     // Pulls data for locations, items, and names from txt files for generation,
@@ -44,6 +59,7 @@ public class GasStationGenerator {
 
             generateManager(gasStation);
 
+            generateGasTank(gasStation);
 
             service.gasStation().save(gasStation);
 
@@ -70,6 +86,29 @@ public class GasStationGenerator {
         }
     }
 
+    private void generateItemTaxes(ArrayList<Item> items) {
+        String name;
+        for (int i = 0; i < items.size(); i++) {
+            name = items.get(i).getName();
+            if (name.equals("Cigarettes")) {
+                items.get(i).setTax(service.tax().findByType("Tobacco"));
+                service.item().save(items.get(i));
+            }
+            else if (name.equals("Beer")) {
+                items.get(i).setTax(service.tax().findByType("Liquor"));
+                service.item().save(items.get(i));
+            }
+            else if (name.equals("Lottery Tickets")) {
+                items.get(i).setTax(service.tax().findByType("Lottery"));
+                service.item().save(items.get(i));
+            }
+            else {
+                items.get(i).setTax(service.tax().findByType("Sales"));
+                service.item().save(items.get(i));
+            }
+        }
+    }
+
     private void generateSales(int maxSales, GasStation gasStation, ArrayList<Item> items) {
         int numSales = GenUtil.rng.nextInt(maxSales);
 
@@ -80,12 +119,19 @@ public class GasStationGenerator {
             for (int numReceipt = GenUtil.rng.nextInt(8); numReceipt > 0; numReceipt--) {
                 Date date = GenUtil.genDate();
                 int price = item.getSuggestRetailPrice();
+
                 Promotion promotion = service.promotion().findPromotionByGasStationAndItem(gasStation, item);
                 if (promotion != null) {
                     if (!date.before(promotion.getStartDate()) || !date.after(promotion.getEndDate())) {
                         price = (int) (price * promotion.getPriceMultiplier());
                     }
                 }
+
+                /*
+                Tax after promotion because why not right?
+                 */
+                if (item.getTax() != null)
+                    price += (int) (price * item.getTax().getMultiplier());
 
                 Sale sale = new Sale(item, gasStation, receipt, price, date);
 
@@ -137,10 +183,14 @@ public class GasStationGenerator {
             if (!service.cashier().existsUser(cashier.getUsername())) {
             	generateCashierWorkPeriods(cashier);
                 gasStation.addCashier(cashier);
+
+                cashier.setTax(service.tax().findByType("Income"));
+
                 service.cashier().save(cashier);
                 numEmployees--;
                 generateRewardMembershipAccounts(cashier, firstNames, lastNames);
             }
+
         }
     }
 
@@ -155,7 +205,16 @@ public class GasStationGenerator {
 
             RewardMembershipAccount rewardMembershipAccount = new RewardMembershipAccount(email, name, phoneNumber, cashier);
             rewardMembershipAccount.setCreatedOn(GenUtil.genDate());
-            service.rewardMembershipAccount().save(rewardMembershipAccount);
+            boolean invalid = true;
+            while (invalid) {
+                try {
+                    service.rewardMembershipAccount().save(rewardMembershipAccount);
+                    invalid = false;
+                } catch (Exception e) {
+                    email = GenUtil.genRandomEmail();
+                    phoneNumber = GenUtil.genRandomPhoneNumber();
+                }
+            }
 
             int numReceipt = receipts.size() / (numAccounts - i) > 0 ? GenUtil.rng.nextInt(receipts.size() / (numAccounts - i)) : 0;
             for (int j = 0; j < numReceipt; j++) {
@@ -187,7 +246,23 @@ public class GasStationGenerator {
         Manager manager = new Manager(gasStation.getLocation() + "_Manager", "password");
         manager.setStore(gasStation);
         gasStation.setManager(manager);
+
+        manager.setTax(service.tax().findByType("Income"));
+
+
         service.manager().save(manager);
+    }
+    
+    private void generateGasTank(GasStation gasStation) {
+    	int min = 50; int max = 200;
+    	int regular = GenUtil.rng.nextInt(max - min) + min;
+    	int midGrade = GenUtil.rng.nextInt(max - min) + min;
+    	int premium = GenUtil.rng.nextInt(max - min) + min;
+    	int bioDiesel = GenUtil.rng.nextInt(max - min) + min;
+    	int ethanol = GenUtil.rng.nextInt(max - min) + min;
+    	
+    	GasTank gasTank = new GasTank(regular, midGrade, premium, bioDiesel, ethanol);
+    	gasStation.setGasTank(gasTank);
     }
 
     private void generateGasStationInventory(GasStation gasStation) {

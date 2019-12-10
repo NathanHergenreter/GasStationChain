@@ -11,6 +11,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static java.util.Collections.shuffle;
@@ -29,6 +31,8 @@ public class ManagerHelper {
     private static RewardMembershipAccountService _rewardMembershipAccountService = ServiceAutoWire.getBean(RewardMembershipAccountService.class);
     private static ReceiptService _receiptService = ServiceAutoWire.getBean(ReceiptService.class);
     private static SaleService _saleService = ServiceAutoWire.getBean(SaleService.class);
+    private static GasTankService gasTankService = ServiceAutoWire.getBean(GasTankService.class);
+    private static TaxService _taxService = ServiceAutoWire.getBean(TaxService.class);
 
     @MethodHelp("args should be ordered: username, password, name, wagesHourly, hoursWeekly")
     @ManagerUser(command = "AddCashier", parameterEquation = "p == 5")
@@ -322,6 +326,85 @@ public class ManagerHelper {
         return endOfShift;
     }
 
+    @MethodHelp("args: -<type> -<item>\n")
+    @ManagerUser(command = "ApplyItemTax", parameterEquation = "p == 2")
+    public static void applyItemTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        String name = args.get(1);
+
+        if (_taxService.findByType(type) != null) {
+            if (_itemService.findByName(name) != null) {
+                _itemService.findByName(name).setTax(_taxService.findByType(type));
+            }
+            else {
+                throw new Exception("Employee " + name + " does not exist");
+            }
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type> -<employee>\n")
+    @ManagerUser(command = "ApplyEmployeeTax", parameterEquation = "p == 2")
+    public static void applyEmployeeTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        String name = args.get(1);
+        if (_taxService.findByType(type) != null) {
+            if (_cashierService.findByUsername(name) != null) {
+                _cashierService.findByUsername(name).setTax(_taxService.findByType(type));
+            }
+            else {
+                throw new Exception("Employee " + name + " does not exist");
+            }
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type> -<multiplier>\n")
+    @ManagerUser(command = "AddTax", parameterEquation = "p == 2")
+    public static void addTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        Float multiplier = Float.parseFloat(args.get(1));
+
+        if (_taxService.findByType(type) == null) {
+            Tax tax = new Tax(type, multiplier);
+            _taxService.save(tax);
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type> -<multiplier>\n")
+    @ManagerUser(command = "UpdateTax", parameterEquation = "p == 2")
+    public static void updateTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+        Float multiplier = Float.parseFloat(args.get(1));
+
+        if (_taxService.findByType(type) != null) {
+            _taxService.findByType(type).setMultiplier(multiplier);
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
+    @MethodHelp("args: -<type>\n")
+    @ManagerUser(command = "DeleteTax", parameterEquation = "p == 1")
+    public static void deleteTax(List<String> args, Manager manager) throws Exception {
+        String type = args.get(0);
+
+        if (_taxService.findByType(type) != null) {
+            _taxService.delete(_taxService.findByType(type));
+        }
+        else {
+            throw new Exception("Tax type " + type + " does not exist");
+        }
+    }
+
     @MethodHelp("args: -<item> -<priceMultiplier> -<startDate> -<endDate>\n")
     @ManagerUser(command = "AddPromotion", parameterEquation = "p == 4")
     public static void addPromotion(List<String> args, Manager manager) throws Exception {
@@ -413,7 +496,6 @@ public class ManagerHelper {
         }
     }
 
-    // TODO - check if item already exists
     @MethodHelp("args: -<item> -<suggestRetailPrice> \n")
     @ManagerUser(command = "AddItem", parameterEquation = "p == 2")
     public static void addItem(List<String> args, Manager manager) throws Exception {
@@ -427,7 +509,6 @@ public class ManagerHelper {
         }
     }
 
-    // TODO - check if inventory already contains item
     @ManagerUser(command = "AddGasStationInventory", parameterEquation = "p == 3")
     public static void addGasStationInventory(List<String> args, Manager manager) throws Exception {
 
@@ -481,8 +562,7 @@ public class ManagerHelper {
             GasStationInventory inventory = iter.next();
             if (((float) inventory.getQuantity() / (float) inventory.getMaxQuantity()) <= .5) {
                 int desiredQuantity = inventory.getMaxQuantity() - inventory.getQuantity();
-                //TODO
-//				Set<WarehouseInventory> warehouseInventory = inventory.getItem().getInWarehouses();
+
                 Set<WarehouseInventory> warehouseInventory = null;
                 Iterator<WarehouseInventory> warehouseIterator = warehouseInventory.iterator();
                 while (warehouseIterator.hasNext() && desiredQuantity > 0) {
@@ -681,4 +761,120 @@ public class ManagerHelper {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMinimum(Calendar.DAY_OF_MONTH));
         return cal.getTime();
     }
+    
+
+    @ManagerUser(command = "ResupplyGasTank", parameterEquation = "p % 2 == 0")
+    public static void resupplyGasTank(List<String> args, Manager manager) throws Exception {
+    	ArrayList<String> types = new ArrayList<String>();
+    	ArrayList<Integer> amounts = new ArrayList<Integer>();
+    	
+    	for(int idx = 0; idx < args.size() - 1; idx += 2)
+    	{
+    		types.add(args.get(idx));
+    		amounts.add(new Integer(args.get(idx + 1)));
+    	}
+
+        GasStation gasStation = manager.getStore();
+        GasTank gasTank = gasStation.getGasTank();
+        
+        for(int idx = 0; idx < types.size(); idx++)
+        {
+        	String type = types.get(idx);
+        	int amount = amounts.get(idx);
+        	boolean validFill = gasTank.fillGas(type, amount);
+
+            if(!validFill)
+                throw new Exception("Invalid gas type (" + type + ") or amount (" + amount + ")\n"
+                				  + "No fills were performed.");
+        }
+        
+        gasTankService.save(gasTank);
+    }
+
+    @MethodHelp("Enter an expense name (electric, water, sewage, garbage, insurance) followed by its new cost to update it")
+    @ManagerUser(command = "generatePromotionalDataReport", parameterEquation = "p == 0")
+    public static void generatePromotionalDataReport(List<String> args, Manager manager) throws Exception {
+        SimpleDateFormat formatter = new SimpleDateFormat("MM-dd-yyyy");
+        java.util.Date startDate = null;
+        java.util.Date endDate = null;
+        boolean isStartBeforeEnd = false;
+        while (!isStartBeforeEnd) {
+            while (startDate == null) {
+                try {
+                    System.out.println("Enter start date of report (Format MM-dd-yyyy): ");
+                    startDate = formatter.parse(UserApplication.getInput());
+                } catch (ParseException e) {
+                    System.out.println("Invalid date entered. Please use format MM-dd-yyyy");
+                }
+            }
+            while (endDate == null) {
+                try {
+                    System.out.println("Enter end date of report (Format MM-dd-yyyy): ");
+                    endDate = formatter.parse(UserApplication.getInput());
+                } catch (ParseException e) {
+                    System.out.println("Invalid date entered. Please use format MM-dd-yyyy");
+                }
+            }
+
+            isStartBeforeEnd = startDate.before(endDate);
+            if (!isStartBeforeEnd) {
+                System.out.println("Start date must be before end date. Please re-enter valid dates");
+                startDate = null;
+                endDate = null;
+            }
+        }
+        Set<Promotion> promotions = _promotionService.findAllPromotionsInTimePeriod(startDate, endDate, manager.getStore());
+        StringBuilder sb = new StringBuilder();
+        int numOfWeeksInReport = weeksBetweenDates(startDate, endDate);
+        for (Promotion p : promotions) {
+            List<Sale> sales = _saleService.findAllBySellLocationAndAndItem(manager.getStore(), p.getItem());
+            int totalNumSalesAllTime = 0;
+            int totalDollarsSalesAllTime = 0;
+            int totalNumSalesDuringPeriod = 0;
+            int totalDollarsSalesDuringPeriod = 0;
+            java.util.Date firstSaleDate = formatter.parse("01-01-2100");
+            java.util.Date lastSaleDate = formatter.parse("01-01-1970");
+            for (Sale s : sales) {
+                if (dateAfterOrSame(s.getSellDate(), startDate) && dateAfterOrSame(endDate, s.getSellDate())) {
+                    totalNumSalesDuringPeriod++;
+                    totalDollarsSalesDuringPeriod += s.getPrice();
+                } else {
+                    totalNumSalesAllTime++;
+                    totalDollarsSalesAllTime += s.getPrice();
+                    if (s.getSellDate().before(firstSaleDate)) {
+                        firstSaleDate = s.getSellDate();
+                    }
+                    if (s.getSellDate().after(lastSaleDate)) {
+                        lastSaleDate = s.getSellDate();
+                    }
+                }
+            }
+            int numberOfWeeksAllSales = weeksBetweenDates(firstSaleDate, lastSaleDate);
+            double averagePerWeekPromoDollar = (double) totalDollarsSalesDuringPeriod / numOfWeeksInReport / 100.0;
+            double averagePerWeekPromoUnits = (double) totalNumSalesDuringPeriod / numOfWeeksInReport;
+            double averagePerWeekAllTimeDollar = (double) totalDollarsSalesAllTime / numberOfWeeksAllSales / 100.0;
+            double averagePerWeekAllTimeUnits = (double) totalNumSalesAllTime / numberOfWeeksAllSales;
+            double percentIncreaseInUnitSales = averagePerWeekPromoUnits / averagePerWeekAllTimeUnits;
+            double totalIncreaseRevenue = totalDollarsSalesDuringPeriod / 100.0 - (totalNumSalesAllTime * p.getItem().getSuggestRetailPrice() / 150.0) - (averagePerWeekAllTimeDollar * numOfWeeksInReport - (averagePerWeekAllTimeUnits * p.getItem().getSuggestRetailPrice() / 150.0));
+            sb.append(String.format("| %tD | %tD | %15s | %,6d | $%7.2f | %4.1f | %6.2f | $%4.1f | $%6.2f | %3.2f%% | $%6.2f |\n", p.getStartDate(), p.getEndDate(), p.getItem().getName(), totalNumSalesDuringPeriod, totalDollarsSalesDuringPeriod / 100.0, averagePerWeekPromoUnits, averagePerWeekPromoDollar, averagePerWeekAllTimeDollar, averagePerWeekPromoUnits, percentIncreaseInUnitSales, totalIncreaseRevenue));
+        }
+        System.out.println(sb.toString());
+    }
+
+    private static boolean dateAfterOrSame(java.util.Date date1, java.util.Date date2) {
+        return date1.after(date2) || date1.equals(date2);
+    }
+
+    private static int weeksBetweenDates(java.util.Date start, java.util.Date end) {
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(start);
+
+        int weeks = 0;
+        while (cal.getTime().before(end)) {
+            cal.add(Calendar.WEEK_OF_YEAR, 1);
+            weeks++;
+        }
+        return weeks;
+    }
+
 }
