@@ -44,6 +44,7 @@ public class GasStationGenerator {
 
             generateManager(gasStation);
 
+            generateGasTank(gasStation);
 
             service.gasStation().save(gasStation);
 
@@ -197,6 +198,18 @@ public class GasStationGenerator {
         manager.setStore(gasStation);
         gasStation.setManager(manager);
         service.manager().save(manager);
+    }
+    
+    private void generateGasTank(GasStation gasStation) {
+    	int min = 50; int max = 200;
+    	int regular = GenUtil.rng.nextInt(max - min) + min;
+    	int midGrade = GenUtil.rng.nextInt(max - min) + min;
+    	int premium = GenUtil.rng.nextInt(max - min) + min;
+    	int bioDiesel = GenUtil.rng.nextInt(max - min) + min;
+    	int ethanol = GenUtil.rng.nextInt(max - min) + min;
+    	
+    	GasTank gasTank = new GasTank(regular, midGrade, premium, bioDiesel, ethanol);
+    	gasStation.setGasTank(gasTank);
     }
 
     private void generateGasStationInventory(GasStation gasStation) {

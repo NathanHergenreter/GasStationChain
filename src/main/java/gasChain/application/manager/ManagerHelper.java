@@ -688,7 +688,7 @@ public class ManagerHelper {
     	ArrayList<String> types = new ArrayList<String>();
     	ArrayList<Integer> amounts = new ArrayList<Integer>();
     	
-    	for(int idx = 0; idx < args.size() - 2; idx += 2)
+    	for(int idx = 0; idx < args.size() - 1; idx += 2)
     	{
     		types.add(args.get(idx));
     		amounts.add(new Integer(args.get(idx + 1)));
