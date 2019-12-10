@@ -179,6 +179,10 @@ public class CashierHelper {
                 }
             }
 
+            if (item.getTax() != null) {
+                price += (int)  (price * item.getTax().getMultiplier());
+            }
+
             total += price;
 
             Sale s = new Sale(item, gasStation, receipt, price);
