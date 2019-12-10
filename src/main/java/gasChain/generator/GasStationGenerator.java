@@ -129,7 +129,7 @@ public class GasStationGenerator {
                 Tax after promotion because why not right?
                  */
                 if (item.getTax() != null)
-                    price += price * item.getTax().getMultiplier();
+                    price += (int) (price * item.getTax().getMultiplier());
 
                 Sale sale = new Sale(item, gasStation, receipt, price, date);
 
